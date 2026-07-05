@@ -36,6 +36,7 @@
 - [ ] 공개 커버 사진(현재 explore는 그라데이션) — 공개용 버킷 or 서명 정책 재설계
 - [ ] app-dev: 모바일 앱(Expo) 동일 흐름
 - [ ] uiux-reviewer 정식 패스 + 접근성 보강
+- [ ] AdSense 도입 — 공개 랜딩/정책 페이지 + /explore 공개화 선행 필요 (plan: docs/plan/03-adsense.md)
 - [ ] 사진 업로드 (Supabase Storage `date-photos` 버킷 연동)
 - [ ] 커플 연결 실테스트(두 계정) + 파트너 아바타 실제 표시
 - [ ] app-dev: 모바일 동일 흐름

@@ -25,11 +25,12 @@
 - [x] **배포: `maps-web` → blueteams 팀, GitHub 자동배포, `maps.weourus.xyz` 라이브** (Root Directory=apps/web)
 
 ## 다음 (Next)   ← 여기부터
-- [ ] **DB 적용** (Blocked 해제 후): 0001을 라이브 반영
-- [ ] **Kakao provider 설정** (Blocked 해제 후): Supabase Auth에 Kakao 켜기
-- [ ] designer: DESIGN.md 확정 + 다크 토큰 + Atomic 컴포넌트 스펙
-- [ ] db-dev/dba: 0002 (places/date_logs/date_log_places/routes) + Storage 버킷
-- [ ] server-dev: date-logs 엔드포인트 / web·app-dev: 실데이터 피드 + 지도(경로)
+- [ ] Kakao 플랫폼 → Web 사이트 도메인에 `https://maps.weourus.xyz` 추가 (프로덕션 지도용; 로컬은 localhost:3000)
+- [ ] 기록 상세 페이지 `/logs/[id]` (지도 + 장소 + 메모)
+- [ ] 사진 업로드 (Supabase Storage `date-photos` 버킷 연동)
+- [ ] 커플 연결 실테스트(두 계정) + 파트너 아바타 실제 표시
+- [ ] app-dev: 모바일 동일 흐름
+- [ ] (나중) api 서버리스 + Kakao 장소검색 프록시 + map-api.weourus.xyz
 
 ## 막힘 (Blocked)
 - [ ] **0001 라이브 적용** — 자동 적용이 프로덕션 DB 쓰기라 auto-mode에서 차단됨. 해결: 사용자가 승인해 CLI로 적용하거나, Supabase SQL Editor에 `supabase/migrations/0001_init.sql` 붙여넣기.

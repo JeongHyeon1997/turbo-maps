@@ -14,17 +14,23 @@
 - [x] Vercel 프로젝트 연결 + env 밀어넣기: `maps-web`·`maps-api` (production/development). 시크릿은 api에만. 스크립트: `scripts/{sync,pull}-env-*.sh`
 
 ## 진행중 (Doing)
-- (없음)
+- [ ] 인증+커플 수직 슬라이스. 코드 완성(아래 완료), **막힘 2건** 남음 → Blocked 참고.
+
+## 완료 (이번 슬라이스)
+- [x] db-dev: `0001_init` 마이그레이션 작성 (profiles/couples + 초대코드 join_couple 함수 + RLS, public/test) — SCHEMA.md 갱신
+- [x] schema-dev: `@maps/shared` profile/couple Zod 스키마
+- [x] web-dev: 소셜로그인 페이지(`/login`, Kakao/Google) + `/auth/callback`(세션교환+프로필 upsert) + 세션 미들웨어 + `/couple/connect`(초대코드 생성/입력)
 
 ## 다음 (Next)   ← 여기부터
-- [ ] planner: MVP 확정 — 소셜로그인 **적극 사용**(Kakao 우선 + Google/Apple), 사진=Supabase Storage, 커플연결=초대코드 — (plan: docs/plan/00-mvp.md)
-- [ ] designer: DESIGN.md 확정 + 다크 토큰 + Atomic 컴포넌트 스펙 (반응형 브레이크포인트 규칙 포함)
-- [ ] db-dev: 0001 마이그레이션 (profiles/couples/places/date_logs/date_log_places/routes) + RLS + test 스키마 — SCHEMA.md 갱신
-- [ ] dba: 위 마이그레이션 라이브 적용 + 인덱스/Storage 버킷/RLS 성능
-- [ ] schema-dev: @maps/shared 스키마 (couple/place/dateLog/route)
-- [ ] server-dev: couples/places/date-logs 엔드포인트
-- [ ] web-dev / app-dev: 소셜로그인 → 커플연결 → 피드(실데이터) → 지도(경로) 화면
-- [ ] build-qa: 각 단계 후 typecheck/lint/build 게이트
+- [ ] **DB 적용** (Blocked 해제 후): 0001을 라이브 반영
+- [ ] **Kakao provider 설정** (Blocked 해제 후): Supabase Auth에 Kakao 켜기
+- [ ] designer: DESIGN.md 확정 + 다크 토큰 + Atomic 컴포넌트 스펙
+- [ ] db-dev/dba: 0002 (places/date_logs/date_log_places/routes) + Storage 버킷
+- [ ] server-dev: date-logs 엔드포인트 / web·app-dev: 실데이터 피드 + 지도(경로)
+
+## 막힘 (Blocked)
+- [ ] **0001 라이브 적용** — 자동 적용이 프로덕션 DB 쓰기라 auto-mode에서 차단됨. 해결: 사용자가 승인해 CLI로 적용하거나, Supabase SQL Editor에 `supabase/migrations/0001_init.sql` 붙여넣기.
+- [ ] **Kakao 로그인 실동작** — Supabase 대시보드 Auth → Providers → Kakao 활성화 필요. **Kakao REST API 키 + Client Secret** 필요(지금 받은 건 JavaScript 키). Redirect: `https://giilijttitajvygdosbe.supabase.co/auth/v1/callback` 를 Kakao 앱에 등록.
 
 ## 막힘 (Blocked)
 - (없음)

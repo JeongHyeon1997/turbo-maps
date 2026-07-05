@@ -38,7 +38,7 @@ maps/
 ├── docs/           기획·진행 문서 (planner 소유) — 세션이 끊겨도 이어서 작업하는 근거
 ├── DESIGN.md       디자인 시스템 방향 (designer 소유)
 └── .claude/
-    ├── agents/     역할별 서브에이전트 (planner/designer/web/app/server/db/dba/schema/reviewer/build-qa)
+    ├── agents/     역할별 서브에이전트 (planner/designer/web/app/server/db/dba/schema/reviewer/uiux-reviewer/build-qa)
     └── skills/     Claude Code skills (see below)
 ```
 
@@ -107,6 +107,7 @@ Prefer invoking a skill over ad-hoc scaffolding when the task matches one.
 | `dba` | Sonnet | 라이브 Supabase에 스키마 *적용* + 인덱스/성능 최적화·운영 |
 | `schema-dev` | Sonnet | packages/shared Zod 스키마 |
 | `reviewer` | Opus | 정확성·규칙 준수·중복 검수 (읽기 전용) |
+| `uiux-reviewer` | Opus | 디자인 일관성·반응형·접근성·사용성 검사 (읽기 전용) |
 | `build-qa` | Sonnet | build/lint/typecheck/스모크 QA, 회귀 확인 |
 
 ## docs 진행 규칙 (세션이 끊겨도 이어서)

@@ -25,8 +25,11 @@
 - [x] **배포: `maps-web` → blueteams 팀, GitHub 자동배포, `maps.weourus.xyz` 라이브** (Root Directory=apps/web)
 
 ## 다음 (Next)   ← 여기부터
+- [ ] **전체 지도 `/map`** — 모든 방문지 마커 (KakaoMap 재사용, 스키마 무관) — (plan: docs/plan/01-calendar-map-public.md)
+- [ ] **캘린더 `/calendar`** — 기록 있는 날 표시 → 클릭 (스키마 무관)
+- [ ] **퍼블릭 공간 `/explore`** — 0004(visibility) + 공개 RLS + 공개 피드/토글 (큰 작업, 프라이버시 설계)
 - [ ] Kakao 플랫폼 → Web 사이트 도메인에 `https://maps.weourus.xyz` 추가 (프로덕션 지도용; 로컬은 localhost:3000)
-- [ ] 기록 상세 페이지 `/logs/[id]` (지도 + 장소 + 메모)
+- [ ] 기록 상세 페이지 `/logs/[id]` (지도 + 장소 + 메모 + 사진)
 - [ ] 사진 업로드 (Supabase Storage `date-photos` 버킷 연동)
 - [ ] 커플 연결 실테스트(두 계정) + 파트너 아바타 실제 표시
 - [ ] app-dev: 모바일 동일 흐름

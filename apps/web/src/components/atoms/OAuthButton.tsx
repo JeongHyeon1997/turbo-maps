@@ -12,7 +12,7 @@ export function OAuthButton({ label, onClick, disabled, bg, fg = '#ffffff' }: OA
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-full rounded-xl px-4 py-3 text-sm font-semibold transition-opacity disabled:opacity-60"
+      className="w-full rounded-xl border border-black/10 px-4 py-3 text-sm font-semibold transition-opacity disabled:opacity-60"
       style={{ backgroundColor: bg, color: fg }}
     >
       {label}

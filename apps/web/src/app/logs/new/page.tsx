@@ -19,7 +19,11 @@ export default function NewLogPage() {
   const [date, setDate] = useState('');
   useEffect(() => {
     setDate(new Date().toISOString().slice(0, 10));
-  }, []);
+    // Redirect to login if not signed in (don't let the form fill then fail).
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) router.replace('/login');
+    });
+  }, [supabase, router]);
   const [title, setTitle] = useState('');
   const [memo, setMemo] = useState('');
   const [places, setPlaces] = useState<Selected[]>([]);

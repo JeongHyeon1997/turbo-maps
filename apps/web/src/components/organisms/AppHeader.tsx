@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Avatar } from '@/components/atoms';
 
 export interface AppHeaderProps {
@@ -5,10 +6,9 @@ export interface AppHeaderProps {
 }
 
 const nav = [
-  { label: '홈', href: '#' },
-  { label: '지도', href: '#' },
-  { label: '기록', href: '#' },
-];
+  { label: '홈', href: '/' },
+  { label: '기록 추가', href: '/logs/new' },
+] as const;
 
 /** Full-width sticky top bar. Nav links appear on desktop; avatars always. */
 export function AppHeader({ coupleInitials = ['J', 'H'] }: AppHeaderProps) {
@@ -19,13 +19,13 @@ export function AppHeader({ coupleInitials = ['J', 'H'] }: AppHeaderProps) {
           <span className="text-xl font-extrabold tracking-tight text-brand">maps</span>
           <nav className="hidden gap-6 md:flex">
             {nav.map((n) => (
-              <a
+              <Link
                 key={n.label}
                 href={n.href}
                 className="text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
               >
                 {n.label}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>

@@ -9,11 +9,15 @@ export default function LoginPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState<string | null>(null);
 
-  const signIn = async (provider: Provider, scopes?: string) => {
+  // NOTE: Supabase's Kakao provider hard-codes scope to
+  // "account_email profile_image profile_nickname" — a client `scopes` option
+  // only appends, it cannot shrink it. So those three consent items MUST be
+  // enabled in the Kakao Developers console (동의항목), else Kakao errors.
+  const signIn = async (provider: Provider) => {
     setLoading(provider);
     await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback`, scopes },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
   };
 
@@ -31,7 +35,7 @@ export default function LoginPage() {
       <div className="flex flex-col gap-3">
         <OAuthButton
           label={loading === 'kakao' ? '카카오로 이동 중…' : '카카오로 시작하기'}
-          onClick={() => signIn('kakao', 'profile_nickname')}
+          onClick={() => signIn('kakao')}
           disabled={loading !== null}
           bg="#FEE500"
           fg="#191600"

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/templates';
 import { DateLogFeed } from '@/components/organisms';
-import { SectionHeader } from '@/components/molecules';
+import { SectionHeader, ConnectBanner } from '@/components/molecules';
 import { Button } from '@/components/atoms';
 import { mockDateLogs } from '@/lib/mock/date-logs';
 
@@ -12,18 +12,19 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Auth gate: logged-out → login, logged-in but not connected → couple connect.
+  // Must be logged in; couple connection is encouraged but not required.
   if (!user) redirect('/login');
   const { data: couple } = await supabase
     .from('couples')
     .select('status')
     .or(`partner_a.eq.${user.id},partner_b.eq.${user.id}`)
     .maybeSingle();
-  if (!couple || couple.status !== 'connected') redirect('/couple/connect');
+  const connected = couple?.status === 'connected';
 
   return (
     <AppShell>
       <div className="flex flex-col gap-6 md:gap-8">
+        {!connected && <ConnectBanner />}
         <div className="flex flex-col gap-1">
           <p className="text-sm text-text-muted">우리가 함께한 날</p>
           <p className="text-2xl font-extrabold text-text-primary md:text-4xl">

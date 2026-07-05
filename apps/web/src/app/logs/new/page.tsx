@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { KakaoMap, PlaceSearch, type KakaoPlace, type MapMarker } from '@/components/organisms';
@@ -14,8 +14,12 @@ export default function NewLogPage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
-  const today = new Date().toISOString().slice(0, 10);
-  const [date, setDate] = useState(today);
+  // Set default date on the client only — using new Date() during SSR would
+  // mismatch the client on hydration.
+  const [date, setDate] = useState('');
+  useEffect(() => {
+    setDate(new Date().toISOString().slice(0, 10));
+  }, []);
   const [title, setTitle] = useState('');
   const [memo, setMemo] = useState('');
   const [places, setPlaces] = useState<Selected[]>([]);

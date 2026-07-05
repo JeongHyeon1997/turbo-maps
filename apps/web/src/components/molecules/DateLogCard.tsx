@@ -2,10 +2,10 @@ import { Tag, HeartRating } from '@/components/atoms';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 
 function formatDate(iso: string) {
-  const d = new Date(iso);
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(
-    d.getDate(),
-  ).padStart(2, '0')}`;
+  // Parse the yyyy-mm-dd string directly — avoids timezone/locale drift that
+  // would cause SSR/client hydration mismatches.
+  const [y, m, d] = iso.slice(0, 10).split('-');
+  return `${y}.${m}.${d}`;
 }
 
 /** One date-log entry in the feed: gradient cover + meta + places. */

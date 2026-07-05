@@ -31,7 +31,7 @@ export function DateLogCard({ log }: { log: MockDateLog }) {
           <HeartRating value={log.rating} />
         </div>
 
-        <p className="text-sm leading-relaxed text-text-secondary">{log.memo}</p>
+        {log.memo && <p className="text-sm leading-relaxed text-text-secondary">{log.memo}</p>}
 
         <div className="flex flex-wrap gap-1.5 pt-1">
           {log.places.map((p) => (
@@ -40,6 +40,8 @@ export function DateLogCard({ log }: { log: MockDateLog }) {
             </Tag>
           ))}
         </div>
+
+        {log.author && <p className="pt-1 text-xs text-text-muted">by {log.author}</p>}
       </div>
     </article>
   );

@@ -2,3 +2,4 @@
 export { SectionHeader } from './SectionHeader';
 export { DateLogCard } from './DateLogCard';
 export { ConnectBanner } from './ConnectBanner';
+export { ProfileActions } from './ProfileActions';

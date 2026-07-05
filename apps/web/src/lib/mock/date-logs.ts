@@ -17,6 +17,8 @@ export interface MockDateLog {
   cover: [string, string];
   /** signed URL of the cover photo, when one was uploaded */
   coverImage?: string | null;
+  /** author nickname — shown on the public explore feed */
+  author?: string;
 }
 
 export const mockDateLogs: MockDateLog[] = [

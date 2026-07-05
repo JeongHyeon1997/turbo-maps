@@ -29,6 +29,7 @@ export default function NewLogPage() {
   const [places, setPlaces] = useState<Selected[]>([]);
   const [cover, setCover] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [isPublic, setIsPublic] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -118,6 +119,7 @@ export default function NewLogPage() {
           title: title || null,
           memo: memo || null,
           cover_photo_path: coverPath,
+          visibility: isPublic ? 'public' : 'private',
         })
         .select('id')
         .single();
@@ -233,6 +235,21 @@ export default function NewLogPage() {
           rows={3}
           placeholder="그날의 기억을 적어보세요"
           className="rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand"
+        />
+      </label>
+
+      <label className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3">
+        <span className="flex flex-col">
+          <span className="text-sm font-medium text-text-primary">탐색에 공개</span>
+          <span className="text-xs text-text-muted">
+            다른 커플이 장소·평점을 볼 수 있어요 (개인 메모는 비공개)
+          </span>
+        </span>
+        <input
+          type="checkbox"
+          checked={isPublic}
+          onChange={(e) => setIsPublic(e.target.checked)}
+          className="h-5 w-5 accent-brand"
         />
       </label>
 

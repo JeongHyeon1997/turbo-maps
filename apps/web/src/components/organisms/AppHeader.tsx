@@ -7,7 +7,9 @@ export interface AppHeaderProps {
 
 const nav = [
   { label: '홈', href: '/' },
-  { label: '기록 추가', href: '/logs/new' },
+  { label: '지도', href: '/map' },
+  { label: '캘린더', href: '/calendar' },
+  { label: '탐색', href: '/explore' },
 ] as const;
 
 /** Full-width sticky top bar. Nav links appear on desktop; avatars always. */

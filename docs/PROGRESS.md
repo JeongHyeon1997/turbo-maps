@@ -11,7 +11,7 @@
 - [x] docs 이어가기 프로토콜 정립 (`docs/README.md`)
 - [x] 웹 로컬 실행 확인 (localhost:3000)
 - [x] 첫 웹 화면: 홈 피드 (Atomic 컴포넌트 + 토큰 + 목업) — **반응형**(모바일 1열 / PC 2~3열 그리드 + 상단 내비)
-- [x] Vercel env 동기화 스크립트 (`scripts/sync-env-to-vercel.sh`)
+- [x] Vercel 프로젝트 연결 + env 밀어넣기: `maps-web`·`maps-api` (production/development). 시크릿은 api에만. 스크립트: `scripts/{sync,pull}-env-*.sh`
 
 ## 진행중 (Doing)
 - (없음)

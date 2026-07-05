@@ -13,8 +13,10 @@ export interface MockDateLog {
   memo: string;
   rating: number; // 0-5
   places: MockPlace[];
-  /** two tailwind color stops for the cover gradient (no image assets yet) */
+  /** two color stops for the cover gradient (fallback when no photo) */
   cover: [string, string];
+  /** signed URL of the cover photo, when one was uploaded */
+  coverImage?: string | null;
 }
 
 export const mockDateLogs: MockDateLog[] = [

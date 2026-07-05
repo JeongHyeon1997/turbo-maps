@@ -19,10 +19,11 @@ interface Row {
   date: string;
   title: string | null;
   memo: string | null;
+  cover_photo_path: string | null;
   date_log_places: { visit_order: number; rating: number | null; places: { name: string; category: string | null } | null }[];
 }
 
-function toCard(row: Row, i: number): MockDateLog {
+function toCard(row: Row, i: number, coverUrl?: string | null): MockDateLog {
   const dlp = [...(row.date_log_places ?? [])].sort((a, b) => a.visit_order - b.visit_order);
   const ratings = dlp.map((p) => p.rating ?? 0).filter((r) => r > 0);
   const avg = ratings.length ? Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
@@ -34,6 +35,7 @@ function toCard(row: Row, i: number): MockDateLog {
     rating: avg,
     places: dlp.map((p) => ({ name: p.places?.name ?? '', category: p.places?.category ?? '' })),
     cover: COVERS[i % COVERS.length]!,
+    coverImage: coverUrl ?? null,
   };
 }
 
@@ -53,10 +55,26 @@ export default async function HomePage() {
 
   const { data: rows } = await supabase
     .from('date_logs')
-    .select('id, date, title, memo, date_log_places(visit_order, rating, places(name, category))')
+    .select(
+      'id, date, title, memo, cover_photo_path, date_log_places(visit_order, rating, places(name, category))',
+    )
     .order('date', { ascending: false });
 
-  const logs = ((rows ?? []) as unknown as Row[]).map(toCard);
+  const typed = (rows ?? []) as unknown as Row[];
+
+  // Sign cover-photo paths (private bucket) so the browser can render them.
+  const paths = typed.map((r) => r.cover_photo_path).filter((p): p is string => !!p);
+  const signed = new Map<string, string>();
+  if (paths.length) {
+    const { data: urls } = await supabase.storage.from('date-photos').createSignedUrls(paths, 3600);
+    urls?.forEach((u) => {
+      if (u.path && u.signedUrl) signed.set(u.path, u.signedUrl);
+    });
+  }
+
+  const logs = typed.map((r, i) =>
+    toCard(r, i, r.cover_photo_path ? signed.get(r.cover_photo_path) : null),
+  );
 
   return (
     <AppShell>

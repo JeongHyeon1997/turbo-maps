@@ -27,8 +27,18 @@ export default function NewLogPage() {
   const [title, setTitle] = useState('');
   const [memo, setMemo] = useState('');
   const [places, setPlaces] = useState<Selected[]>([]);
+  const [cover, setCover] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const onPickCover = (file: File | null) => {
+    setCover(file);
+    setCoverPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return file ? URL.createObjectURL(file) : null;
+    });
+  };
 
   const markers: MapMarker[] = places.map((p) => ({ lat: p.lat, lng: p.lng, name: p.name }));
 
@@ -88,9 +98,27 @@ export default function NewLogPage() {
         placeIds.push(pl.id);
       }
 
+      // Upload cover photo to the user's folder (matches storage RLS).
+      let coverPath: string | null = null;
+      if (cover) {
+        const safe = cover.name.replace(/[^\w.-]/g, '_');
+        coverPath = `${user.id}/${crypto.randomUUID()}-${safe}`;
+        const { error: upErr } = await supabase.storage
+          .from('date-photos')
+          .upload(coverPath, cover, { upsert: true, contentType: cover.type });
+        if (upErr) throw upErr;
+      }
+
       const { data: log, error: lErr } = await supabase
         .from('date_logs')
-        .insert({ couple_id: couple!.id, author_id: user.id, date, title: title || null, memo: memo || null })
+        .insert({
+          couple_id: couple!.id,
+          author_id: user.id,
+          date,
+          title: title || null,
+          memo: memo || null,
+          cover_photo_path: coverPath,
+        })
         .select('id')
         .single();
       if (lErr) throw lErr;
@@ -145,6 +173,24 @@ export default function NewLogPage() {
           className="rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand"
         />
       </label>
+
+      <div className="flex flex-col gap-1.5">
+        <span className="text-sm font-medium text-text-secondary">대표 사진</span>
+        <label className="flex cursor-pointer items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-surface">
+          {coverPreview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={coverPreview} alt="대표 사진 미리보기" className="h-40 w-full object-cover" />
+          ) : (
+            <span className="py-10 text-sm text-text-muted">사진 추가 (선택)</span>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => onPickCover(e.target.files?.[0] ?? null)}
+          />
+        </label>
+      </div>
 
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium text-text-secondary">방문한 곳</span>

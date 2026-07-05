@@ -5,7 +5,7 @@
 
 **Project:** `giilijttitajvygdosbe` · **Schemas:** `public` (prod), `test` (test data) — kept in sync.
 
-Applied migrations: `0001_init`, `0002_date_logs`. Mirrored in `public` and `test`.
+Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`. Mirrored in `public` and `test`.
 
 ## Tables
 
@@ -44,7 +44,7 @@ id, kakao_place_id (unique), name, category, address, lat, lng, created_at.
 RLS: any authenticated user may select/insert.
 
 ### `date_logs` (couple-scoped)
-id, couple_id → couples, author_id → auth.users, date, title, memo, created_at.
+id, couple_id → couples, author_id → auth.users, date, title, memo, cover_photo_path (date-photos 경로), created_at.
 Index `date_logs_couple_date_idx (couple_id, date desc)`.
 
 ### `date_log_places` (date_log ↔ place)

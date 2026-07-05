@@ -13,8 +13,12 @@ export function DateLogCard({ log }: { log: MockDateLog }) {
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
       <div
-        className="flex h-40 items-end p-4"
-        style={{ backgroundImage: `linear-gradient(135deg, ${log.cover[0]}, ${log.cover[1]})` }}
+        className="flex h-40 items-end bg-cover bg-center p-4"
+        style={{
+          backgroundImage: log.coverImage
+            ? `url(${log.coverImage})`
+            : `linear-gradient(135deg, ${log.cover[0]}, ${log.cover[1]})`,
+        }}
       >
         <span className="rounded-full bg-black/20 px-3 py-1 text-xs font-medium text-white backdrop-blur">
           {formatDate(log.date)}

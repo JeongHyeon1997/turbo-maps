@@ -25,8 +25,11 @@ cd "$DIR"
 grep -vE '^\s*#|^\s*$' "$(basename "$ENV_FILE")" | while IFS='=' read -r key val; do
   key="$(echo "$key" | xargs)"
   [ -z "$key" ] && continue
+  # skip Vercel-managed vars injected by `vercel link` (OIDC token, etc.)
+  case "$key" in VERCEL_*) echo "  · skip $key (Vercel-managed)"; continue;; esac
   # strip surrounding quotes
   val="${val%\"}"; val="${val#\"}"
+  [ -z "$val" ] && { echo "  · skip $key (empty)"; continue; }
   echo "  + $key"
   # remove existing var (ignore failure), then add
   bunx vercel env rm "$key" "$TARGET" -y >/dev/null 2>&1 || true

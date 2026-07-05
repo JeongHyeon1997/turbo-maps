@@ -5,7 +5,7 @@
 
 **Project:** `giilijttitajvygdosbe` · **Schemas:** `public` (prod), `test` (test data) — kept in sync.
 
-Applied migrations: `0001_init`. Mirrored in `public` and `test`.
+Applied migrations: `0001_init`, `0002_date_logs`. Mirrored in `public` and `test`.
 
 ## Tables
 
@@ -39,5 +39,27 @@ Indexes: `couples_partner_a_idx`, `couples_partner_b_idx`.
 - **profiles**: select own row + connected partner's row; insert/update own only.
 - **couples**: select/update only the two partners; insert as `partner_a = auth.uid()`. Joining goes through `join_couple()` (definer) so a stranger can't read a couple by code.
 
-## Not yet migrated (next: 0002)
-`places`, `date_logs`, `date_log_places`, `routes` + Storage bucket for photos (dba).
+### `places` (shared reference — Kakao place)
+id, kakao_place_id (unique), name, category, address, lat, lng, created_at.
+RLS: any authenticated user may select/insert.
+
+### `date_logs` (couple-scoped)
+id, couple_id → couples, author_id → auth.users, date, title, memo, created_at.
+Index `date_logs_couple_date_idx (couple_id, date desc)`.
+
+### `date_log_places` (date_log ↔ place)
+id, date_log_id → date_logs, place_id → places, visit_order, rating (0-5), memo.
+Index `date_log_places_log_idx (date_log_id)`.
+
+### `routes` (one per date_log)
+id, date_log_id (unique) → date_logs, coordinates jsonb, created_at.
+
+RLS (date_logs / date_log_places / routes): FOR ALL, couple-scoped — only `partner_a`/`partner_b`
+of the owning couple. `date_log_places`/`routes` inherit via join to `date_logs → couples`.
+
+## Storage
+- Bucket `date-photos` (private). Policy: authenticated users read/write within their own
+  top-level folder (`<uid>/…`). Global (not schema-mirrored).
+
+## Not yet migrated
+그 외 확장(좋아요/댓글/공유 등)은 향후 마이그레이션.

@@ -6,6 +6,5 @@ export const SHARED_PACKAGE = '@maps/shared' as const;
 
 export * from './schemas/profile';
 export * from './schemas/couple';
-// export * from './schemas/place';
-// export * from './schemas/date-log';
-// export * from './schemas/route';
+export * from './schemas/place';
+export * from './schemas/date-log';

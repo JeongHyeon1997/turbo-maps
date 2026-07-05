@@ -7,19 +7,23 @@
 - [x] 모노레포 스캐폴딩 (Bun+Turborepo, apps/web·api·mobile, packages/shared·tokens) — morun 구조 복제 후 커플 도메인으로 정리
 - [x] Supabase 연결 배선 (project `giilijttitajvygdosbe`) + `.env` (gitignore) + Kakao JS 키
 - [x] 워밍한 디자인 방향 초안 (`DESIGN.md`) + 토큰 warm 팔레트 반영
-- [x] 9개 역할 에이전트 (`.claude/agents/`)
+- [x] 10개 역할 에이전트 (`.claude/agents/`) — dba 추가
 - [x] docs 이어가기 프로토콜 정립 (`docs/README.md`)
+- [x] 웹 로컬 실행 확인 (localhost:3000)
+- [x] 첫 웹 화면: 홈 피드 (Atomic 컴포넌트 + 토큰 + 목업) — **반응형**(모바일 1열 / PC 2~3열 그리드 + 상단 내비)
+- [x] Vercel env 동기화 스크립트 (`scripts/sync-env-to-vercel.sh`)
 
 ## 진행중 (Doing)
-- (없음 — 스캐폴딩 완료 상태)
+- (없음)
 
 ## 다음 (Next)   ← 여기부터
-- [ ] planner: MVP 범위 확정 + 데이터모델 상세화 — (plan: docs/plan/00-mvp.md)
+- [ ] planner: MVP 확정 — 소셜로그인 **적극 사용**(Kakao 우선 + Google/Apple), 사진=Supabase Storage, 커플연결=초대코드 — (plan: docs/plan/00-mvp.md)
+- [ ] designer: DESIGN.md 확정 + 다크 토큰 + Atomic 컴포넌트 스펙 (반응형 브레이크포인트 규칙 포함)
 - [ ] db-dev: 0001 마이그레이션 (profiles/couples/places/date_logs/date_log_places/routes) + RLS + test 스키마 — SCHEMA.md 갱신
+- [ ] dba: 위 마이그레이션 라이브 적용 + 인덱스/Storage 버킷/RLS 성능
 - [ ] schema-dev: @maps/shared 스키마 (couple/place/dateLog/route)
-- [ ] designer: DESIGN.md 확정 + 다크 토큰 + Atomic 컴포넌트 스펙
 - [ ] server-dev: couples/places/date-logs 엔드포인트
-- [ ] web-dev / app-dev: 인증 + 피드 + 지도(경로) 화면
+- [ ] web-dev / app-dev: 소셜로그인 → 커플연결 → 피드(실데이터) → 지도(경로) 화면
 - [ ] build-qa: 각 단계 후 typecheck/lint/build 게이트
 
 ## 막힘 (Blocked)

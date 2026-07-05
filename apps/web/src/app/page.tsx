@@ -1,13 +1,36 @@
+import { AppShell } from '@/components/templates';
+import { DateLogFeed } from '@/components/organisms';
+import { SectionHeader } from '@/components/molecules';
+import { Button } from '@/components/atoms';
+import { mockDateLogs } from '@/lib/mock/date-logs';
+
 export default function HomePage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col items-center justify-center gap-4 px-6 text-center">
-      <h1 className="text-4xl font-extrabold tracking-tight">maps</h1>
-      <p className="text-text-secondary">
-        커플이 함께한 데이트 · 맛집 · 경로를 기록하는 공간입니다.
-      </p>
-      <p className="text-sm text-text-muted">
-        스캐폴딩 완료 — 화면은 <code>web-dev</code> 역할이 <code>DESIGN.md</code> 기반으로 채워갑니다.
-      </p>
-    </main>
+    <AppShell>
+      <div className="flex flex-col gap-6 md:gap-8">
+        {/* Hero / summary — scales up on desktop */}
+        <div className="flex flex-col gap-1">
+          <p className="text-sm text-text-muted">우리가 함께한 날</p>
+          <p className="text-2xl font-extrabold text-text-primary md:text-4xl">
+            {mockDateLogs.length}개의 기록
+          </p>
+        </div>
+
+        <SectionHeader
+          title="최근 데이트"
+          action={
+            <Button href="#" variant="primary">
+              + 기록 추가
+            </Button>
+          }
+        />
+
+        <DateLogFeed logs={mockDateLogs} />
+
+        <p className="py-4 text-center text-xs text-text-muted">
+          목업 데이터입니다 · 지도·기록 작성은 다음 단계
+        </p>
+      </div>
+    </AppShell>
   );
 }

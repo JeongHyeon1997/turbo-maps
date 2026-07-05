@@ -46,7 +46,11 @@ owner: planner
 ## 완료 기준 (MVP)
 로그인 → 커플 연결 → 데이트 기록 1건 작성(장소+경로+사진) → 피드에서 열람이 web/mobile 양쪽에서 동작.
 
-## 미결 (planner가 사용자 확인)
-- 사진 저장: Supabase Storage 사용?
-- 소셜 로그인(Kakao) 포함 여부 (memory: minimal signup 선호).
-- 커플 연결 방식: 초대코드 vs 링크.
+## 확정된 결정 (2026-07-05)
+- **소셜 로그인 적극 사용** — Supabase Auth OAuth. **Kakao 우선**(국내 커플 앱), 이어서 Google·Apple. 이메일/비번은 보조. 각 provider는 Supabase 대시보드 Auth → Providers에서 설정 + redirect URL 등록. 최소 프로필(닉네임/아바타)만 수집, 나머지는 온보딩.
+- **사진 저장 = Supabase Storage** — 커플 소유 기준 버킷/정책(dba).
+- **커플 연결 = 초대 코드** — 한 명이 커플 생성 → 코드 발급 → 파트너가 코드 입력해 합류.
+
+## 반응형 규칙 (designer 확정 예정)
+- 웹: 모바일 1열 / `sm` 2열 / `lg` 3열 그리드. 헤더는 full-width, 콘텐츠 `max-w-6xl`. PC답게 내비 노출, 모바일은 숨김(추후 하단 탭/햄버거).
+- 모바일 앱(Expo): 본질적으로 모바일 뷰. 웹 모바일과 시각 언어는 공유하되 구현은 별도.

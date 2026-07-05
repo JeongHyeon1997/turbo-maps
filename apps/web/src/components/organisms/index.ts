@@ -1,2 +1,3 @@
-// Organisms barrel — standalone sections (Header, PlaceList, RouteMap…).
-export {};
+// Organisms barrel — standalone sections (Header, DateLogFeed…).
+export { AppHeader } from './AppHeader';
+export { DateLogFeed } from './DateLogFeed';

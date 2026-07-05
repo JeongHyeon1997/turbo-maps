@@ -1,2 +1,3 @@
 // Molecules barrel — 2–5 atoms composed. Import atoms downward only.
-export {};
+export { SectionHeader } from './SectionHeader';
+export { DateLogCard } from './DateLogCard';

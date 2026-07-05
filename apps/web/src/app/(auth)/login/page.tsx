@@ -9,11 +9,11 @@ export default function LoginPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState<string | null>(null);
 
-  const signIn = async (provider: Provider) => {
+  const signIn = async (provider: Provider, scopes?: string) => {
     setLoading(provider);
     await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${window.location.origin}/auth/callback`, scopes },
     });
   };
 
@@ -31,7 +31,7 @@ export default function LoginPage() {
       <div className="flex flex-col gap-3">
         <OAuthButton
           label={loading === 'kakao' ? '카카오로 이동 중…' : '카카오로 시작하기'}
-          onClick={() => signIn('kakao')}
+          onClick={() => signIn('kakao', 'profile_nickname')}
           disabled={loading !== null}
           bg="#FEE500"
           fg="#191600"

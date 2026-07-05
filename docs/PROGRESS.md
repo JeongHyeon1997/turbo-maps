@@ -30,7 +30,12 @@
 - [x] 모바일 하단 네비 `BottomNav`, 내정보 `/profile`(닉네임 수정·커플상태·로그아웃)
 - [x] 대표 사진 썸네일(0003) + hydration/UX 수정들
 
+## 이번에 완료 (서버)
+- [x] **maps-api 서버리스 배포 성공** — `apps/api/api/index.ts`(Express 어댑터) + `vercel.json`(public 출력 + rewrite), Root Directory=apps/api, Framework=Other
+- [x] `https://map-api.weourus.xyz/api/health` = 200, `/api/health/db` = ok(Supabase 연결 확인)
+
 ## 다음 (Next)   ← 여기부터
+- [ ] api CORS_ORIGINS에 `https://maps.weourus.xyz` 추가 (웹 브라우저에서 api 호출 시 필요; 현재 웹은 Supabase 직접 사용)
 - [ ] Kakao 플랫폼 → Web 사이트 도메인에 `https://maps.weourus.xyz` 추가 (프로덕션 지도용)
 - [ ] 기록 상세 페이지 `/logs/[id]` (지도 + 장소 + 메모 + 사진) — 피드/캘린더에서 진입
 - [ ] 공개 커버 사진(현재 explore는 그라데이션) — 공개용 버킷 or 서명 정책 재설계

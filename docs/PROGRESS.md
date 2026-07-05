@@ -24,12 +24,18 @@
 - [x] DB 0002 적용 (places/date_logs/date_log_places/routes + date-photos 버킷) + 공유 스키마
 - [x] **배포: `maps-web` → blueteams 팀, GitHub 자동배포, `maps.weourus.xyz` 라이브** (Root Directory=apps/web)
 
+## 이번에 완료
+- [x] 전체 지도 `/map`, 캘린더 `/calendar`
+- [x] 퍼블릭 공간 `/explore` + 0004(visibility) 공개 RLS + 작성 시 공개 토글 (메모 비공개)
+- [x] 모바일 하단 네비 `BottomNav`, 내정보 `/profile`(닉네임 수정·커플상태·로그아웃)
+- [x] 대표 사진 썸네일(0003) + hydration/UX 수정들
+
 ## 다음 (Next)   ← 여기부터
-- [ ] **전체 지도 `/map`** — 모든 방문지 마커 (KakaoMap 재사용, 스키마 무관) — (plan: docs/plan/01-calendar-map-public.md)
-- [ ] **캘린더 `/calendar`** — 기록 있는 날 표시 → 클릭 (스키마 무관)
-- [ ] **퍼블릭 공간 `/explore`** — 0004(visibility) + 공개 RLS + 공개 피드/토글 (큰 작업, 프라이버시 설계)
-- [ ] Kakao 플랫폼 → Web 사이트 도메인에 `https://maps.weourus.xyz` 추가 (프로덕션 지도용; 로컬은 localhost:3000)
-- [ ] 기록 상세 페이지 `/logs/[id]` (지도 + 장소 + 메모 + 사진)
+- [ ] Kakao 플랫폼 → Web 사이트 도메인에 `https://maps.weourus.xyz` 추가 (프로덕션 지도용)
+- [ ] 기록 상세 페이지 `/logs/[id]` (지도 + 장소 + 메모 + 사진) — 피드/캘린더에서 진입
+- [ ] 공개 커버 사진(현재 explore는 그라데이션) — 공개용 버킷 or 서명 정책 재설계
+- [ ] app-dev: 모바일 앱(Expo) 동일 흐름
+- [ ] uiux-reviewer 정식 패스 + 접근성 보강
 - [ ] 사진 업로드 (Supabase Storage `date-photos` 버킷 연동)
 - [ ] 커플 연결 실테스트(두 계정) + 파트너 아바타 실제 표시
 - [ ] app-dev: 모바일 동일 흐름

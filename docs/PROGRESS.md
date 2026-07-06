@@ -43,6 +43,11 @@
 ## 이번에 완료 (사진)
 - [x] **사진 갤러리 — 기록당 여러 장** — DB `0005_date_log_photos`(커플 스코프 RLS, public/test 미러) + `@maps/shared` Zod(`dateLogPhotoSchema`/`createDateLogPhotoSchema`) + `/logs/new` 다중 업로드(best-effort) + `PhotoGallery` organism·`PhotoThumb` molecule + `/logs/[id]` 서명·sort_order 갤러리. **단, 0005 라이브 미적용 → Blocked 참고.** (단일 커버 업로드는 이전부터 동작 중)
 
+## 이번에 완료 (브랜드·인증)
+- [x] **브랜드 "We Log"로 rebrand** — layout 메타데이터(title 템플릿 `%s · We Log`, description, OpenGraph, metadataBase), 로그인 h1, AppHeader(홈 링크화), web package.json. `@maps/*` 패키지 스코프는 내부명이라 유지.
+- [x] **인증 보강 (SSO 대응)** — 미들웨어 중앙 라우트 가드(비로그인→`/login?redirect=`, 로그인 상태로 `/login`→홈, 리프레시된 쿠키 리다이렉트에 보존) / 로그인 페이지 에러·상태 표시 + `signInWithOAuth` 실패 시 UI 복구(“이동 중…” 멈춤 해결) + 복귀경로 `?next=` 전달 / 콜백 provider error(동의 거부 등) → `?error=oauth`.
+- [x] **Kakao Web 플랫폼 도메인 반영 확인** — prod에서 지도 렌더 + 로그인 동작 확인됨(도메인 등록 정상).
+
 ## 다음 (Next)   ← 여기부터
 - [ ] 공개 커버 사진(현재 explore는 그라데이션) — 공개용 버킷 or 서명 정책 재설계
 - [ ] app-dev: 모바일 앱(Expo) 동일 흐름 (로그인→커플→피드→상세→사진)
@@ -54,7 +59,7 @@
 ## 막힘 (Blocked) — 사용자 승인/대시보드 필요
 - [ ] **0005 라이브 적용** — `supabase/migrations/0005_date_log_photos.sql`를 SQL Editor에 붙여넣거나 `SBP_TOKEN=sbp_... bun scripts/mgmt-apply.ts supabase/migrations/0005_date_log_photos.sql` 실행. 적용 전엔 갤러리 저장/조회가 실패한다.
 - [ ] **api CORS_ORIGINS prod 반영** — `.env.example`/로컬 `.env`엔 `https://maps.weourus.xyz` 추가됨. Vercel production 값은 라이브 변경이라 auto-mode 차단 → 사용자가 `vercel env`로 반영 (현재 웹은 Supabase 직접 호출이라 당장 blocking 아님).
-- [ ] **Kakao 플랫폼 → Web 사이트 도메인**에 `https://maps.weourus.xyz` 추가 (프로덕션 지도 렌더용, 대시보드 작업).
+- [ ] **SSO 동의화면 앱명 We Log로** — Kakao Developers 콘솔 앱 이름/아이콘, Google Cloud OAuth 동의화면 App name을 "We Log"로. (코드 아님 — 로그인 시 사용자에게 보이는 이름)
 
 ## 세팅 메모
 - 지도: Kakao Map. web `NEXT_PUBLIC_KAKAO_MAP_KEY`, mobile `EXPO_PUBLIC_KAKAO_MAP_KEY` 채워짐. api `KAKAO_REST_API_KEY`는 미정(장소검색 프록시 시 필요).

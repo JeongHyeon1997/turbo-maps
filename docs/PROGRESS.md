@@ -52,7 +52,9 @@
 - [x] **🎯 공개 랜딩 `/` + `/privacy` + `/terms`** — 미들웨어 `/` exact-only public(+`/privacy`·`/terms`), `/` 세션 분기(비로그인=랜딩 hero/features/공개코스 미리보기+폴백, 로그인=기존 피드), 정책 페이지(AdSense 쿠키·제3자 광고 고지 포함). 신규 컴포넌트: Logo atom / FeatureCard·PolicySection·PolicyList·EmptyState molecule / Landing{Header,Hero,Features}·ExplorePreview·SiteFooter·PolicyDocument organism / PublicShell template. build+lint+typecheck 통과. (`docs/plan/04-public-surface.md` 1단계)
 
 ## 다음 (Next)   ← 여기부터 (2026-07-06 우선순위 재정렬)
-2. [ ] **/explore 공개 열람 + 공개 커버 사진** — 진행중(Doing). **ADR 확정**(DECISIONS 2026-07-06): public 버킷 `public-covers` + copy-on-publish(커버 1장만, 갤러리는 커플 전용 유지) + anon 안전 뷰 `explore_logs`로 memo 등 사적 필드 비노출. db-dev `0006_public_explore`(버킷·storage RLS·`date_logs.public_cover_path`·anon 뷰, public/test+SCHEMA) → dba 라이브 적용(⚠️사용자 승인, +0005 함께) → web-dev(미들웨어 `/explore` public·explore를 anon 뷰 기반·공개 URL 커버·copy-on-publish). `docs/plan/04-public-surface.md` 2단계.
+2. [ ] **/explore 공개 열람 + 공개 커버 사진** — 진행중(Doing). **ADR 확정**(DECISIONS 2026-07-06): public 버킷 `public-covers` + copy-on-publish(커버 1장만, 갤러리는 커플 전용 유지) + anon 안전 뷰 `explore_logs`로 memo 등 사적 필드 비노출.
+   - [x] db-dev: **`0006_public_explore.sql` 작성 완료**(커밋됨) — `public-covers` 버킷·storage RLS·`date_logs.public_cover_path`·안전 뷰 `explore_logs`/`explore_log_places`(security_invoker=false, 공개행만) + **0004 공개 select 정책 `to authenticated` 재정의 + anon revoke**(아래 보안 메모). public/test+SCHEMA.md.
+   - [ ] **⟵ 다음 세션 시작점**: dba 라이브 적용(⚠️사용자 승인, 0005·0006 함께) → web-dev(미들웨어 `/explore` public·explore를 anon 뷰 기반 조회·`public-covers` 공개 URL 커버·로그 생성/수정 시 copy-on-publish, 비공개 전환/삭제 시 복사본 정리). `docs/plan/04-public-surface.md` 2단계.
 3. [ ] **커플 연결 실테스트(두 계정) + 파트너 아바타 실제 표시** — 핵심 커플 루프 검증. 아바타=코드(web-dev), 실테스트=사용자 2계정 필요. 1·2와 병렬 가능.
 4. [ ] **uiux-reviewer 정식 패스 + 접근성 보강** — 공개 표면 늘어난 뒤 일괄 점검이 효율적. 읽기전용·저리스크. 담당: uiux-reviewer.
 5. [ ] **AdSense 도입** — 1·2 완료 전제. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`.
@@ -60,7 +62,8 @@
 7. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
 ## 막힘 (Blocked) — 사용자 승인/대시보드 필요
-- [ ] **0005 라이브 적용** — `supabase/migrations/0005_date_log_photos.sql`를 SQL Editor에 붙여넣거나 `SBP_TOKEN=sbp_... bun scripts/mgmt-apply.ts supabase/migrations/0005_date_log_photos.sql` 실행. 적용 전엔 갤러리 저장/조회가 실패한다.
+- [ ] **0005 + 0006 라이브 적용 (함께)** — SQL Editor에 순서대로 붙여넣거나 `SBP_TOKEN=sbp_... bun scripts/mgmt-apply.ts supabase/migrations/0005_date_log_photos.sql` 후 `…0006_public_explore.sql`. 0005 미적용 시 사진 갤러리 저장/조회 실패, 0006 미적용 시 explore 공개·공개커버 미동작. **dba 검증**: 적용 후 anon으로 `select * from public.explore_logs`(공개행 반환)·`select * from public.date_logs`(0행) 확인. 뷰 owner-bypass는 마이그레이션 실행 role이 테이블 owner일 때만 성립(SQL Editor=postgres면 OK).
+- [ ] ⚠️ **보안 메모 (0006이 수정함)** — 기존 `0004` 공개 select 정책이 `to` 절 없이 생성돼 PUBLIC(anon 포함)에 적용됨 → anon 키로 PostgREST 직결 시 공개 date_logs의 memo까지 조회 가능했음(/explore는 미들웨어로 막혀 있었으나 REST 직결과 무관). 0006 적용 시 해소. 적용 전까지 이론상 노출 상태이니 **0006 적용 우선순위 높음**.
 - [ ] **api CORS_ORIGINS prod 반영** — `.env.example`/로컬 `.env`엔 `https://maps.weourus.xyz` 추가됨. Vercel production 값은 라이브 변경이라 auto-mode 차단 → 사용자가 `vercel env`로 반영 (현재 웹은 Supabase 직접 호출이라 당장 blocking 아님).
 - [ ] **SSO 동의화면 앱명 We Log로** — Kakao Developers 콘솔 앱 이름/아이콘, Google Cloud OAuth 동의화면 App name을 "We Log"로. (코드 아님 — 로그인 시 사용자에게 보이는 이름)
 

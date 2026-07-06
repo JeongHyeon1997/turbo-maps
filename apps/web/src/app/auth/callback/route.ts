@@ -11,6 +11,11 @@ export async function GET(request: Request) {
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/';
 
+  // Provider bounced back with an error (e.g. user denied consent) — no code.
+  if (searchParams.get('error')) {
+    return NextResponse.redirect(`${origin}/login?error=oauth`);
+  }
+
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);

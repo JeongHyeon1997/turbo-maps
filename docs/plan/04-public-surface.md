@@ -1,5 +1,5 @@
 ---
-status: todo
+status: doing
 last-updated: 2026-07-06
 owner: planner
 ---
@@ -28,11 +28,30 @@ owner: planner
 - **정책 페이지**: `/privacy`(개인정보처리방침 — 수집 항목/이용/보관, **AdSense 쿠키·제3자 광고 고지 포함**), `/terms`(이용약관). 초안 문구는 planner가 작성해 전달.
 - 담당: **web-dev**(미들웨어·랜딩·정책 페이지, atoms/molecules/organisms/template) · **designer**(히어로 비주얼·warm 방향·필요 토큰) · planner(정책 문구 초안).
 
-### 2단계 — /explore 공개 열람 + 공개 커버 사진
-- **explore 공개화**: `/explore`를 비로그인도 열람 가능하게. 미들웨어 public 추가 + **anon 읽기 RLS**(공개 date_log + 공개 places select). 메모 등 사적 필드는 계속 비노출.
-- **공개 커버 사진**(현재 explore는 그라데이션): 사적 사진 버킷과 분리된 **공개 접근 정책** 필요.
-  - 결정 필요(ADR): 별도 public 버킷으로 복사 vs. 장기 서명 URL vs. 공개 표시 동의 플래그. → 되돌리기 어려운 스토리지 구조 결정이므로 DECISIONS.md에 기록.
-- 담당: **db-dev**(anon RLS + 스토리지 정책) · **dba**(라이브 적용) · **web-dev**(공개 커버 렌더) · planner(ADR).
+### 2단계 — /explore 공개 열람 + 공개 커버 사진 (status: doing · 2026-07-06)
+
+**ADR 확정**(DECISIONS.md 2026-07-06): 공개 커버 = 별도 **public 버킷 `public-covers` + copy-on-publish**. 갤러리는 커플 전용 유지(커버 1장만 공개). 사적 필드는 anon 안전 뷰로 비노출.
+
+#### db-dev — 마이그레이션 `0006_public_explore.sql` (public/test 미러 + SCHEMA.md 갱신)
+1. **public 버킷 생성**: `public-covers` (public read = true). 글로벌(스키마 미러 아님, storage는 전역).
+2. **storage RLS (`public-covers`)**: authenticated는 본인 `<uid>/…` 폴더에만 INSERT/UPDATE/DELETE. **SELECT는 anyone(public)** — 무토큰 공개 읽기.
+3. **`date_logs.public_cover_path text` 컬럼 추가**(nullable) — 공개 복사본의 `public-covers` 내 경로. private/커버없음이면 null. public/test 양쪽.
+4. **anon 읽기 허용**: 기존 `0004_visibility`의 public-select 정책들(`date_logs`/`date_log_places`/`routes`, `visibility='public'`)이 **`anon` role에도 적용**되는지 확인. `TO authenticated`로만 돼 있으면 `TO anon, authenticated`로 확장(또는 anon 전용 정책 추가). 확장 시 사적 필드 노출 주의(아래 5).
+5. **사적 필드 비노출 뷰**: anon에 date_logs 전체 컬럼(특히 `memo`)이 열리지 않게 — 안전 컬럼만 노출하는 뷰 `explore_logs` 생성(id·couple_id·title·date·public_cover_path·created_at + 필요한 표시명), `grant select on explore_logs to anon`. anon의 base `date_logs` 직접 select는 열지 않는다(뷰만 anon 대상). `date_log_places`/`routes`는 사적 컬럼 없음 → anon select 허용 유지.
+   - (표시명) 공개 로그의 작성자/커플 닉네임을 anon에 보여줄지 결정: 필요 시 뷰에 join된 닉네임만 포함, `profiles` 원테이블은 anon 비노출 유지.
+6. SCHEMA.md의 Storage 섹션·`date_logs` 컬럼·RLS 섹션 갱신.
+
+#### web-dev
+- **미들웨어**: `PUBLIC_PREFIXES`에 `/explore`(및 하위) 추가.
+- **/explore**: 데이터 조회를 anon 뷰(`explore_logs`) 기반으로 전환. 커버는 `public_cover_path`가 있으면 **public 버킷 공개 URL**(`/storage/v1/object/public/public-covers/<path>`)로 렌더, 없으면 기존 그라데이션 폴백. 로그인/비로그인 모두 동작.
+- **랜딩 ExplorePreview**: 실제 공개 데이터 발췌 + 공개 커버 렌더.
+- **copy-on-publish**: 로그 생성/수정에서 `visibility='public'`이고 커버가 있으면 원본을 `public-covers/<uid>/…`로 복사하고 `public_cover_path` 저장. `private`로 전환/커버 삭제/로그 삭제 시 공개 복사본 삭제 + `public_cover_path` null. best-effort + 실패 로깅.
+- **OG 이미지**: 공개 상세/랜딩의 OG에 public 커버 URL 사용(선택).
+
+#### 라이브 적용 (⚠️ 사용자 승인 필요)
+`0006` DDL·스토리지 정책은 **라이브 변경 → auto-mode 차단**. 사용자가 SQL Editor 붙여넣기 또는 `SBP_TOKEN=sbp_... bun scripts/mgmt-apply.ts supabase/migrations/0006_public_explore.sql`. **0005도 아직 미적용(Blocked)** → 함께 적용 요청. 적용 전엔 explore 공개 조회/공개 커버가 동작하지 않음.
+
+- 담당: **db-dev**(0006 작성) · **dba**(라이브 적용·인덱스) · **web-dev**(미들웨어·explore·copy-on-publish·렌더) · planner(ADR, 완료).
 
 ## 완료 기준
 - 비로그인 상태로 `/`·`/privacy`·`/terms` 접근 가능하고 콘텐츠가 렌더된다(로그인으로 안 튕김).

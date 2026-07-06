@@ -52,7 +52,7 @@
 - [x] **🎯 공개 랜딩 `/` + `/privacy` + `/terms`** — 미들웨어 `/` exact-only public(+`/privacy`·`/terms`), `/` 세션 분기(비로그인=랜딩 hero/features/공개코스 미리보기+폴백, 로그인=기존 피드), 정책 페이지(AdSense 쿠키·제3자 광고 고지 포함). 신규 컴포넌트: Logo atom / FeatureCard·PolicySection·PolicyList·EmptyState molecule / Landing{Header,Hero,Features}·ExplorePreview·SiteFooter·PolicyDocument organism / PublicShell template. build+lint+typecheck 통과. (`docs/plan/04-public-surface.md` 1단계)
 
 ## 다음 (Next)   ← 여기부터 (2026-07-06 우선순위 재정렬)
-2. [ ] **/explore 공개 열람 + 공개 커버 사진** — 공개 표면 실질 콘텐츠. anon 읽기 RLS + 스토리지 공개 정책(ADR 필요). `docs/plan/04-public-surface.md` 2단계. 담당: db-dev/dba/web-dev. ← 진행중
+2. [ ] **/explore 공개 열람 + 공개 커버 사진** — 진행중(Doing). **ADR 확정**(DECISIONS 2026-07-06): public 버킷 `public-covers` + copy-on-publish(커버 1장만, 갤러리는 커플 전용 유지) + anon 안전 뷰 `explore_logs`로 memo 등 사적 필드 비노출. db-dev `0006_public_explore`(버킷·storage RLS·`date_logs.public_cover_path`·anon 뷰, public/test+SCHEMA) → dba 라이브 적용(⚠️사용자 승인, +0005 함께) → web-dev(미들웨어 `/explore` public·explore를 anon 뷰 기반·공개 URL 커버·copy-on-publish). `docs/plan/04-public-surface.md` 2단계.
 3. [ ] **커플 연결 실테스트(두 계정) + 파트너 아바타 실제 표시** — 핵심 커플 루프 검증. 아바타=코드(web-dev), 실테스트=사용자 2계정 필요. 1·2와 병렬 가능.
 4. [ ] **uiux-reviewer 정식 패스 + 접근성 보강** — 공개 표면 늘어난 뒤 일괄 점검이 효율적. 읽기전용·저리스크. 담당: uiux-reviewer.
 5. [ ] **AdSense 도입** — 1·2 완료 전제. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`.

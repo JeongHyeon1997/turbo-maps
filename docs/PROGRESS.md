@@ -40,24 +40,21 @@
 ## 이번에 완료 (웹)
 - [x] **기록 상세 페이지 `/logs/[id]`** — 서버 컴포넌트. date_log 단건(장소·평점·장소별 메모·경로 좌표) 조회 + 커버 서명 URL, 커버/메모/KakaoMap(경로 좌표 우선, 없으면 장소 마커)/방문 장소 리스트. RLS 커플 스코프, 없는 row → notFound(). 신규 `VisitedPlaceItem` molecule. 피드 카드·캘린더 항목에서 진입 링크 연결.
 
+## 이번에 완료 (사진)
+- [x] **사진 갤러리 — 기록당 여러 장** — DB `0005_date_log_photos`(커플 스코프 RLS, public/test 미러) + `@maps/shared` Zod(`dateLogPhotoSchema`/`createDateLogPhotoSchema`) + `/logs/new` 다중 업로드(best-effort) + `PhotoGallery` organism·`PhotoThumb` molecule + `/logs/[id]` 서명·sort_order 갤러리. **단, 0005 라이브 미적용 → Blocked 참고.** (단일 커버 업로드는 이전부터 동작 중)
+
 ## 다음 (Next)   ← 여기부터
-- [ ] api CORS_ORIGINS에 `https://maps.weourus.xyz` 추가 (웹 브라우저에서 api 호출 시 필요; 현재 웹은 Supabase 직접 사용)
-- [ ] Kakao 플랫폼 → Web 사이트 도메인에 `https://maps.weourus.xyz` 추가 (프로덕션 지도용)
 - [ ] 공개 커버 사진(현재 explore는 그라데이션) — 공개용 버킷 or 서명 정책 재설계
-- [ ] app-dev: 모바일 앱(Expo) 동일 흐름
+- [ ] app-dev: 모바일 앱(Expo) 동일 흐름 (로그인→커플→피드→상세→사진)
 - [ ] uiux-reviewer 정식 패스 + 접근성 보강
 - [ ] AdSense 도입 — 공개 랜딩/정책 페이지 + /explore 공개화 선행 필요 (plan: docs/plan/03-adsense.md)
-- [ ] 사진 업로드 (Supabase Storage `date-photos` 버킷 연동)
 - [ ] 커플 연결 실테스트(두 계정) + 파트너 아바타 실제 표시
-- [ ] app-dev: 모바일 동일 흐름
 - [ ] (나중) api 서버리스 + Kakao 장소검색 프록시 + map-api.weourus.xyz
 
-## 막힘 (Blocked)
-- [ ] **0001 라이브 적용** — 자동 적용이 프로덕션 DB 쓰기라 auto-mode에서 차단됨. 해결: 사용자가 승인해 CLI로 적용하거나, Supabase SQL Editor에 `supabase/migrations/0001_init.sql` 붙여넣기.
-- [ ] **Kakao 로그인 실동작** — Supabase 대시보드 Auth → Providers → Kakao 활성화 필요. **Kakao REST API 키 + Client Secret** 필요(지금 받은 건 JavaScript 키). Redirect: `https://giilijttitajvygdosbe.supabase.co/auth/v1/callback` 를 Kakao 앱에 등록.
-
-## 막힘 (Blocked)
-- (없음)
+## 막힘 (Blocked) — 사용자 승인/대시보드 필요
+- [ ] **0005 라이브 적용** — `supabase/migrations/0005_date_log_photos.sql`를 SQL Editor에 붙여넣거나 `SBP_TOKEN=sbp_... bun scripts/mgmt-apply.ts supabase/migrations/0005_date_log_photos.sql` 실행. 적용 전엔 갤러리 저장/조회가 실패한다.
+- [ ] **api CORS_ORIGINS prod 반영** — `.env.example`/로컬 `.env`엔 `https://maps.weourus.xyz` 추가됨. Vercel production 값은 라이브 변경이라 auto-mode 차단 → 사용자가 `vercel env`로 반영 (현재 웹은 Supabase 직접 호출이라 당장 blocking 아님).
+- [ ] **Kakao 플랫폼 → Web 사이트 도메인**에 `https://maps.weourus.xyz` 추가 (프로덕션 지도 렌더용, 대시보드 작업).
 
 ## 세팅 메모
 - 지도: Kakao Map. web `NEXT_PUBLIC_KAKAO_MAP_KEY`, mobile `EXPO_PUBLIC_KAKAO_MAP_KEY` 채워짐. api `KAKAO_REST_API_KEY`는 미정(장소검색 프록시 시 필요).

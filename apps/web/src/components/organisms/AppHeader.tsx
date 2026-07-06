@@ -18,7 +18,9 @@ export function AppHeader({ coupleInitials = ['J', 'H'] }: AppHeaderProps) {
     <header className="sticky top-0 z-10 border-b border-divider bg-background/90 backdrop-blur">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 md:px-8">
         <div className="flex items-center gap-8">
-          <span className="text-xl font-extrabold tracking-tight text-brand">maps</span>
+          <Link href="/" className="text-xl font-extrabold tracking-tight text-brand">
+            We Log
+          </Link>
           <nav className="hidden gap-6 md:flex">
             {nav.map((n) => (
               <Link

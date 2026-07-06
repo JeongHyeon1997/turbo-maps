@@ -2,7 +2,7 @@
   "name": "@maps/web",
   "version": "0.0.1",
   "private": true,
-  "description": "maps Next.js web",
+  "description": "We Log — Next.js web",
   "scripts": {
     "dev": "next dev --turbo -p 3000",
     "build": "next build",

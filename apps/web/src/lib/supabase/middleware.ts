@@ -4,9 +4,13 @@ import { NextResponse, type NextRequest } from 'next/server';
 type CookieToSet = { name: string; value: string; options?: CookieOptions };
 
 // Routes reachable while signed out. Everything else requires a session.
-const PUBLIC_PREFIXES = ['/login', '/auth'];
+// `/` is public ONLY as an exact match — it renders a marketing landing when signed
+// out (see app/page.tsx) but its sub-paths (/logs, /map, /calendar, …) stay protected.
+const EXACT_PUBLIC = ['/'];
+const PUBLIC_PREFIXES = ['/login', '/auth', '/privacy', '/terms'];
 
-const isPublic = (path: string) => PUBLIC_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
+const isPublic = (path: string) =>
+  EXACT_PUBLIC.includes(path) || PUBLIC_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
 
 /**
  * Refresh the Supabase session cookie on every request AND guard routes:

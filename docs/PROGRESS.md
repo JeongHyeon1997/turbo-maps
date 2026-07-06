@@ -34,10 +34,13 @@
 - [x] **maps-api 서버리스 배포 성공** — `apps/api/api/index.ts`(Express 어댑터) + `vercel.json`(public 출력 + rewrite), Root Directory=apps/api, Framework=Other
 - [x] `https://map-api.weourus.xyz/api/health` = 200, `/api/health/db` = ok(Supabase 연결 확인)
 
+## 이번에 완료 (인증)
+- [x] **prod Kakao 로그인 localhost 리다이렉트 버그 수정** — Supabase Auth → URL Configuration의 Redirect URLs 허용목록에 `https://maps.weourus.xyz/**`(+ `https://*.vercel.app/**`, `maps://**`) 추가. redirectTo가 허용목록에 없어 Site URL(localhost)로 폴백되던 문제. 재현용 스크립트 `scripts/set-auth-urls.ts` (Management API, SBP_TOKEN).
+
 ## 다음 (Next)   ← 여기부터
 - [ ] api CORS_ORIGINS에 `https://maps.weourus.xyz` 추가 (웹 브라우저에서 api 호출 시 필요; 현재 웹은 Supabase 직접 사용)
 - [ ] Kakao 플랫폼 → Web 사이트 도메인에 `https://maps.weourus.xyz` 추가 (프로덕션 지도용)
-- [ ] 기록 상세 페이지 `/logs/[id]` (지도 + 장소 + 메모 + 사진) — 피드/캘린더에서 진입
+- [ ] 기록 상세 페이지 `/logs/[id]` (지도 + 장소 + 메모 + 사진) — 피드/캘린더에서 진입 ← 진행중
 - [ ] 공개 커버 사진(현재 explore는 그라데이션) — 공개용 버킷 or 서명 정책 재설계
 - [ ] app-dev: 모바일 앱(Expo) 동일 흐름
 - [ ] uiux-reviewer 정식 패스 + 접근성 보강

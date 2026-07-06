@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 
 export interface CalendarItem {
   id: string;
@@ -107,12 +108,14 @@ export function CalendarView({
       {selectedItems.length > 0 && (
         <ul className="flex flex-col gap-2">
           {selectedItems.map((it) => (
-            <li
-              key={it.id}
-              className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3"
-            >
-              <span className="text-sm font-semibold text-text-primary">{it.title}</span>
-              <span className="text-xs text-text-muted">{it.placeCount}곳</span>
+            <li key={it.id}>
+              <Link
+                href={`/logs/${it.id}` as React.ComponentProps<typeof Link>['href']}
+                className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3 hover:bg-surface-alt"
+              >
+                <span className="text-sm font-semibold text-text-primary">{it.title}</span>
+                <span className="text-xs text-text-muted">{it.placeCount}곳</span>
+              </Link>
             </li>
           ))}
         </ul>

@@ -8,3 +8,4 @@ export type { KakaoPlace } from './PlaceSearch';
 export { CalendarView } from './CalendarView';
 export type { CalendarItem } from './CalendarView';
 export { BottomNav } from './BottomNav';
+export { PhotoGallery } from './PhotoGallery';

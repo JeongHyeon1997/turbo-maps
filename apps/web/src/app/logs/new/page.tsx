@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { KakaoMap, PlaceSearch, type KakaoPlace, type MapMarker } from '@/components/organisms';
 import { RatingInput } from '@/components/atoms';
+import { PhotoThumb } from '@/components/molecules';
 
 interface Selected extends KakaoPlace {
   rating: number;
@@ -29,6 +30,8 @@ export default function NewLogPage() {
   const [places, setPlaces] = useState<Selected[]>([]);
   const [cover, setCover] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [isPublic, setIsPublic] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +42,21 @@ export default function NewLogPage() {
       if (prev) URL.revokeObjectURL(prev);
       return file ? URL.createObjectURL(file) : null;
     });
+  };
+
+  const onPickPhotos = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const list = Array.from(files);
+    setPhotos((prev) => [...prev, ...list]);
+    setPhotoPreviews((prev) => [...prev, ...list.map((f) => URL.createObjectURL(f))]);
+  };
+  const removePhoto = (index: number) => {
+    setPhotoPreviews((prev) => {
+      const url = prev[index];
+      if (url) URL.revokeObjectURL(url);
+      return prev.filter((_, i) => i !== index);
+    });
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
   const markers: MapMarker[] = places.map((p) => ({ lat: p.lat, lng: p.lng, name: p.name }));
@@ -110,6 +128,22 @@ export default function NewLogPage() {
         if (upErr) throw upErr;
       }
 
+      // Upload gallery photos (best-effort — keep whichever succeed, note failures).
+      const photoPaths: string[] = [];
+      let photoUploadFailures = 0;
+      for (const file of photos) {
+        const safe = file.name.replace(/[^\w.-]/g, '_');
+        const path = `${user.id}/${crypto.randomUUID()}-${safe}`;
+        const { error: upErr } = await supabase.storage
+          .from('date-photos')
+          .upload(path, file, { upsert: true, contentType: file.type });
+        if (upErr) {
+          photoUploadFailures += 1;
+        } else {
+          photoPaths.push(path);
+        }
+      }
+
       const { data: log, error: lErr } = await supabase
         .from('date_logs')
         .insert({
@@ -138,6 +172,23 @@ export default function NewLogPage() {
       await supabase
         .from('routes')
         .insert({ date_log_id: log.id, coordinates: places.map((p) => ({ lat: p.lat, lng: p.lng })) });
+
+      if (photoPaths.length > 0) {
+        const { error: photosErr } = await supabase.from('date_log_photos').insert(
+          photoPaths.map((path, i) => ({
+            date_log_id: log.id,
+            storage_path: path,
+            sort_order: i,
+          })),
+        );
+        if (photosErr) throw photosErr;
+      }
+
+      if (photoUploadFailures > 0) {
+        setError(`사진 ${photoUploadFailures}장 업로드에 실패했어요. 나머지 기록은 저장되었습니다.`);
+        setSaving(false);
+        return;
+      }
 
       router.push('/');
       router.refresh();
@@ -192,6 +243,27 @@ export default function NewLogPage() {
             onChange={(e) => onPickCover(e.target.files?.[0] ?? null)}
           />
         </label>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <span className="text-sm font-medium text-text-secondary">사진</span>
+        <label className="flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-border bg-surface py-6 text-sm text-text-muted">
+          사진 추가 (여러 장 선택 가능)
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(e) => onPickPhotos(e.target.files)}
+          />
+        </label>
+        {photoPreviews.length > 0 && (
+          <div className="grid grid-cols-3 gap-2">
+            {photoPreviews.map((src, i) => (
+              <PhotoThumb key={src} src={src} onRemove={() => removePhoto(i)} />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-2">

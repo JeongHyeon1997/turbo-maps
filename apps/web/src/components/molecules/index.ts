@@ -4,3 +4,4 @@ export { DateLogCard } from './DateLogCard';
 export { ConnectBanner } from './ConnectBanner';
 export { ProfileActions } from './ProfileActions';
 export { VisitedPlaceItem } from './VisitedPlaceItem';
+export { PhotoThumb } from './PhotoThumb';

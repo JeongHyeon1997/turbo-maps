@@ -3,7 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { colors } from '@maps/tokens';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/templates';
-import { KakaoMap, type MapMarker } from '@/components/organisms';
+import { KakaoMap, PhotoGallery, type MapMarker } from '@/components/organisms';
 import { HeartRating } from '@/components/atoms';
 import { VisitedPlaceItem } from '@/components/molecules';
 
@@ -90,6 +90,28 @@ export default async function DateLogDetailPage({
     coverUrl = signed?.signedUrl ?? null;
   }
 
+  const { data: photoRows } = await supabase
+    .from('date_log_photos')
+    .select('storage_path')
+    .eq('date_log_id', id)
+    .order('sort_order', { ascending: true });
+
+  const photoPaths = (photoRows ?? []).map((r) => r.storage_path as string);
+  let galleryUrls: string[] = [];
+  if (photoPaths.length > 0) {
+    const { data: signedPhotos } = await supabase.storage
+      .from('date-photos')
+      .createSignedUrls(photoPaths, 3600);
+    const signedMap = new Map<string, string>();
+    signedPhotos?.forEach((u) => {
+      if (u.path && u.signedUrl) signedMap.set(u.path, u.signedUrl);
+    });
+    // Preserve sort_order — createSignedUrls doesn't guarantee response order.
+    galleryUrls = photoPaths
+      .map((p) => signedMap.get(p))
+      .filter((u): u is string => !!u);
+  }
+
   const { data: author } = await supabase
     .from('profiles')
     .select('nickname')
@@ -164,6 +186,13 @@ export default async function DateLogDetailPage({
                 />
               ))}
             </ul>
+          </div>
+        )}
+
+        {galleryUrls.length > 0 && (
+          <div className="flex flex-col gap-3">
+            <h2 className="text-lg font-bold text-text-primary">사진</h2>
+            <PhotoGallery urls={galleryUrls} />
           </div>
         )}
       </div>

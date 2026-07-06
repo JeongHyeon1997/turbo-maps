@@ -8,3 +8,4 @@ export * from './schemas/profile';
 export * from './schemas/couple';
 export * from './schemas/place';
 export * from './schemas/date-log';
+export * from './schemas/date-log-photo';

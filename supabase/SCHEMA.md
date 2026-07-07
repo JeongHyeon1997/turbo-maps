@@ -7,9 +7,9 @@
 
 Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`, `0004_visibility`, `0005_date_log_photos`, `0006_public_explore`, `0007_public_detail`. Mirrored in `public` and `test`.
 
-**Not yet applied to the live DB:** `0005_date_log_photos`, `0006_public_explore`,
-`0007_public_detail` (see `docs/PROGRESS.md` § Blocked — dba to apply together). This
-file describes the schema these migrations *will* produce once applied.
+**Live DB status:** all migrations through `0007_public_detail` are **applied to the live DB**
+(0005/0006 applied 2026-07-07, 0007 applied 2026-07-07 — verified: anon+authenticated blocked from
+base `date_logs`, `explore_logs` anonymized). This file matches the live schema.
 
 ## Tables
 

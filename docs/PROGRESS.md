@@ -67,16 +67,18 @@
 - [x] **0005 + 0006 라이브 적용 완료 (dba)** — `SBP_TOKEN`(apps/api/.env)으로 mgmt-apply, 둘 다 201 OK. **검증**: anon→`explore_logs`/`explore_log_places` 200, anon→`date_logs` 직결 **401 차단**(0004 memo 갭 해소 확인) / `public-covers` 버킷 존재·public=true·storage 정책 2개·`public_cover_path` 컬럼 public+test 존재. **explore 2단계·아바타·warm 배경이 실제로 켜짐.**
 - [x] **uiux 잔여(Med/Low) 일괄 (web-dev)** — h1 계층(#11)·폼 라벨(#10)·지도/검색 로딩·빈상태(#9)·경로선/BottomNav 토큰화(#12·#13)·Button 변형+폼버튼 흡수(#14)·Avatar size/name/aria(#15)·캘린더 빈날 비인터랙티브+오늘 표시(#16)·커버칩 대비(#17)·`BackLink`로 상세 뒤로가기(#18)·로그인 fg 토큰화(#19). web typecheck+lint+build 통과.
 
+## 이번에 완료 (공개 콘텐츠 Phase 1 A+E + 0007)
+- [x] **공개 코스 상세 `/explore/[id]` + SEO 기반공사** — 결정 반영(작성자 익명화·경로선 비공개 마커만·범위 A+E). 
+  - db-dev `0007_public_detail`: base `to authenticated` 공개 select 정책 3개 삭제 + `explore_logs` 익명화(profiles join·author_nickname 제거). (commit ec5a5a5)
+  - web-dev: 공개 상세 `/explore/[id]`(anon-safe 뷰·커버·마커만·방문장소·익명, memo/갤러리/경로선/실명 전부 비노출) + explore·랜딩 카드 링크 활성화(`hrefBase`) + `sitemap.ts`/`robots.ts`/per-log OG/JSON-LD + SITE_URL·formatLogDate·JsonLd 추출. (commit 6938692)
+  - **dba: 0007 라이브 적용 완료(201) + 검증** — `explore_logs` 컬럼에 author_nickname 없음, 공개 select 정책 0개 잔존, `date_logs`는 커플 RW만 → **anon+authenticated 모두 base 직결 차단(memo 갭 완전 폐쇄)**. SCHEMA.md 라이브 상태 현행화(0005/0006/0007 모두 적용됨).
+
 ## 다음 (Next)   ← 여기부터
-1. [ ] **🎯 공개 콘텐츠 풍부화 Phase 1 (AdSense 심사 최소 세트)** — `docs/plan/05-public-enrichment.md`.
-   - **A. 공개 코스 상세 `/explore/[id]`** (anon-safe 뷰 기반 전용 페이지) + explore 카드 링크 활성화. **이것이 아래 보안 백로그를 정공법 해결**(공개 열람을 뷰로 일원화, base 테이블 `to authenticated` public-select 제거 — `0007`).
-   - **E. SEO 기반공사** — `app/sitemap.ts` + `app/robots.ts`(보호 경로 disallow) + per-log OG(공개 커버) + JSON-LD.
-   - 담당: db-dev(0007: 정책 제거 + 선택 route 뷰) · web-dev(상세·sitemap·robots·OG·JSON-LD) · designer(공개 상세 template·기본 OG) · dba(0007 적용·memo 갭 폐쇄 재검증). Phase2(place 축)·열린 질문은 05 문서 참고.
-2. [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함)는 완료. 남은 건 **사용자가 2계정으로 실제 검증**: A가 초대코드 생성 → B가 `/couple/connect`에서 입력 → 양쪽 헤더에 서로 아바타 표시 / status=connected / 커플 스코프 기록 공유 확인.
-3. [ ] ⚠️ **[보안 백로그] `/logs/[id]` memo 노출** → **위 1-A로 해결 예정**(공개 상세를 anon-safe 뷰 전용 페이지로 분리 + base 테이블 광역 authenticated public-select 제거, `0007`). 현재는 explore 카드 비링크로 회피 중. `docs/plan/05-public-enrichment.md` A + DECISIONS 2026-07-07.
-4. [ ] **AdSense 도입** — 선행: 위 1(Phase1) 완료 시 공개 URL·깊이·SEO 충족. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`.
-5. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.
-6. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
+1. [ ] **AdSense 도입** — 선행조건(공개 URL·깊이·SEO) 충족됨. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`. *단, 공개 콘텐츠 양이 적으면 심사 불리 → 실데이터 확보 또는 Phase 2 병행 고려.*
+2. [ ] **공개 콘텐츠 Phase 2 (place 축)** — place 공개 페이지/디렉터리(`explore_places` 집계 뷰) + 지역/카테고리 탐색. 콘텐츠 양·검색 유입 큰 축. `docs/plan/05-public-enrichment.md` Phase 2. 열린 질문(지역 태깅 방식 등) 확정 필요.
+3. [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함) 완료. **사용자가 2계정으로 실제 검증**: A 초대코드 생성 → B `/couple/connect` 입력 → 양쪽 헤더 아바타/status=connected/커플 스코프 공유 확인.
+4. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.
+5. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
 ## 막힘 (Blocked) — 사용자 승인/대시보드 필요
 - [ ] **api CORS_ORIGINS prod 반영** — `.env.example`/로컬 `.env`엔 `https://maps.weourus.xyz` 추가됨. Vercel production 값은 라이브 변경이라 auto-mode 차단 → 사용자가 `vercel env`로 반영 (현재 웹은 Supabase 직접 호출이라 당장 blocking 아님).

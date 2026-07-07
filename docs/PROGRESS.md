@@ -63,21 +63,22 @@
   - designer: `@maps/tokens`에 `coverGradients`/`coverTints` 추가(하드코딩 3중복 제거 소스) + DESIGN.md 커버/Pretendard 방침. (commit baef0be)
   - web-dev: warm cream 배경 실제 적용(`background` 토큰 tailwind 배선 — 그동안 `bg-background`가 무효였음) + Pretendard 실제 로드(jsDelivr @import) + 커버 토큰 소비. (commit) / 아바타 이미지 실패 시 이니셜 폴백(client `AvatarImage`) + 헤더 아바타→`/profile` 링크(PC 로그아웃 경로) + 파일 input `sr-only`(키보드 접근) + 공개 피드 카드 비링크(공개 상세 페이지 부재) + `/explore` 로그아웃 시 `PublicShell`. (commit)
 
+## 이번에 완료 (DB 라이브 적용 + uiux Med/Low)
+- [x] **0005 + 0006 라이브 적용 완료 (dba)** — `SBP_TOKEN`(apps/api/.env)으로 mgmt-apply, 둘 다 201 OK. **검증**: anon→`explore_logs`/`explore_log_places` 200, anon→`date_logs` 직결 **401 차단**(0004 memo 갭 해소 확인) / `public-covers` 버킷 존재·public=true·storage 정책 2개·`public_cover_path` 컬럼 public+test 존재. **explore 2단계·아바타·warm 배경이 실제로 켜짐.**
+- [x] **uiux 잔여(Med/Low) 일괄 (web-dev)** — h1 계층(#11)·폼 라벨(#10)·지도/검색 로딩·빈상태(#9)·경로선/BottomNav 토큰화(#12·#13)·Button 변형+폼버튼 흡수(#14)·Avatar size/name/aria(#15)·캘린더 빈날 비인터랙티브+오늘 표시(#16)·커버칩 대비(#17)·`BackLink`로 상세 뒤로가기(#18)·로그인 fg 토큰화(#19). web typecheck+lint+build 통과.
+
 ## 다음 (Next)   ← 여기부터
-2. [ ] **0006(+0005) 라이브 적용 = explore 2단계를 실제로 켜는 유일한 남은 일** — Blocked 참고(사용자 승인). 적용 후 dba 검증(anon `explore_logs` 공개행 / `date_logs` 0행) → /explore·랜딩·공개 커버 실동작 확인.
-3. [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함)는 완료. 남은 건 **사용자가 2계정으로 실제 검증**: A가 초대코드 생성 → B가 `/couple/connect`에서 입력 → 양쪽 헤더에 서로 아바타 표시 / status=connected / 커플 스코프 기록 공유 확인. (테스트 절차는 아래 세팅 메모/대화 참고)
-4. [ ] **uiux 잔여(Med/Low) 백로그** — Top 5 외 남은 지적: 지도/검색 로딩·빈상태(#9), 초대코드 input 라벨(#10), heading 계층 h1 통일(#11), 경로선/11px 토큰화(#12·#13), Button 변형(disabled/type/fullWidth)로 폼버튼 흡수(#14), Avatar size prop/alt 개선(#15), 캘린더 빈날 비포커스·오늘 표시(#16), 커버 날짜칩 대비(#17), 상세 뒤로가기 맥락(#18). 저리스크, 여유 시 일괄.
-5. [ ] ⚠️ **[보안 백로그] `/logs/[id]` memo 노출** — 0006의 public-select 정책이 `to authenticated`(커플 스코프 아님)라, 적용 후엔 **로그인 유저가 남의 공개 로그 상세를 직결 조회 시 memo까지 노출** 가능. 근본수정: 공개 상세는 anon-safe 뷰 기반 전용 페이지로 分離 or 상세 페이지에서 비소유 공개로그는 memo 등 사적 필드 프로젝션 제외. (현재는 explore 카드 비링크로 회피 중)
-5. [ ] **AdSense 도입** — 1·2 완료 전제. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`.
-6. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.
-7. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
+2. [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함)는 완료. 남은 건 **사용자가 2계정으로 실제 검증**: A가 초대코드 생성 → B가 `/couple/connect`에서 입력 → 양쪽 헤더에 서로 아바타 표시 / status=connected / 커플 스코프 기록 공유 확인.
+3. [ ] ⚠️ **[보안 백로그] `/logs/[id]` memo 노출** — 0006의 public-select 정책이 `to authenticated`(커플 스코프 아님)라, **로그인 유저가 남의 공개 로그 상세를 직결 조회 시 memo까지 노출** 가능. 근본수정: 공개 상세는 anon-safe 뷰 기반 전용 페이지로 分離 or 상세 페이지에서 비소유 공개로그는 memo 등 사적 필드 프로젝션 제외. (현재는 explore 카드 비링크로 회피 중)
+4. [ ] **AdSense 도입** — 공개 표면 완료(1·2단계 라이브)로 선행조건 충족. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`.
+5. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.
+6. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
 ## 막힘 (Blocked) — 사용자 승인/대시보드 필요
-- [ ] **0005 + 0006 라이브 적용 (함께)** — SQL Editor에 순서대로 붙여넣거나 `SBP_TOKEN=sbp_... bun scripts/mgmt-apply.ts supabase/migrations/0005_date_log_photos.sql` 후 `…0006_public_explore.sql`. 0005 미적용 시 사진 갤러리 저장/조회 실패, 0006 미적용 시 explore 공개·공개커버 미동작. **dba 검증**: 적용 후 anon으로 `select * from public.explore_logs`(공개행 반환)·`select * from public.date_logs`(0행) 확인. 뷰 owner-bypass는 마이그레이션 실행 role이 테이블 owner일 때만 성립(SQL Editor=postgres면 OK).
-- [ ] ⚠️ **보안 메모 (0006이 수정함)** — 기존 `0004` 공개 select 정책이 `to` 절 없이 생성돼 PUBLIC(anon 포함)에 적용됨 → anon 키로 PostgREST 직결 시 공개 date_logs의 memo까지 조회 가능했음(/explore는 미들웨어로 막혀 있었으나 REST 직결과 무관). 0006 적용 시 해소. 적용 전까지 이론상 노출 상태이니 **0006 적용 우선순위 높음**.
 - [ ] **api CORS_ORIGINS prod 반영** — `.env.example`/로컬 `.env`엔 `https://maps.weourus.xyz` 추가됨. Vercel production 값은 라이브 변경이라 auto-mode 차단 → 사용자가 `vercel env`로 반영 (현재 웹은 Supabase 직접 호출이라 당장 blocking 아님).
 - [ ] **SSO 동의화면 앱명 We Log로** — Kakao Developers 콘솔 앱 이름/아이콘, Google Cloud OAuth 동의화면 App name을 "We Log"로. (코드 아님 — 로그인 시 사용자에게 보이는 이름)
 
 ## 세팅 메모
 - 지도: Kakao Map. web `NEXT_PUBLIC_KAKAO_MAP_KEY`, mobile `EXPO_PUBLIC_KAKAO_MAP_KEY` 채워짐. api `KAKAO_REST_API_KEY`는 미정(장소검색 프록시 시 필요).
 - ⚠️ 보안: service_role/secret/DB비번이 초기 대화로 노출됨 → Supabase 대시보드에서 rotate 권장(SETUP.md "Key rotation").
+- ⚠️ `SBP_TOKEN`(Supabase 개인 액세스 토큰)이 `apps/api/.env`에 추가됨(0005/0006 적용용). gitignore돼 커밋 안 되지만 **일회성이므로 대시보드에서 revoke 권장**. mgmt-apply/mgmt-query가 이 값을 사용.

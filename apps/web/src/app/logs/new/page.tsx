@@ -128,6 +128,21 @@ export default function NewLogPage() {
         if (upErr) throw upErr;
       }
 
+      // copy-on-publish: for public logs with a cover, also upload the same file
+      // to the public `public-covers` bucket so /explore can render it via a
+      // token-free URL. Best-effort — the private original above is what actually
+      // guards the record, so a failure here just leaves public_cover_path null
+      // (log still saves as public, just without a cover on /explore).
+      let publicCoverPath: string | null = null;
+      if (isPublic && cover) {
+        const safe = cover.name.replace(/[^\w.-]/g, '_');
+        const candidatePath = `${user.id}/${crypto.randomUUID()}-${safe}`;
+        const { error: pubUpErr } = await supabase.storage
+          .from('public-covers')
+          .upload(candidatePath, cover, { upsert: true, contentType: cover.type });
+        if (!pubUpErr) publicCoverPath = candidatePath;
+      }
+
       // Upload gallery photos (best-effort — keep whichever succeed, note failures).
       const photoPaths: string[] = [];
       let photoUploadFailures = 0;
@@ -153,6 +168,7 @@ export default function NewLogPage() {
           title: title || null,
           memo: memo || null,
           cover_photo_path: coverPath,
+          public_cover_path: publicCoverPath,
           visibility: isPublic ? 'public' : 'private',
         })
         .select('id')

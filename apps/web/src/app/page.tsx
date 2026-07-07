@@ -4,6 +4,7 @@ import { DateLogFeed, LandingHero, LandingFeatures, ExplorePreview } from '@/com
 import { SectionHeader, ConnectBanner, EmptyState } from '@/components/molecules';
 import { Button } from '@/components/atoms';
 import type { MockDateLog } from '@/lib/mock/date-logs';
+import { getPublicExploreLogs } from '@/lib/explore';
 
 const COVERS: [string, string][] = [
   ['#F6C6A8', '#E8635C'],
@@ -19,14 +20,6 @@ interface Row {
   title: string | null;
   memo: string | null;
   cover_photo_path: string | null;
-  date_log_places: { visit_order: number; rating: number | null; places: { name: string; category: string | null } | null }[];
-}
-
-interface PublicPreviewRow {
-  id: string;
-  date: string;
-  title: string | null;
-  author_id: string;
   date_log_places: { visit_order: number; rating: number | null; places: { name: string; category: string | null } | null }[];
 }
 
@@ -46,57 +39,6 @@ function toCard(row: Row, i: number, coverUrl?: string | null): MockDateLog {
   };
 }
 
-/**
- * Best-effort excerpt of publicly visible date logs for the logged-out landing page.
- * Anon read RLS isn't live yet (public-surface plan, 2단계) — the anon key can't see
- * `visibility='public'` rows until that lands, so this quietly returns [] instead of
- * erroring, and the landing page falls back to an EmptyState placeholder.
- */
-async function getPublicPreview(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-): Promise<MockDateLog[]> {
-  try {
-    const { data, error } = await supabase
-      .from('date_logs')
-      .select(
-        'id, date, title, author_id, date_log_places(visit_order, rating, places(name, category))',
-      )
-      .eq('visibility', 'public')
-      .order('date', { ascending: false })
-      .limit(3);
-    if (error || !data) return [];
-
-    const rows = data as unknown as PublicPreviewRow[];
-    const authorIds = [...new Set(rows.map((r) => r.author_id))];
-    const nameById = new Map<string, string>();
-    if (authorIds.length) {
-      const { data: profs } = await supabase
-        .from('profiles')
-        .select('id, nickname')
-        .in('id', authorIds);
-      profs?.forEach((p) => nameById.set(p.id, p.nickname));
-    }
-
-    return rows.map((r, i) => {
-      const dlp = [...(r.date_log_places ?? [])].sort((a, b) => a.visit_order - b.visit_order);
-      const ratings = dlp.map((p) => p.rating ?? 0).filter((x) => x > 0);
-      const avg = ratings.length ? Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
-      return {
-        id: r.id,
-        date: r.date,
-        title: r.title ?? '무제 데이트',
-        memo: '',
-        rating: avg,
-        places: dlp.map((p) => ({ name: p.places?.name ?? '', category: p.places?.category ?? '' })),
-        cover: COVERS[i % COVERS.length]!,
-        author: nameById.get(r.author_id) ?? '익명 커플',
-      };
-    });
-  } catch {
-    return [];
-  }
-}
-
 export default async function HomePage() {
   const supabase = await createClient();
   const {
@@ -104,7 +46,9 @@ export default async function HomePage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const previewLogs = await getPublicPreview(supabase);
+    // Best-effort excerpt of publicly visible date logs (anon-safe `explore_logs`
+    // view, 0006 migration) — gracefully empty until that migration is live.
+    const previewLogs = await getPublicExploreLogs(supabase, 3);
     return (
       <PublicShell>
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 py-10 md:gap-24 md:px-8 md:py-16">

@@ -6,8 +6,10 @@ type CookieToSet = { name: string; value: string; options?: CookieOptions };
 // Routes reachable while signed out. Everything else requires a session.
 // `/` is public ONLY as an exact match — it renders a marketing landing when signed
 // out (see app/page.tsx) but its sub-paths (/logs, /map, /calendar, …) stay protected.
+// `/explore` (and sub-paths) is public too — it reads from anon-safe views
+// (see app/explore/page.tsx and docs/plan/04-public-surface.md 2단계).
 const EXACT_PUBLIC = ['/'];
-const PUBLIC_PREFIXES = ['/login', '/auth', '/privacy', '/terms'];
+const PUBLIC_PREFIXES = ['/login', '/auth', '/privacy', '/terms', '/explore'];
 
 const isPublic = (path: string) =>
   EXACT_PUBLIC.includes(path) || PUBLIC_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));

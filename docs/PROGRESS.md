@@ -55,9 +55,12 @@
 - [x] **web-dev: /explore 공개화 + copy-on-publish** — 미들웨어 `/explore` public / `/explore`·랜딩 미리보기를 anon 안전 뷰(`explore_logs`+`explore_log_places`) 기반 조회로 전환(공통 `lib/explore.ts`의 `getPublicExploreLogs`, 뷰 미적용 시 `[]`로 graceful degrade) / 공개 커버는 `public-covers` 무토큰 URL(`lib/storage/public-cover-url.ts`), 없으면 그라데이션 폴백 / 기록 생성 시 공개+커버면 `public-covers`에 best-effort 복사 후 `public_cover_path` 저장. web typecheck+lint+build 통과. (commit 2b9bb04, bae9dd9) (plan: docs/plan/04-public-surface.md 2단계)
   - 남음: **0006(+0005) 라이브 적용 전엔 explore가 빈 상태**(의도된 degrade). 적용되면 코드 변경 없이 켜짐. 비공개 전환/삭제 시 공개 복사본 정리는 편집/삭제 UI가 생길 때 후속.
 
+## 이번에 완료 (커플 아바타)
+- [x] **web-dev: 헤더 파트너 아바타 실제 표시** — AppShell(async)이 로그인 유저+파트너 profiles 조회해 실제 아바타(이니셜+`avatar_url` 이미지)를 AppHeader에 전달, 에러 시 본인만/무세션이면 로그인 링크(/explore 공개 대응) / Avatar atom 이미지 지원 / 콜백이 provider 메타에서 `avatar_url` 매 로그인 백필(닉네임 미덮어씀) / 프로필 페이지도 avatar_url 배선. web typecheck+lint+build 통과. (commit 9760dd2)
+
 ## 다음 (Next)   ← 여기부터
-2. [ ] **0006(+0005) 라이브 적용 = 2단계를 실제로 켜는 유일한 남은 일** — Blocked 참고(사용자 승인). 적용 후 dba 검증(anon `explore_logs` 공개행 / `date_logs` 0행) → /explore·랜딩·공개 커버 실동작 확인.
-3. [ ] **커플 연결 실테스트(두 계정) + 파트너 아바타 실제 표시** — 핵심 커플 루프 검증. 아바타=코드(web-dev), 실테스트=사용자 2계정 필요. 1·2와 병렬 가능.
+2. [ ] **0006(+0005) 라이브 적용 = explore 2단계를 실제로 켜는 유일한 남은 일** — Blocked 참고(사용자 승인). 적용 후 dba 검증(anon `explore_logs` 공개행 / `date_logs` 0행) → /explore·랜딩·공개 커버 실동작 확인.
+3. [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함)는 완료. 남은 건 **사용자가 2계정으로 실제 검증**: A가 초대코드 생성 → B가 `/couple/connect`에서 입력 → 양쪽 헤더에 서로 아바타 표시 / status=connected / 커플 스코프 기록 공유 확인. (테스트 절차는 아래 세팅 메모/대화 참고)
 4. [ ] **uiux-reviewer 정식 패스 + 접근성 보강** — 공개 표면 늘어난 뒤 일괄 점검이 효율적. 읽기전용·저리스크. 담당: uiux-reviewer.
 5. [ ] **AdSense 도입** — 1·2 완료 전제. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`.
 6. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.

@@ -68,9 +68,13 @@
 - [x] **uiux 잔여(Med/Low) 일괄 (web-dev)** — h1 계층(#11)·폼 라벨(#10)·지도/검색 로딩·빈상태(#9)·경로선/BottomNav 토큰화(#12·#13)·Button 변형+폼버튼 흡수(#14)·Avatar size/name/aria(#15)·캘린더 빈날 비인터랙티브+오늘 표시(#16)·커버칩 대비(#17)·`BackLink`로 상세 뒤로가기(#18)·로그인 fg 토큰화(#19). web typecheck+lint+build 통과.
 
 ## 다음 (Next)   ← 여기부터
+1. [ ] **🎯 공개 콘텐츠 풍부화 Phase 1 (AdSense 심사 최소 세트)** — `docs/plan/05-public-enrichment.md`.
+   - **A. 공개 코스 상세 `/explore/[id]`** (anon-safe 뷰 기반 전용 페이지) + explore 카드 링크 활성화. **이것이 아래 보안 백로그를 정공법 해결**(공개 열람을 뷰로 일원화, base 테이블 `to authenticated` public-select 제거 — `0007`).
+   - **E. SEO 기반공사** — `app/sitemap.ts` + `app/robots.ts`(보호 경로 disallow) + per-log OG(공개 커버) + JSON-LD.
+   - 담당: db-dev(0007: 정책 제거 + 선택 route 뷰) · web-dev(상세·sitemap·robots·OG·JSON-LD) · designer(공개 상세 template·기본 OG) · dba(0007 적용·memo 갭 폐쇄 재검증). Phase2(place 축)·열린 질문은 05 문서 참고.
 2. [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함)는 완료. 남은 건 **사용자가 2계정으로 실제 검증**: A가 초대코드 생성 → B가 `/couple/connect`에서 입력 → 양쪽 헤더에 서로 아바타 표시 / status=connected / 커플 스코프 기록 공유 확인.
-3. [ ] ⚠️ **[보안 백로그] `/logs/[id]` memo 노출** — 0006의 public-select 정책이 `to authenticated`(커플 스코프 아님)라, **로그인 유저가 남의 공개 로그 상세를 직결 조회 시 memo까지 노출** 가능. 근본수정: 공개 상세는 anon-safe 뷰 기반 전용 페이지로 分離 or 상세 페이지에서 비소유 공개로그는 memo 등 사적 필드 프로젝션 제외. (현재는 explore 카드 비링크로 회피 중)
-4. [ ] **AdSense 도입** — 공개 표면 완료(1·2단계 라이브)로 선행조건 충족. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`.
+3. [ ] ⚠️ **[보안 백로그] `/logs/[id]` memo 노출** → **위 1-A로 해결 예정**(공개 상세를 anon-safe 뷰 전용 페이지로 분리 + base 테이블 광역 authenticated public-select 제거, `0007`). 현재는 explore 카드 비링크로 회피 중. `docs/plan/05-public-enrichment.md` A + DECISIONS 2026-07-07.
+4. [ ] **AdSense 도입** — 선행: 위 1(Phase1) 완료 시 공개 URL·깊이·SEO 충족. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`.
 5. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.
 6. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 

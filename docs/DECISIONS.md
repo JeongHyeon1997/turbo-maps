@@ -2,6 +2,20 @@
 
 되돌리기 어려운 결정과 근거만 기록. 새 결정은 위에 추가(최신순).
 
+## 2026-07-07 · 공개 콘텐츠 풍부화 + 공개 상세 (`docs/plan/05-public-enrichment.md`)
+- **공개 코스 상세 = anon-safe 뷰 기반 별도 페이지 `/explore/[id]`** — `/logs/[id]`(커플 전용)를 재사용하지 않고
+  `explore_logs`/`explore_log_places`(+선택 route 뷰)만 읽는 전용 공개 페이지를 신설한다.
+  - **근거:** memo·갤러리·private cover를 **구조적으로** 접근 불가로 만든다(뷰에 애초에 없음). URL은 explore 하위라
+    미들웨어 public 그대로. permalink는 SEO상 나중에 바꾸기 어려우니 `/explore/[id]`로 확정.
+- **base 테이블의 `to authenticated` public-select 정책 제거(0007)** — `date_logs`/`date_log_places`/`routes`의
+  광역 authenticated public-select를 없애고 공개 열람을 **뷰로 일원화**한다. 커플 스코프 select 정책은 유지.
+  - **근거:** 기존 `to authenticated` 정책 탓에 **로그인 유저가 남의 공개 로그 memo까지 직결 조회** 가능했던
+    보안 백로그를 정공법으로 폐쇄. 공개 열람 경로가 뷰 하나로 좁혀져 사적 필드 노출면이 사라진다.
+- **SEO 기반공사는 Phase1에 A와 함께** — sitemap/robots/per-log OG/JSON-LD. robots는 보호 경로 전부 disallow,
+  공개 표면만 allow + sitemap 링크. copy-on-publish·원본 무손상·anon은 뷰로만 원칙 계승.
+- (미확정, 열린 질문) place 디렉터리 범위·표시명 공개 범위·경로선 공개·지역 태깅·좋아요/조회수·댓글은 05 문서 말미
+  "열린 질문"에서 사용자 결정 대기 — 확정 전 강행하지 않는다.
+
 ## 2026-07-06 · 공개 표면(랜딩)
 - **`/` 하나로 랜딩+피드 처리** — 라우트를 `/feed`로 분리하지 않고, `/`가 세션 유무로 분기(비로그인=마케팅 랜딩, 로그인=기존 피드). 이유: 기존 링크·미들웨어·북마크 파괴 없이 공개 표면 확보. 미들웨어에선 `/`(정확 일치)·`/privacy`·`/terms`만 public 추가하고 하위 보호 경로는 유지.
 - **공개 커버 사진 = 별도 public 버킷 `public-covers` + 공개 시 복사(copy-on-publish)** — 후보 (a)public 버킷 복사 / (b)장기 서명 URL / (c)private 버킷 storage RLS로 anon 읽기 허용 중 **(a) 채택.**

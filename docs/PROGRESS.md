@@ -73,9 +73,16 @@
   - web-dev: 공개 상세 `/explore/[id]`(anon-safe 뷰·커버·마커만·방문장소·익명, memo/갤러리/경로선/실명 전부 비노출) + explore·랜딩 카드 링크 활성화(`hrefBase`) + `sitemap.ts`/`robots.ts`/per-log OG/JSON-LD + SITE_URL·formatLogDate·JsonLd 추출. (commit 6938692)
   - **dba: 0007 라이브 적용 완료(201) + 검증** — `explore_logs` 컬럼에 author_nickname 없음, 공개 select 정책 0개 잔존, `date_logs`는 커플 RW만 → **anon+authenticated 모두 base 직결 차단(memo 갭 완전 폐쇄)**. SCHEMA.md 라이브 상태 현행화(0005/0006/0007 모두 적용됨).
 
+## 이번에 완료 (공개 콘텐츠 Phase 2-B: place 축)
+- [x] **장소 공개 페이지/디렉터리 + 0008** — 결정 반영(B만·작성자 익명·지역 탐색 C는 나중에 주소파싱 방식).
+  - db-dev `0008_explore_places`: anon-safe 집계 뷰 `explore_places`(place별 public_log_count·avg_rating, 공개로그만)·`explore_place_logs`(익명 공개코스) + `date_log_places(place_id)` 인덱스. (commit)
+  - web-dev: `/places/[id]`(장소 상세·단일 마커·평균평점·공개 방문 코스, Place JSON-LD+aggregateRating·per-place OG) + `/places` 카테고리 디렉터리(FilterChip·PlaceCard) + 코스↔장소 내부링크(VisitedPlaceItem→/places/[id]) + `/places` public 미들웨어/robots/sitemap. 뷰만 조회·익명·사적필드 비노출. (commit)
+  - **dba: 0008 라이브 적용(201) + 검증** — anon으로 `explore_places`/`explore_place_logs` 200. SCHEMA.md 라이브 현행화(0005–0008 모두 적용).
+
 ## 다음 (Next)   ← 여기부터
-1. [ ] **AdSense 도입** — 선행조건(공개 URL·깊이·SEO) 충족됨. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`. *단, 공개 콘텐츠 양이 적으면 심사 불리 → 실데이터 확보 또는 Phase 2 병행 고려.*
-2. [ ] **공개 콘텐츠 Phase 2 (place 축)** — place 공개 페이지/디렉터리(`explore_places` 집계 뷰) + 지역/카테고리 탐색. 콘텐츠 양·검색 유입 큰 축. `docs/plan/05-public-enrichment.md` Phase 2. 열린 질문(지역 태깅 방식 등) 확정 필요.
+1. [ ] **AdSense 도입** — 선행조건(공개 URL·깊이·SEO·place 축) 충족. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`. *단, 실제 공개 로그가 0건이면 심사 불리 → 실데이터(공개 기록) 확보가 사실상 선행. 커플 실테스트 겸 공개 기록 몇 건 작성 권장.*
+2. [ ] **(Phase 2-C, 나중) 지역 탐색** — `/explore/지역/[region]` 등. 지역=places.address **주소 파싱 동/구**(결정됨). 공개 로그 실데이터 쌓인 뒤(thin-content 회피). `docs/plan/05-public-enrichment.md` C.
+3. [ ] **(Phase 3, 나중) 큐레이션·좋아요·코스 따라하기** — 05 문서 Phase 3.
 3. [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함) 완료. **사용자가 2계정으로 실제 검증**: A 초대코드 생성 → B `/couple/connect` 입력 → 양쪽 헤더 아바타/status=connected/커플 스코프 공유 확인.
 4. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.
 5. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).

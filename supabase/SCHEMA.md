@@ -7,11 +7,10 @@
 
 Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`, `0004_visibility`, `0005_date_log_photos`, `0006_public_explore`, `0007_public_detail`, `0008_explore_places`. Mirrored in `public` and `test`.
 
-**Live DB status:** migrations through `0007_public_detail` are **applied to the live DB**
-(0005/0006 applied 2026-07-07, 0007 applied 2026-07-07 — verified: anon+authenticated blocked from
-base `date_logs`, `explore_logs` anonymized). **`0008_explore_places` is written but NOT YET
-APPLIED to the live DB** — dba applies it and should flip this note once verified (anon can read
-`explore_places`/`explore_place_logs`; both views return public-only rows).
+**Live DB status:** all migrations through `0008_explore_places` are **applied to the live DB**
+(0005–0008 applied 2026-07-07 — verified: anon+authenticated blocked from base `date_logs`,
+`explore_logs` anonymized, anon can read `explore_places`/`explore_place_logs`). This file matches
+the live schema.
 
 ## Tables
 

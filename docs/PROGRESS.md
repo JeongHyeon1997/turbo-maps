@@ -58,10 +58,16 @@
 ## 이번에 완료 (커플 아바타)
 - [x] **web-dev: 헤더 파트너 아바타 실제 표시** — AppShell(async)이 로그인 유저+파트너 profiles 조회해 실제 아바타(이니셜+`avatar_url` 이미지)를 AppHeader에 전달, 에러 시 본인만/무세션이면 로그인 링크(/explore 공개 대응) / Avatar atom 이미지 지원 / 콜백이 provider 메타에서 `avatar_url` 매 로그인 백필(닉네임 미덮어씀) / 프로필 페이지도 avatar_url 배선. web typecheck+lint+build 통과. (commit 9760dd2)
 
+## 이번에 완료 (uiux 패스 Top 5)
+- [x] **uiux-reviewer 정식 패스** — 19건(High3/Med8/Low8) 지적 수령, Top 5 수정 완료. designer(토큰)+web-dev(앱) 분담, web typecheck+lint+build 통과.
+  - designer: `@maps/tokens`에 `coverGradients`/`coverTints` 추가(하드코딩 3중복 제거 소스) + DESIGN.md 커버/Pretendard 방침. (commit baef0be)
+  - web-dev: warm cream 배경 실제 적용(`background` 토큰 tailwind 배선 — 그동안 `bg-background`가 무효였음) + Pretendard 실제 로드(jsDelivr @import) + 커버 토큰 소비. (commit) / 아바타 이미지 실패 시 이니셜 폴백(client `AvatarImage`) + 헤더 아바타→`/profile` 링크(PC 로그아웃 경로) + 파일 input `sr-only`(키보드 접근) + 공개 피드 카드 비링크(공개 상세 페이지 부재) + `/explore` 로그아웃 시 `PublicShell`. (commit)
+
 ## 다음 (Next)   ← 여기부터
 2. [ ] **0006(+0005) 라이브 적용 = explore 2단계를 실제로 켜는 유일한 남은 일** — Blocked 참고(사용자 승인). 적용 후 dba 검증(anon `explore_logs` 공개행 / `date_logs` 0행) → /explore·랜딩·공개 커버 실동작 확인.
 3. [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함)는 완료. 남은 건 **사용자가 2계정으로 실제 검증**: A가 초대코드 생성 → B가 `/couple/connect`에서 입력 → 양쪽 헤더에 서로 아바타 표시 / status=connected / 커플 스코프 기록 공유 확인. (테스트 절차는 아래 세팅 메모/대화 참고)
-4. [ ] **uiux-reviewer 정식 패스 + 접근성 보강** — 공개 표면 늘어난 뒤 일괄 점검이 효율적. 읽기전용·저리스크. 담당: uiux-reviewer.
+4. [ ] **uiux 잔여(Med/Low) 백로그** — Top 5 외 남은 지적: 지도/검색 로딩·빈상태(#9), 초대코드 input 라벨(#10), heading 계층 h1 통일(#11), 경로선/11px 토큰화(#12·#13), Button 변형(disabled/type/fullWidth)로 폼버튼 흡수(#14), Avatar size prop/alt 개선(#15), 캘린더 빈날 비포커스·오늘 표시(#16), 커버 날짜칩 대비(#17), 상세 뒤로가기 맥락(#18). 저리스크, 여유 시 일괄.
+5. [ ] ⚠️ **[보안 백로그] `/logs/[id]` memo 노출** — 0006의 public-select 정책이 `to authenticated`(커플 스코프 아님)라, 적용 후엔 **로그인 유저가 남의 공개 로그 상세를 직결 조회 시 memo까지 노출** 가능. 근본수정: 공개 상세는 anon-safe 뷰 기반 전용 페이지로 分離 or 상세 페이지에서 비소유 공개로그는 memo 등 사적 필드 프로젝션 제외. (현재는 explore 카드 비링크로 회피 중)
 5. [ ] **AdSense 도입** — 1·2 완료 전제. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`.
 6. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.
 7. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).

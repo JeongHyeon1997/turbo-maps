@@ -120,6 +120,7 @@ export default async function ExploreLogDetailPage({ params }: PageParams) {
                 category={p.category}
                 address={p.address}
                 rating={p.rating}
+                placeId={p.placeId}
               />
             ))}
           </ul>

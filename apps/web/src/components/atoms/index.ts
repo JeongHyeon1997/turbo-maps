@@ -10,3 +10,4 @@ export { OAuthButton } from './OAuthButton';
 export { RatingInput } from './RatingInput';
 export { Logo } from './Logo';
 export { JsonLd } from './JsonLd';
+export { FilterChip } from './FilterChip';

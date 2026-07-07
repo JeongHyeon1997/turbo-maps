@@ -9,3 +9,4 @@ export { FeatureCard } from './FeatureCard';
 export { PolicySection } from './PolicySection';
 export { PolicyList } from './PolicyList';
 export { EmptyState } from './EmptyState';
+export { PlaceCard } from './PlaceCard';

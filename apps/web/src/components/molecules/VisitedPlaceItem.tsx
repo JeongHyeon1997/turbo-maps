@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { HeartRating, Tag } from '@/components/atoms';
 
 export interface VisitedPlaceItemProps {
@@ -8,6 +9,13 @@ export interface VisitedPlaceItemProps {
   address?: string | null;
   rating?: number | null;
   memo?: string | null;
+  /**
+   * When present, links the place name to its public page (`/places/[id]`) —
+   * used by the public course detail (`/explore/[id]`) so visitors can hop
+   * between a course and the places it visits. Renders as plain text when
+   * omitted (e.g. the couple-private `/logs/[id]` doesn't need this).
+   */
+  placeId?: string | null;
 }
 
 /** One visited place row in a date-log detail: order badge, name, rating and memo. */
@@ -18,6 +26,7 @@ export function VisitedPlaceItem({
   address,
   rating,
   memo,
+  placeId,
 }: VisitedPlaceItemProps) {
   return (
     <li className="flex gap-3 rounded-2xl border border-border bg-surface p-4">
@@ -27,7 +36,16 @@ export function VisitedPlaceItem({
       <div className="flex flex-1 flex-col gap-1.5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-base font-bold text-text-primary">{name}</span>
+            {placeId ? (
+              <Link
+                href={`/places/${placeId}` as React.ComponentProps<typeof Link>['href']}
+                className="text-base font-bold text-text-primary hover:text-brand hover:underline"
+              >
+                {name}
+              </Link>
+            ) : (
+              <span className="text-base font-bold text-text-primary">{name}</span>
+            )}
             {category && <Tag>{category}</Tag>}
           </div>
           {!!rating && <HeartRating value={rating} />}

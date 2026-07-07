@@ -12,7 +12,9 @@ import { publicCoverUrl } from '@/lib/storage/public-cover-url';
 
 // Public surfaces are anonymized by product decision — the views don't even carry
 // an author nickname column. Every public log/course is attributed to this label.
-const ANONYMOUS_AUTHOR = '익명 커플';
+// Exported so `lib/places.ts` (place detail's "appeared in these courses" list) uses
+// the exact same label instead of redefining it.
+export const ANONYMOUS_AUTHOR = '익명 커플';
 
 interface ExploreLogRow {
   id: string;
@@ -59,8 +61,11 @@ export interface PublicExploreLogDetail {
   places: PublicExplorePlace[];
 }
 
-/** Deterministic gradient pick for a single record (no list index to hash off of). */
-function gradientForId(id: string) {
+/**
+ * Deterministic gradient pick for a single record (no list index to hash off of).
+ * Exported for reuse by `lib/places.ts` (place-attributed course cards).
+ */
+export function gradientForId(id: string) {
   let hash = 0;
   for (let i = 0; i < id.length; i += 1) hash = (hash * 31 + id.charCodeAt(i)) % coverGradients.length;
   return coverGradients[Math.abs(hash) % coverGradients.length]!;

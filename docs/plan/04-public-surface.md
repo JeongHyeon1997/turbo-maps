@@ -41,7 +41,8 @@ owner: planner
    - (표시명) 공개 로그의 작성자/커플 닉네임을 anon에 보여줄지 결정: 필요 시 뷰에 join된 닉네임만 포함, `profiles` 원테이블은 anon 비노출 유지.
 6. SCHEMA.md의 Storage 섹션·`date_logs` 컬럼·RLS 섹션 갱신.
 
-#### web-dev
+#### web-dev — ✅ 완료 (2026-07-07, commit 2b9bb04·bae9dd9)
+구현: 미들웨어 `/explore` public / `/explore`·랜딩을 anon 뷰 조회로 전환(공통 `apps/web/src/lib/explore.ts`, 뷰 미적용 시 `[]` degrade) / 공개 커버 무토큰 URL(`lib/storage/public-cover-url.ts`) + 폴백 / 생성 시 copy-on-publish. **비공개 전환·삭제 정리는 편집/삭제 UI 부재로 후속.** 실동작은 0006 라이브 적용 후 켜짐.
 - **미들웨어**: `PUBLIC_PREFIXES`에 `/explore`(및 하위) 추가.
 - **/explore**: 데이터 조회를 anon 뷰(`explore_logs`) 기반으로 전환. 커버는 `public_cover_path`가 있으면 **public 버킷 공개 URL**(`/storage/v1/object/public/public-covers/<path>`)로 렌더, 없으면 기존 그라데이션 폴백. 로그인/비로그인 모두 동작.
 - **랜딩 ExplorePreview**: 실제 공개 데이터 발췌 + 공개 커버 렌더.

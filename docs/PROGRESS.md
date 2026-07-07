@@ -1,4 +1,4 @@
-# PROGRESS — 2026-07-06 기준
+# PROGRESS — 2026-07-07 기준
 
 > 새 세션은 이 파일을 먼저 읽는다. `## 다음` 맨 위 항목부터 집어든다.
 > 형식 규칙은 `docs/README.md`.
@@ -51,10 +51,12 @@
 ## 이번에 완료 (공개 표면 1단계)
 - [x] **🎯 공개 랜딩 `/` + `/privacy` + `/terms`** — 미들웨어 `/` exact-only public(+`/privacy`·`/terms`), `/` 세션 분기(비로그인=랜딩 hero/features/공개코스 미리보기+폴백, 로그인=기존 피드), 정책 페이지(AdSense 쿠키·제3자 광고 고지 포함). 신규 컴포넌트: Logo atom / FeatureCard·PolicySection·PolicyList·EmptyState molecule / Landing{Header,Hero,Features}·ExplorePreview·SiteFooter·PolicyDocument organism / PublicShell template. build+lint+typecheck 통과. (`docs/plan/04-public-surface.md` 1단계)
 
-## 다음 (Next)   ← 여기부터 (2026-07-06 우선순위 재정렬)
-2. [ ] **/explore 공개 열람 + 공개 커버 사진** — 진행중(Doing). **ADR 확정**(DECISIONS 2026-07-06): public 버킷 `public-covers` + copy-on-publish(커버 1장만, 갤러리는 커플 전용 유지) + anon 안전 뷰 `explore_logs`로 memo 등 사적 필드 비노출.
-   - [x] db-dev: **`0006_public_explore.sql` 작성 완료**(커밋됨) — `public-covers` 버킷·storage RLS·`date_logs.public_cover_path`·안전 뷰 `explore_logs`/`explore_log_places`(security_invoker=false, 공개행만) + **0004 공개 select 정책 `to authenticated` 재정의 + anon revoke**(아래 보안 메모). public/test+SCHEMA.md.
-   - [ ] **⟵ 다음 세션 시작점**: dba 라이브 적용(⚠️사용자 승인, 0005·0006 함께) → web-dev(미들웨어 `/explore` public·explore를 anon 뷰 기반 조회·`public-covers` 공개 URL 커버·로그 생성/수정 시 copy-on-publish, 비공개 전환/삭제 시 복사본 정리). `docs/plan/04-public-surface.md` 2단계.
+## 이번에 완료 (공개 표면 2단계 web)
+- [x] **web-dev: /explore 공개화 + copy-on-publish** — 미들웨어 `/explore` public / `/explore`·랜딩 미리보기를 anon 안전 뷰(`explore_logs`+`explore_log_places`) 기반 조회로 전환(공통 `lib/explore.ts`의 `getPublicExploreLogs`, 뷰 미적용 시 `[]`로 graceful degrade) / 공개 커버는 `public-covers` 무토큰 URL(`lib/storage/public-cover-url.ts`), 없으면 그라데이션 폴백 / 기록 생성 시 공개+커버면 `public-covers`에 best-effort 복사 후 `public_cover_path` 저장. web typecheck+lint+build 통과. (commit 2b9bb04, bae9dd9) (plan: docs/plan/04-public-surface.md 2단계)
+  - 남음: **0006(+0005) 라이브 적용 전엔 explore가 빈 상태**(의도된 degrade). 적용되면 코드 변경 없이 켜짐. 비공개 전환/삭제 시 공개 복사본 정리는 편집/삭제 UI가 생길 때 후속.
+
+## 다음 (Next)   ← 여기부터
+2. [ ] **0006(+0005) 라이브 적용 = 2단계를 실제로 켜는 유일한 남은 일** — Blocked 참고(사용자 승인). 적용 후 dba 검증(anon `explore_logs` 공개행 / `date_logs` 0행) → /explore·랜딩·공개 커버 실동작 확인.
 3. [ ] **커플 연결 실테스트(두 계정) + 파트너 아바타 실제 표시** — 핵심 커플 루프 검증. 아바타=코드(web-dev), 실테스트=사용자 2계정 필요. 1·2와 병렬 가능.
 4. [ ] **uiux-reviewer 정식 패스 + 접근성 보강** — 공개 표면 늘어난 뒤 일괄 점검이 효율적. 읽기전용·저리스크. 담당: uiux-reviewer.
 5. [ ] **AdSense 도입** — 1·2 완료 전제. ads.txt/스크립트/AdUnit(공개 페이지) + 신청(사용자). `docs/plan/03-adsense.md`.

@@ -1,23 +1,18 @@
 import Link from 'next/link';
 import { Tag, HeartRating } from '@/components/atoms';
 import type { MockDateLog } from '@/lib/mock/date-logs';
-
-function formatDate(iso: string) {
-  // Parse the yyyy-mm-dd string directly — avoids timezone/locale drift that
-  // would cause SSR/client hydration mismatches.
-  const [y, m, d] = iso.slice(0, 10).split('-');
-  return `${y}.${m}.${d}`;
-}
+import { formatLogDate } from '@/lib/format-date';
 
 export interface DateLogCardProps {
   log: MockDateLog;
   /**
-   * Whether the card links to `/logs/[id]`. That detail page requires a
-   * session and is scoped to the viewer's own couple, so public contexts
-   * (explore, the logged-out landing preview) must render non-linkable —
-   * otherwise a signed-in visitor could open another couple's log detail.
-   * Defaults to `true` (the signed-in home feed keeps linking).
+   * Base path the card links to (`${hrefBase}/${log.id}`). The signed-in home
+   * feed links to the couple-scoped `/logs/[id]`; public contexts (explore,
+   * the logged-out landing preview) pass `/explore` so cards open the
+   * anon-safe public detail page instead. Defaults to `/logs`.
    */
+  hrefBase?: string;
+  /** Renders as a plain (non-linking) card when explicitly set to `false`. Defaults to `true`. */
   linkable?: boolean;
 }
 
@@ -33,7 +28,7 @@ function CardBody({ log }: { log: MockDateLog }) {
         }}
       >
         <span className="rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
-          {formatDate(log.date)}
+          {formatLogDate(log.date)}
         </span>
       </div>
 
@@ -59,15 +54,15 @@ function CardBody({ log }: { log: MockDateLog }) {
   );
 }
 
-/** One date-log entry in the feed: gradient cover + meta + places. Links to the detail page unless `linkable={false}`. */
-export function DateLogCard({ log, linkable = true }: DateLogCardProps) {
+/** One date-log entry in the feed: gradient cover + meta + places. Links to `${hrefBase}/[id]` unless `linkable={false}`. */
+export function DateLogCard({ log, hrefBase = '/logs', linkable = true }: DateLogCardProps) {
   if (!linkable) {
     return <CardBody log={log} />;
   }
 
   return (
     <Link
-      href={`/logs/${log.id}` as React.ComponentProps<typeof Link>['href']}
+      href={`${hrefBase}/${log.id}` as React.ComponentProps<typeof Link>['href']}
       className="block"
     >
       <CardBody log={log} />

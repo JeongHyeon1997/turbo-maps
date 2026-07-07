@@ -5,6 +5,7 @@ import { AppShell } from '@/components/templates';
 import { KakaoMap, PhotoGallery, type MapMarker } from '@/components/organisms';
 import { BackLink, HeartRating } from '@/components/atoms';
 import { VisitedPlaceItem } from '@/components/molecules';
+import { formatLogDate } from '@/lib/format-date';
 
 interface PlaceRow {
   name: string;
@@ -35,13 +36,6 @@ interface Row {
   date_log_places: DateLogPlaceRow[];
   // one-to-one via a unique FK, but PostgREST may still shape it as an array.
   routes: RouteRow | RouteRow[] | null;
-}
-
-function formatDate(iso: string) {
-  // Parse the yyyy-mm-dd string directly — avoids timezone/locale drift that
-  // would cause SSR/client hydration mismatches.
-  const [y, m, d] = iso.slice(0, 10).split('-');
-  return `${y}.${m}.${d}`;
 }
 
 function isCoordList(v: unknown): v is { lat: number; lng: number }[] {
@@ -144,7 +138,7 @@ export default async function DateLogDetailPage({
           }}
         >
           <span className="w-fit rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
-            {formatDate(row.date)}
+            {formatLogDate(row.date)}
           </span>
           <h1 className="text-2xl font-extrabold text-white drop-shadow md:text-3xl">
             {row.title ?? '무제 데이트'}

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://maps.weourus.xyz'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'We Log',
     template: '%s · We Log',
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     title: 'We Log',
     description: '커플이 함께한 데이트·맛집·경로를 기록하는 공간, We Log.',
     locale: 'ko_KR',
-    url: 'https://maps.weourus.xyz',
+    url: SITE_URL,
   },
 };
 

@@ -21,11 +21,10 @@ export default async function ExplorePage() {
         <p className="text-sm text-text-secondary">다른 커플이 공개한 데이트 코스를 구경해보세요.</p>
       </div>
       {logs.length > 0 ? (
-        // Not linkable: `/logs/[id]` is RLS-readable by any signed-in user for
-        // public logs (couple-agnostic), which would expose the private memo
-        // field. There's no public detail page yet, so explore cards stay
-        // display-only regardless of session state.
-        <DateLogFeed logs={logs} linkable={false} />
+        // Cards link to the anon-safe public detail page (`/explore/[id]`), not
+        // the couple-scoped `/logs/[id]` — that keeps memo/private fields
+        // structurally unreachable regardless of session state.
+        <DateLogFeed logs={logs} hrefBase="/explore" />
       ) : (
         <div className="rounded-2xl border border-dashed border-border bg-surface px-6 py-16 text-center text-sm text-text-secondary">
           아직 공개된 기록이 없어요. 기록 작성 시 &ldquo;탐색에 공개&rdquo;를 켜보세요.

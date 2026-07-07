@@ -9,3 +9,4 @@ export { Button } from './Button';
 export { OAuthButton } from './OAuthButton';
 export { RatingInput } from './RatingInput';
 export { Logo } from './Logo';
+export { JsonLd } from './JsonLd';

@@ -3,9 +3,18 @@ import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { DateLogFeed, LandingHero, LandingFeatures, ExplorePreview } from '@/components/organisms';
 import { SectionHeader, ConnectBanner, EmptyState } from '@/components/molecules';
-import { Button } from '@/components/atoms';
+import { Button, JsonLd } from '@/components/atoms';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 import { getPublicExploreLogs } from '@/lib/explore';
+import { SITE_URL } from '@/lib/site-url';
+
+const LANDING_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'We Log',
+  url: SITE_URL,
+  publisher: { '@type': 'Organization', name: 'We Log' },
+};
 
 interface Row {
   id: string;
@@ -45,11 +54,12 @@ export default async function HomePage() {
     return (
       <PublicShell>
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 py-10 md:gap-24 md:px-8 md:py-16">
+          <JsonLd data={LANDING_JSON_LD} />
           <LandingHero />
           <LandingFeatures />
           <ExplorePreview>
             {previewLogs.length > 0 ? (
-              <DateLogFeed logs={previewLogs} linkable={false} />
+              <DateLogFeed logs={previewLogs} hrefBase="/explore" />
             ) : (
               <EmptyState icon="🌤️" message="공개된 데이트 코스가 곧 채워질 예정이에요." />
             )}

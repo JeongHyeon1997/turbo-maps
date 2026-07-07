@@ -56,6 +56,38 @@ export const accentPalette = {
 
 export type AccentColor = (typeof accentPalette)[keyof typeof accentPalette];
 
+/**
+ * Cover gradient tints — the light (top-left) stop of each date-log cover
+ * gradient. Warm-leaning pastels that pair 1:1 with `accentPalette` as the
+ * dark (bottom-right) stop. Named by hue so consumers read intent, not hex.
+ */
+export const coverTints = {
+  peach: '#F6C6A8', // pairs with accentPalette.coral
+  mint: '#BFE3C0', // pairs with accentPalette.sage
+  lilac: '#D9C6EE', // pairs with accentPalette.lavender
+  honey: '#FCE1A8', // pairs with accentPalette.amber
+  powder: '#BFE0F5', // pairs with accentPalette.sky
+} as const;
+
+export type CoverTint = (typeof coverTints)[keyof typeof coverTints];
+
+/**
+ * Date-log cover gradients — the photo-less fallback for a date-log card cover.
+ * Each pair is `[from, to]`: a warm light tint → its accent counterpart, meant
+ * to be rendered as a linear gradient (e.g. top-left → bottom-right).
+ * Single source of truth; do not hard-code these pairs in apps.
+ */
+export const coverGradients = [
+  [coverTints.peach, accentPalette.coral],
+  [coverTints.mint, accentPalette.sage],
+  [coverTints.lilac, accentPalette.lavender],
+  [coverTints.honey, accentPalette.amber],
+  [coverTints.powder, accentPalette.sky],
+] as const satisfies readonly (readonly [from: string, to: string])[];
+
+/** A single `[from, to]` cover-gradient stop pair. */
+export type CoverGradient = readonly [from: string, to: string];
+
 // Rating / highlight tiers (repurposed from a 1-2-3 scale).
 export const medalPalette = {
   1: { fill: '#FFD438', dark: '#D4A317' },

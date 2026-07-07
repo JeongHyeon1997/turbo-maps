@@ -1,5 +1,6 @@
 // Organisms barrel — standalone sections (Header, DateLogFeed…).
 export { AppHeader } from './AppHeader';
+export type { AvatarDescriptor } from './AppHeader';
 export { DateLogFeed } from './DateLogFeed';
 export { KakaoMap } from './KakaoMap';
 export type { MapMarker } from './KakaoMap';

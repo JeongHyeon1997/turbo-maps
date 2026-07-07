@@ -1,8 +1,17 @@
 import Link from 'next/link';
-import { Avatar, Logo } from '@/components/atoms';
+import { Avatar, Button, Logo } from '@/components/atoms';
+
+export interface AvatarDescriptor {
+  initial: string;
+  color?: string;
+  imageUrl?: string | null;
+}
 
 export interface AppHeaderProps {
-  coupleInitials?: [string, string];
+  /** Signed-in profile avatars (self first, then partner), already resolved server-side. */
+  avatars?: AvatarDescriptor[];
+  /** False when there's no session — shows a login CTA instead of avatars. */
+  signedIn?: boolean;
 }
 
 const nav = [
@@ -12,8 +21,8 @@ const nav = [
   { label: '탐색', href: '/explore' },
 ] as const;
 
-/** Full-width sticky top bar. Nav links appear on desktop; avatars always. */
-export function AppHeader({ coupleInitials = ['J', 'H'] }: AppHeaderProps) {
+/** Full-width sticky top bar. Nav links appear on desktop; avatars (or login CTA) always. */
+export function AppHeader({ avatars = [], signedIn = true }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-10 border-b border-divider bg-background/90 backdrop-blur">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 md:px-8">
@@ -31,10 +40,17 @@ export function AppHeader({ coupleInitials = ['J', 'H'] }: AppHeaderProps) {
             ))}
           </nav>
         </div>
-        <div className="flex -space-x-2">
-          <Avatar initial={coupleInitials[0]} color="#E8635C" />
-          <Avatar initial={coupleInitials[1]} color="#B79BD9" />
-        </div>
+        {avatars.length > 0 ? (
+          <div className="flex -space-x-2">
+            {avatars.map((a, i) => (
+              <Avatar key={i} initial={a.initial} color={a.color} imageUrl={a.imageUrl} />
+            ))}
+          </div>
+        ) : !signedIn ? (
+          <Button href="/login" variant="primary">
+            로그인
+          </Button>
+        ) : null}
       </div>
     </header>
   );

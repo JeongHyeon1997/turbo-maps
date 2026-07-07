@@ -33,7 +33,7 @@ export default async function ProfilePage() {
     <AppShell>
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-4">
-          <Avatar initial={nickname.slice(0, 1)} />
+          <Avatar initial={nickname.slice(0, 1)} imageUrl={profile?.avatar_url} />
           <div className="flex flex-col">
             <span className="text-xl font-extrabold text-text-primary">{nickname}</span>
             <span className="text-sm text-text-muted">기록 {count ?? 0}개</span>

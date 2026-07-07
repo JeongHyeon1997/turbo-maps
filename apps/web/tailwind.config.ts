@@ -8,6 +8,7 @@ export default {
       colors: {
         brand: colors.primary,
         'brand-pressed': colors.primaryPressed,
+        background: colors.background,
         surface: colors.surface,
         'surface-alt': colors.surfaceAlt,
         'text-primary': colors.textPrimary,

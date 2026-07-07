@@ -1,3 +1,4 @@
+import { coverGradients } from '@maps/tokens';
 import type { createClient } from '@/lib/supabase/server';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 import { publicCoverUrl } from '@/lib/storage/public-cover-url';
@@ -6,14 +7,6 @@ import { publicCoverUrl } from '@/lib/storage/public-cover-url';
 // anon-safe `explore_logs` / `explore_log_places` views from 0006
 // (docs/plan/04-public-surface.md 2단계). PostgREST can't embed across these
 // views, so places are fetched separately and grouped by `date_log_id` here.
-
-const COVERS: [string, string][] = [
-  ['#F6C6A8', '#E8635C'],
-  ['#BFE3C0', '#8FB08A'],
-  ['#D9C6EE', '#B79BD9'],
-  ['#FCE1A8', '#E7A54B'],
-  ['#BFE0F5', '#7FB4E0'],
-];
 
 interface ExploreLogRow {
   id: string;
@@ -84,7 +77,7 @@ export async function getPublicExploreLogs(
         memo: '', // private memo — never exposed on the public feed
         rating: avg,
         places: places.map((p) => ({ name: p.name, category: p.category ?? '' })),
-        cover: COVERS[i % COVERS.length]!,
+        cover: coverGradients[i % coverGradients.length]!,
         coverImage: publicCoverUrl(log.public_cover_path),
         author: log.author_nickname ?? '익명 커플',
       };

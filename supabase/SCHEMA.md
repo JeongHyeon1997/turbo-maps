@@ -5,11 +5,13 @@
 
 **Project:** `giilijttitajvygdosbe` · **Schemas:** `public` (prod), `test` (test data) — kept in sync.
 
-Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`, `0004_visibility`, `0005_date_log_photos`, `0006_public_explore`, `0007_public_detail`. Mirrored in `public` and `test`.
+Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`, `0004_visibility`, `0005_date_log_photos`, `0006_public_explore`, `0007_public_detail`, `0008_explore_places`. Mirrored in `public` and `test`.
 
-**Live DB status:** all migrations through `0007_public_detail` are **applied to the live DB**
+**Live DB status:** migrations through `0007_public_detail` are **applied to the live DB**
 (0005/0006 applied 2026-07-07, 0007 applied 2026-07-07 — verified: anon+authenticated blocked from
-base `date_logs`, `explore_logs` anonymized). This file matches the live schema.
+base `date_logs`, `explore_logs` anonymized). **`0008_explore_places` is written but NOT YET
+APPLIED to the live DB** — dba applies it and should flip this note once verified (anon can read
+`explore_places`/`explore_place_logs`; both views return public-only rows).
 
 ## Tables
 
@@ -57,7 +59,8 @@ Indexes: `date_logs_couple_date_idx (couple_id, date desc)`, `date_logs_public_i
 
 ### `date_log_places` (date_log ↔ place)
 id, date_log_id → date_logs, place_id → places, visit_order, rating (0-5), memo.
-Index `date_log_places_log_idx (date_log_id)`.
+Indexes: `date_log_places_log_idx (date_log_id)`, `date_log_places_place_idx (place_id)` (added
+`0008`, supports the `explore_places`/`explore_place_logs` aggregation join).
 
 ### `routes` (one per date_log)
 id, date_log_id (unique) → date_logs, coordinates jsonb, created_at.
@@ -151,6 +154,21 @@ explore anymore, but other UI still depends on it.
   tables carry no public-select policy at all anymore. Do not add anon/authenticated public
   grants or policies back onto the base tables — extend the views instead, keeping their column
   list free of `memo`-like fields and (per product decision) real author identity.
+- **`explore_places`** (added `0008`, public + test, **not yet applied live**) — anon-safe
+  place-level aggregate for the future `/places` directory. Columns: `place_id,
+  kakao_place_id, name, category, address, lat, lng, public_log_count, avg_rating`. Source:
+  `places` inner-joined through `date_log_places`/`date_logs` **filtered to
+  `date_logs.visibility = 'public'` only** — private visits never contribute to the count or
+  average, and a place with zero public appearances produces no row (inner join). `avg_rating`
+  ignores null ratings (not treated as 0); rounding is left to callers. No author/couple
+  identity anywhere in this view. `security_invoker = false`, `grant select` to `anon,
+  authenticated`.
+- **`explore_place_logs`** (added `0008`, public + test, **not yet applied live**) — anon-safe
+  list of public date_logs that visited a given place, for `/places/[id]`. Columns: `place_id,
+  date_log_id, title, date, public_cover_path, rating`. Source: `date_log_places` joined to
+  `date_logs` **filtered to `visibility = 'public'`**. **Anonymous by design** — no
+  nickname/author_id/couple_id, no `memo` — same stance as `explore_logs` (`0007`).
+  `security_invoker = false`, `grant select` to `anon, authenticated`.
 
 ## Not yet migrated
 그 외 확장(좋아요/댓글/공유 등)은 향후 마이그레이션.

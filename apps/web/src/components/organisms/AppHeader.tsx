@@ -41,11 +41,11 @@ export function AppHeader({ avatars = [], signedIn = true }: AppHeaderProps) {
           </nav>
         </div>
         {avatars.length > 0 ? (
-          <div className="flex -space-x-2">
+          <Link href="/profile" aria-label="내 프로필" className="flex -space-x-2">
             {avatars.map((a, i) => (
               <Avatar key={i} initial={a.initial} color={a.color} imageUrl={a.imageUrl} />
             ))}
-          </div>
+          </Link>
         ) : !signedIn ? (
           <Button href="/login" variant="primary">
             로그인

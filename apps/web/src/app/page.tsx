@@ -1,3 +1,4 @@
+import { coverGradients } from '@maps/tokens';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { DateLogFeed, LandingHero, LandingFeatures, ExplorePreview } from '@/components/organisms';
@@ -5,14 +6,6 @@ import { SectionHeader, ConnectBanner, EmptyState } from '@/components/molecules
 import { Button } from '@/components/atoms';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 import { getPublicExploreLogs } from '@/lib/explore';
-
-const COVERS: [string, string][] = [
-  ['#F6C6A8', '#E8635C'],
-  ['#BFE3C0', '#8FB08A'],
-  ['#D9C6EE', '#B79BD9'],
-  ['#FCE1A8', '#E7A54B'],
-  ['#BFE0F5', '#7FB4E0'],
-];
 
 interface Row {
   id: string;
@@ -34,7 +27,7 @@ function toCard(row: Row, i: number, coverUrl?: string | null): MockDateLog {
     memo: row.memo ?? '',
     rating: avg,
     places: dlp.map((p) => ({ name: p.places?.name ?? '', category: p.places?.category ?? '' })),
-    cover: COVERS[i % COVERS.length]!,
+    cover: coverGradients[i % coverGradients.length]!,
     coverImage: coverUrl ?? null,
   };
 }
@@ -56,7 +49,7 @@ export default async function HomePage() {
           <LandingFeatures />
           <ExplorePreview>
             {previewLogs.length > 0 ? (
-              <DateLogFeed logs={previewLogs} />
+              <DateLogFeed logs={previewLogs} linkable={false} />
             ) : (
               <EmptyState icon="🌤️" message="공개된 데이트 코스가 곧 채워질 예정이에요." />
             )}

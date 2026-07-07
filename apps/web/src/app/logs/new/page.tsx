@@ -255,7 +255,7 @@ export default function NewLogPage() {
           <input
             type="file"
             accept="image/*"
-            className="hidden"
+            className="sr-only"
             onChange={(e) => onPickCover(e.target.files?.[0] ?? null)}
           />
         </label>
@@ -269,7 +269,7 @@ export default function NewLogPage() {
             type="file"
             accept="image/*"
             multiple
-            className="hidden"
+            className="sr-only"
             onChange={(e) => onPickPhotos(e.target.files)}
           />
         </label>

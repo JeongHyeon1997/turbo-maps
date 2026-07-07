@@ -1,4 +1,5 @@
-import { accentPalette } from '@maps/tokens';
+import { AvatarFallback } from './AvatarFallback';
+import { AvatarImage } from './AvatarImage';
 
 export interface AvatarProps {
   initial: string;
@@ -6,25 +7,15 @@ export interface AvatarProps {
   imageUrl?: string | null;
 }
 
-/** Circular avatar. Renders a profile photo when available, else the nickname initial. */
+/**
+ * Circular avatar. Renders a profile photo when available, else the nickname initial.
+ * Stays a server component — the actual `<img onError>` handling lives in the
+ * client-only `AvatarImage` atom so this can still be used from RSCs.
+ */
 export function Avatar({ initial, color, imageUrl }: AvatarProps) {
   if (imageUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={imageUrl}
-        alt={initial}
-        className="h-8 w-8 rounded-full object-cover ring-2 ring-background"
-      />
-    );
+    return <AvatarImage src={imageUrl} initial={initial} color={color} />;
   }
 
-  return (
-    <span
-      className="inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-white ring-2 ring-background"
-      style={{ backgroundColor: color ?? accentPalette.coral }}
-    >
-      {initial}
-    </span>
-  );
+  return <AvatarFallback initial={initial} color={color} />;
 }

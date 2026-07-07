@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/atoms';
 
 /** Editable nickname + sign-out for the profile page. */
 export function ProfileActions({ initialNickname }: { initialNickname: string }) {
@@ -44,13 +45,9 @@ export function ProfileActions({ initialNickname }: { initialNickname: string })
             }}
             className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand"
           />
-          <button
-            onClick={save}
-            disabled={saving}
-            className="rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
-          >
+          <Button onClick={save} disabled={saving}>
             {saving ? '저장 중' : saved ? '저장됨' : '저장'}
-          </button>
+          </Button>
         </div>
       </label>
 

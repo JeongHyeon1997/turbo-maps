@@ -5,6 +5,8 @@ export interface AvatarDescriptor {
   initial: string;
   color?: string;
   imageUrl?: string | null;
+  /** Full nickname, when known, for a more meaningful accessible label than the bare initial. */
+  name?: string;
 }
 
 export interface AppHeaderProps {
@@ -43,7 +45,7 @@ export function AppHeader({ avatars = [], signedIn = true }: AppHeaderProps) {
         {avatars.length > 0 ? (
           <Link href="/profile" aria-label="내 프로필" className="flex -space-x-2">
             {avatars.map((a, i) => (
-              <Avatar key={i} initial={a.initial} color={a.color} imageUrl={a.imageUrl} />
+              <Avatar key={i} initial={a.initial} color={a.color} imageUrl={a.imageUrl} name={a.name} />
             ))}
           </Link>
         ) : !signedIn ? (

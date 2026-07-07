@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { accentPalette } from '@maps/tokens';
 import { loadKakao } from '@/lib/kakao/loader';
 
 export interface MapMarker {
@@ -20,9 +21,11 @@ export function KakaoMap({
   route?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
   useEffect(() => {
     let cancelled = false;
+    setStatus('loading');
     loadKakao()
       .then((kakao) => {
         if (cancelled || !ref.current) return;
@@ -43,14 +46,16 @@ export function KakaoMap({
             map,
             path,
             strokeWeight: 4,
-            strokeColor: '#E8635C',
+            strokeColor: accentPalette.coral,
             strokeOpacity: 0.9,
           });
         }
         if (markers.length > 0) map.setBounds(bounds);
+        setStatus('ready');
       })
       .catch(() => {
-        /* SDK/domain not configured — map just stays blank */
+        // SDK failed to load (missing key / domain not registered / network).
+        if (!cancelled) setStatus('error');
       });
     return () => {
       cancelled = true;
@@ -59,9 +64,17 @@ export function KakaoMap({
 
   return (
     <div
-      ref={ref}
       style={{ width: '100%', height }}
-      className="overflow-hidden rounded-2xl border border-border bg-surface-alt"
-    />
+      className="relative overflow-hidden rounded-2xl border border-border bg-surface-alt"
+    >
+      <div ref={ref} className="h-full w-full" />
+      {status !== 'ready' && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4 text-center text-sm text-text-secondary">
+          {status === 'error'
+            ? '지도를 불러오지 못했어요. 잠시 후 다시 시도해주세요.'
+            : '지도를 불러오는 중…'}
+        </div>
+      )}
+    </div>
   );
 }

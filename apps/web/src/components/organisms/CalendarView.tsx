@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 
 export interface CalendarItem {
@@ -22,6 +22,13 @@ export function CalendarView({
 }) {
   const [cursor, setCursor] = useState(initialMonth);
   const [selected, setSelected] = useState<string | null>(null);
+  // Computed client-side (after mount) rather than during render, so the
+  // server-rendered markup never depends on "now" and can't hydration-mismatch.
+  const [today, setToday] = useState<string | null>(null);
+  useEffect(() => {
+    const t = new Date();
+    setToday(`${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`);
+  }, []);
 
   const byDate = useMemo(() => {
     const m = new Map<string, CalendarItem[]>();
@@ -86,20 +93,32 @@ export function CalendarView({
           const ds = dateStr(day);
           const has = byDate.has(ds);
           const isSel = selected === ds;
+          const isToday = today === ds;
+          const cellClasses = `flex aspect-square flex-col items-center justify-center rounded-xl text-sm ${
+            isSel ? 'bg-brand text-white' : has ? 'bg-surface-alt text-text-primary' : 'text-text-secondary'
+          } ${isToday && !isSel ? 'ring-2 ring-inset ring-brand' : ''}`;
+
+          // Days without a record aren't interactive — a plain `<div>` avoids
+          // a focusable, clickable-looking control that does nothing.
+          if (!has) {
+            return (
+              <div key={ds} className={cellClasses} aria-current={isToday ? 'date' : undefined}>
+                {day}
+              </div>
+            );
+          }
+
           return (
             <button
               key={ds}
-              onClick={() => has && setSelected(isSel ? null : ds)}
-              className={`flex aspect-square flex-col items-center justify-center rounded-xl text-sm ${
-                isSel ? 'bg-brand text-white' : has ? 'bg-surface-alt text-text-primary' : 'text-text-secondary'
-              }`}
+              type="button"
+              onClick={() => setSelected(isSel ? null : ds)}
+              aria-pressed={isSel}
+              aria-current={isToday ? 'date' : undefined}
+              className={cellClasses}
             >
               {day}
-              {has && (
-                <span
-                  className={`mt-0.5 h-1.5 w-1.5 rounded-full ${isSel ? 'bg-white' : 'bg-brand'}`}
-                />
-              )}
+              <span className={`mt-0.5 h-1.5 w-1.5 rounded-full ${isSel ? 'bg-white' : 'bg-brand'}`} />
             </button>
           );
         })}

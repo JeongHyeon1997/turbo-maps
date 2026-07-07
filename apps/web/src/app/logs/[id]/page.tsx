@@ -1,10 +1,9 @@
-import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { colors } from '@maps/tokens';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/templates';
 import { KakaoMap, PhotoGallery, type MapMarker } from '@/components/organisms';
-import { HeartRating } from '@/components/atoms';
+import { BackLink, HeartRating } from '@/components/atoms';
 import { VisitedPlaceItem } from '@/components/molecules';
 
 interface PlaceRow {
@@ -134,12 +133,7 @@ export default async function DateLogDetailPage({
   return (
     <AppShell>
       <div className="flex flex-col gap-6 md:gap-8">
-        <Link
-          href="/"
-          className="w-fit text-sm font-medium text-text-muted hover:text-text-secondary"
-        >
-          ‹ 피드로 돌아가기
-        </Link>
+        <BackLink fallbackHref="/">‹ 피드로 돌아가기</BackLink>
 
         <div
           className="flex h-48 flex-col justify-end gap-2 rounded-2xl bg-cover bg-center p-6 md:h-64"
@@ -149,7 +143,7 @@ export default async function DateLogDetailPage({
               : `linear-gradient(135deg, ${colors.surfaceAlt}, ${colors.primary})`,
           }}
         >
-          <span className="w-fit rounded-full bg-black/20 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+          <span className="w-fit rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
             {formatDate(row.date)}
           </span>
           <h1 className="text-2xl font-extrabold text-white drop-shadow md:text-3xl">

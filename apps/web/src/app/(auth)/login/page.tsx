@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import type { Provider } from '@supabase/supabase-js';
+import { colors } from '@maps/tokens';
 import { createClient } from '@/lib/supabase/client';
 import { OAuthButton } from '@/components/atoms';
 
@@ -74,7 +75,7 @@ function LoginForm() {
           onClick={() => signIn('google')}
           disabled={loading !== null}
           bg="#FFFFFF"
-          fg="#2B2622"
+          fg={colors.textPrimary}
         />
       </div>
 

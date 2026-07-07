@@ -96,9 +96,9 @@ export default async function HomePage() {
 
         <div className="flex flex-col gap-1">
           <p className="text-sm text-text-muted">우리가 함께한 날</p>
-          <p className="text-2xl font-extrabold text-text-primary md:text-4xl">
+          <h1 className="text-2xl font-extrabold text-text-primary md:text-4xl">
             {logs.length}개의 기록
-          </p>
+          </h1>
         </div>
 
         <SectionHeader

@@ -56,7 +56,9 @@ export default async function ConnectPage({
         </div>
       ) : (
         <form action={createCouple}>
-          <Button>커플 만들고 초대코드 받기</Button>
+          <Button type="submit" fullWidth>
+            커플 만들고 초대코드 받기
+          </Button>
         </form>
       )}
 
@@ -64,15 +66,24 @@ export default async function ConnectPage({
         <p className="text-center text-sm font-medium text-text-secondary">
           이미 초대코드를 받았나요?
         </p>
-        <form action={joinCouple} className="flex gap-2">
-          <input
-            name="code"
-            placeholder="초대코드"
-            className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm uppercase outline-none focus:border-brand"
-          />
-          <button className="rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-white">
-            연결
-          </button>
+        <form action={joinCouple} className="flex flex-col gap-1.5">
+          <label htmlFor="invite-code" className="sr-only">
+            초대코드
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="invite-code"
+              name="code"
+              placeholder="예: A1B2C3"
+              maxLength={6}
+              aria-describedby="invite-code-hint"
+              className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm uppercase outline-none focus:border-brand"
+            />
+            <Button type="submit">연결</Button>
+          </div>
+          <p id="invite-code-hint" className="text-center text-xs text-text-muted">
+            영문·숫자 6자리 코드를 입력하세요.
+          </p>
         </form>
         {error === 'join' && (
           <p className="text-center text-xs text-danger">유효하지 않거나 이미 사용된 코드예요.</p>

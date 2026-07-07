@@ -16,6 +16,7 @@ function toDescriptor(profile: ProfileRow | undefined, order: number): AvatarDes
     initial: nickname ? nickname.slice(0, 1) : '?',
     color: PARTNER_COLORS[order % PARTNER_COLORS.length],
     imageUrl: profile?.avatar_url ?? null,
+    name: nickname ?? undefined,
   };
 }
 

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { KakaoMap, PlaceSearch, type KakaoPlace, type MapMarker } from '@/components/organisms';
-import { RatingInput } from '@/components/atoms';
+import { Button, RatingInput } from '@/components/atoms';
 import { PhotoThumb } from '@/components/molecules';
 
 interface Selected extends KakaoPlace {
@@ -343,13 +343,9 @@ export default function NewLogPage() {
 
       {error && <p className="text-sm text-danger">{error}</p>}
 
-      <button
-        onClick={save}
-        disabled={saving}
-        className="rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
-      >
+      <Button onClick={save} disabled={saving} fullWidth>
         {saving ? '저장 중…' : '기록 저장'}
-      </button>
+      </Button>
     </main>
   );
 }

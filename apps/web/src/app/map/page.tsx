@@ -35,9 +35,9 @@ export default async function MapPage() {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <p className="text-sm text-text-muted">우리가 함께 다닌</p>
-          <p className="text-2xl font-extrabold text-text-primary md:text-4xl">
+          <h1 className="text-2xl font-extrabold text-text-primary md:text-4xl">
             {markers.length}곳의 지도
-          </p>
+          </h1>
         </div>
         {markers.length > 0 ? (
           <KakaoMap markers={markers} route={false} height={520} />

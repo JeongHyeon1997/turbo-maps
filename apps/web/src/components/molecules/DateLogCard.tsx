@@ -32,7 +32,7 @@ function CardBody({ log }: { log: MockDateLog }) {
             : `linear-gradient(135deg, ${log.cover[0]}, ${log.cover[1]})`,
         }}
       >
-        <span className="rounded-full bg-black/20 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+        <span className="rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
           {formatDate(log.date)}
         </span>
       </div>

@@ -60,3 +60,7 @@ supabase/.temp/
 
 # misc
 *.tsbuildinfo
+
+# Root font source bundle (배민 폰트) — self-hosted copies live in
+# apps/web/src/fonts/; this original bundle stays local, not committed.
+/BM-fonts-package/

@@ -25,11 +25,12 @@ export const radius = {
   full: 9999,
 } as const;
 
-// Warm brown-tinted shadows (rgba of textPrimary #2A2521) — never pure black,
-// so elevation stays soft/warm per DESIGN.md.
+// Faint neutral-tinted shadows (rgba of textPrimary #1F1D1B) — never pure black,
+// so elevation stays soft per DESIGN.md (warm-neutral minimalism). In dark mode
+// depth comes from stepped surface elevation, not these shadows.
 export const shadow = {
   none: 'none',
-  sm: '0 1px 2px rgba(42,37,33,0.06)',
-  md: '0 2px 8px rgba(42,37,33,0.08)',
-  lg: '0 10px 28px rgba(42,37,33,0.12)',
+  sm: '0 1px 2px rgba(31,29,27,0.06)',
+  md: '0 2px 8px rgba(31,29,27,0.08)',
+  lg: '0 10px 28px rgba(31,29,27,0.12)',
 } as const;

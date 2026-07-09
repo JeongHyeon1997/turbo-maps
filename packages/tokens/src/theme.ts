@@ -12,54 +12,60 @@
  * Per-token re-exports (`colors`, `spacing`, `fontSize`, ...) still exist for
  * direct access; prefer `theme.*` for anything semantic.
  */
-import { accentPalette, colors } from './colors';
+import { accentPalette, colors, colorsDark } from './colors';
 import { fontFamily, fontSize, fontWeight, lineHeight, textStyle } from './typography';
 import { radius, shadow, spacing } from './spacing';
 
-export const theme = {
-  /** Semantic color tokens. */
-  color: {
-    // Brand — WeLog blue
-    brand: colors.brand,
-    brandPressed: colors.brandPressed,
-    brandSoft: colors.brandSoft,
+/**
+ * Assemble a semantic color layer from a raw palette. `theme.color` is the LIGHT
+ * set (also the constant RN reads). `theme.colorDark` is the charcoal set. The
+ * web publishes both as `--color-*` channels (see `css-vars.ts`) and toggles via
+ * `.dark`; keys are identical across the two so class names stay stable.
+ */
+function semanticColor(p: typeof colors | typeof colorsDark) {
+  return {
+    brand: p.brand,
+    brandPressed: p.brandPressed,
+    brandSoft: p.brandSoft,
 
-    // Surface — warm cream
-    background: colors.background,
-    surface: colors.surface,
-    surfaceAlt: colors.surfaceAlt,
+    background: p.background,
+    surface: p.surface,
+    surfaceAlt: p.surfaceAlt,
 
-    // Text
-    textPrimary: colors.textPrimary,
-    textSecondary: colors.textSecondary,
-    textMuted: colors.textMuted,
-    textDisabled: colors.textDisabled,
-    textOnBrand: colors.textOnBrand,
+    textPrimary: p.textPrimary,
+    textSecondary: p.textSecondary,
+    textMuted: p.textMuted,
+    textDisabled: p.textDisabled,
+    textOnBrand: p.textOnBrand,
     textOnAccent: '#FFFFFF',
 
-    // Border / divider
-    border: colors.border,
-    borderStrong: colors.borderStrong,
-    borderSoft: colors.borderSoft,
-    divider: colors.divider,
+    border: p.border,
+    borderStrong: p.borderStrong,
+    borderSoft: p.borderSoft,
+    divider: p.divider,
 
-    // States
-    danger: colors.danger,
-    success: colors.success,
-    warning: colors.warning,
-    info: colors.info,
+    danger: p.danger,
+    success: p.success,
+    warning: p.warning,
+    info: p.info,
 
-    // Rating (romance coral) + full accent palette (tags / markers)
-    rating: colors.rating,
+    rating: p.rating,
     accent: accentPalette,
 
-    // Input
     input: {
-      underline: colors.inputUnderline,
-      underlineFocus: colors.inputUnderlineFocus,
-      placeholder: colors.inputPlaceholder,
+      underline: p.inputUnderline,
+      underlineFocus: p.inputUnderlineFocus,
+      placeholder: p.inputPlaceholder,
     },
-  },
+  } as const;
+}
+
+export const theme = {
+  /** Semantic color tokens — LIGHT (warm neutral). Also the RN default constant. */
+  color: semanticColor(colors),
+
+  /** Semantic color tokens — DARK (neutral charcoal). Same keys as `color`. */
+  colorDark: semanticColor(colorsDark),
 
   /** Spacing scale (px). */
   space: spacing,
@@ -67,7 +73,8 @@ export const theme = {
   /** Border-radius scale. */
   radius,
 
-  /** Box-shadow scale (CSS strings) — warm brown tint, never pure black. */
+  /** Box-shadow scale (CSS strings) — faint neutral tint, never pure black.
+   *  Dark mode expresses depth via stepped surface elevation, not shadow. */
   shadow,
 
   /** Border presets (width + color) for RN / inline use. */

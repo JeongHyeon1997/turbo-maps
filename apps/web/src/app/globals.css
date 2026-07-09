@@ -4,9 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
-}
+/* Semantic palette (`--color-*` channels) + `color-scheme` for `:root` (light)
+   and `.dark` (charcoal) are injected by the Tailwind base plugin from
+   @maps/tokens — see apps/web/tailwind.config.ts. Do not hard-code hex here. */
 
 html, body {
   height: 100%;

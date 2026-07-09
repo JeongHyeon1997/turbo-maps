@@ -9,7 +9,7 @@ export function Logo({ href = '/' }: LogoProps) {
   return (
     <Link
       href={href as React.ComponentProps<typeof Link>['href']}
-      className="text-xl font-extrabold tracking-tight text-brand"
+      className="font-jua text-xl tracking-tight text-brand"
     >
       위로그
     </Link>

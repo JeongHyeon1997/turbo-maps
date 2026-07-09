@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { jua } from './fonts';
 import { SITE_URL } from '@/lib/site-url';
 import {
   DEFAULT_OG_IMAGE_ALT,
@@ -52,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={jua.variable}>
       <body className="font-sans text-text-primary bg-background antialiased">{children}</body>
     </html>
   );

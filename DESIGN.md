@@ -28,22 +28,25 @@
 
 웜 오프화이트 캔버스 + **흰 카드** + **단일 브랜드 블루** + coral(rating 전용)의 웜 뉴트럴. (2026-07 방향 전환 — 면 분리·색 절제·다크모드 포함.)
 
-**단일 진실 구조:** `colors.ts`는 raw 값 → `theme.ts`가 시맨틱 레이어(`theme.color.*`) → **런타임 테마 토글을 위해 CSS custom properties(`--color-*`)로 발행**하고 tailwind는 그 변수를 소비한다(빌드타임 정적 hex 아님). 라이트/다크는 `.dark`(또는 `[data-theme="dark"]`) 오버라이드. 앱은 raw hex를 직접 만지지 않는다. 배선 상세는 `08-theme-tokens.md`.
+**단일 진실 구조 (배선 완료 2026-07-09):** `colors.ts`는 raw hex(`colors` = 라이트, `colorsDark` = 다크) → `theme.ts`가 시맨틱 레이어(`theme.color.*` 라이트 + `theme.colorDark.*`) → `css-vars.ts`가 각 시맨틱 색을 **`--color-*` 변수(채널값 `"R G B"`)로 발행**(`lightCssVars`/`darkCssVars`). tailwind는 `rgb(var(--color-*) / <alpha-value>)` 형태로 소비하고(정적 hex 아님), `:root`(라이트)·`.dark`(차콜) 변수는 tailwind base 플러그인이 토큰 맵에서 주입한다 — **globals.css에 hex 직박 없음.** 런타임 토글은 web-dev가 `<html class="dark">`를 붙여 수행(`darkMode: 'class'`). 앱은 raw hex를 직접 만지지 않는다. 배선 상세는 `08-theme-tokens.md`.
 
-### 라이트 (웜 뉴트럴)
+**채널 발행 이유(리스크#1 해소):** 변수를 `rgb(...)` 완성형이 아니라 채널(`"30 124 248"`)로 발행해야 Tailwind 알파 유틸(`bg-background/90`·`to-brand/10`·`border-danger/30`)이 `<alpha-value>` 자리에 opacity를 합성할 수 있다. `bg-brand`처럼 opacity 없이 쓰면 `<alpha-value>`가 `1`로 치환된다. 기존 클래스명(`bg-background`·`bg-surface`·`text-text-primary/secondary/muted`·`text-brand`·`border-border`·`divide-divider`·`bg-brand-soft` 등)은 **전부 그대로 동작**(값만 변수로).
 
-| 역할 (semantic) | 값(방향값, designer 확정) | 근거 |
-| --- | --- | --- |
-| **brand** (위로그 blue) | `#1E7CF8` / pressed `#135FD6` / soft `#E9F1FE` | 로고 노트북 블루. **단일 인터랙션 색** — 링크·CTA·활성·포커스 전부 |
-| background (canvas) | 웜 오프화이트 `#F7F5F1`급 | 카드가 아니라 **판**. 흰 카드를 얹기 위해 살짝 낮춘 톤 |
-| surface (카드) | **흰색 `#FFFFFF`** | 캔버스 위 흰 카드(토스식 면 분리) |
-| surfaceAlt (함몰/보조 면) | `#EFECE6`급 | 입력 트랙·구분 면 |
-| text primary/secondary/muted | 웜 뉴트럴 그레이 (브라운 제거, 웜기만 잔류) `#1F1D1B`·`#5C5852`·`#8E8A83`급 | primary AA 여유(≈15:1), secondary AA(≥4.5:1) |
-| textDisabled / onBrand | `#B8B4AD`급 / `#FFFFFF` | |
-| border / borderStrong / divider | 뉴트럴 `#E6E3DD`·`#D2CEC6`·`#F0EDE8`급 | 카드 테두리 or 얕은 그림자 **택1** |
-| **rating** (romance coral) | `#F26B60` | **하트·별 rating 전용으로 강등**. 인터랙션에 쓰지 않음 |
-| accent (태그/마커) | **무채색/브랜드소프트 계열로 축소** (아래 참고) | 5색 무지개 폐기 |
-| states | danger`#D0453C` success`#2F9E5B` warning`#DE912F` info=brand`#1E7CF8` | danger 텍스트 AA 확보, info는 brand와 정렬 |
+### 라이트 (웜 뉴트럴) — 확정값
+
+| 역할 (semantic) | CSS 변수 | 값 | 근거 |
+| --- | --- | --- | --- |
+| **brand** (위로그 blue) | `--color-brand` / `-pressed` / `-soft` | `#1E7CF8` / `#135FD6` / `#E9F1FE` | 로고 노트북 블루. **단일 인터랙션 색** — 링크·CTA·활성·포커스 전부 |
+| background (canvas) | `--color-background` | `#F7F5F1` | 카드가 아니라 **판**. 흰 카드를 얹기 위해 살짝 낮춘 톤 |
+| surface (카드) | `--color-surface` | `#FFFFFF` | 캔버스 위 흰 카드(토스식 면 분리) |
+| surfaceAlt (함몰/보조 면) | `--color-surface-alt` | `#EFECE6` | 입력 트랙·구분 면 |
+| text primary/secondary/muted | `--color-text-*` | `#1F1D1B` / `#5C5852` / `#8A857E` | primary ≈15:1, secondary ≈6.5:1(AA 본문), muted ≈3.6:1(AA large — 메타/비필수 전용) |
+| textDisabled / onBrand | `--color-text-disabled` / `-on-brand` | `#B8B4AD` / `#FFFFFF` | |
+| border / borderStrong / borderSoft / divider | `--color-border*` / `-divider` | `#E6E3DD` / `#D2CEC6` / `#EDE9E3` / `#F1EEE9` | 카드 테두리 or 얕은 그림자 **택1** |
+| **rating** (romance coral) | `--color-rating` | `#F26B60` | **하트·별 rating 전용으로 강등**. 인터랙션에 쓰지 않음 |
+| accent (태그/마커) | (정적, 미테마) | 뉴트럴 램프 + brand (아래 참고) | 5색 무지개 폐기 |
+| states | `--color-danger/success/warning/info` | `#D0453C` / `#2F9E5B` / `#DE912F` / `#1E7CF8` | danger 텍스트 AA 확보, info는 brand와 정렬 |
+| input | `--color-input-placeholder` / `-underline` | `#A8A39B` / `#E6E3DD` | placeholder AA large |
 
 - **대비:** 본문 텍스트는 배경 대비 WCAG AA(4.5:1) 이상. brand blue 텍스트/링크는 큰·세미볼드 UI·아이콘용(AA large 3:1). 긴 본문엔 textPrimary. 흰 카드 배경이라 이전 크림보다 대비 여유가 커진다(uiux 확정).
 - **역할 분리:** 블루=인터랙션·구조, coral=rating(애정)만. 둘을 섞지 않는다.
@@ -52,20 +55,24 @@
 
 토스풍 다크: 웜 브라운이 아니라 **뉴트럴 차콜**. 계단식 elevation, 순수 블랙 금지.
 
-| 역할 | 값(방향값, designer 확정) | 근거 |
+| 역할 | 값(확정) | 근거 |
 | --- | --- | --- |
-| **brand** | `#4B9BFF`급 (라이트보다 약간 밝게) | 어두운 배경 대비 확보 |
-| background | `#17171A`급 | 순수 블랙(`#000`) 금지 |
-| surface / surfaceAlt | `#1F1F24`급 / `#26262C`급 | **계단식 elevation**(위로 올라갈수록 밝은 면) |
-| text primary/secondary/muted | 순백 아님 — `rgba(255,255,255,.92 / .64 / .40)` **3단** | 눈부심 방지, 위계는 alpha로 |
-| border / divider | `rgba(255,255,255,.10 / .06)`급 | 얇은 분리선 |
-| rating | coral 유지(다크 대비 미세 조정 가능) | rating 전용 유지 |
+| **brand** | `#4B9BFF` / pressed `#3A82E0` / soft `#1B2740` | 어두운 배경 대비 확보. soft는 다크 블루-차콜 면 |
+| background | `#17171A` | 순수 블랙(`#000`) 금지 |
+| surface / surfaceAlt | `#1F1F24` / `#26262C` | **계단식 elevation**(위로 올라갈수록 밝은 면) |
+| text primary/secondary/muted | `#EDEDED` / `#A1A1A6` / `#6E6E73` | 순백 아닌 **.92/.60/.40 white의 solid 등가값**. 채널 발행+알파 유틸 호환을 위해 solid로 발행(아래 note) |
+| textDisabled | `#55555A` | |
+| border / borderStrong / borderSoft / divider | `#2E2E33` / `#3A3A40` / `#252529` / `#232328` | white 오버레이(.10/.06) 등가 solid |
+| states | danger `#FF6B60` · success `#3DBB72` · warning `#F0A83C` · info `#4B9BFF` | 다크 대비 위해 밝게 |
+| rating | `#FF7A6F` | rating 전용 유지, 다크에서 약간 밝게 |
+
+- **다크 텍스트 발행 방식(note):** DESIGN 방향은 "순백 대신 rgba 3단"이지만, CSS 변수를 **채널값**으로 발행해 알파 유틸(`text-x/70`)을 살리는 아키텍처와 충돌한다(변수에 alpha를 미리 굽지 못함). 그래서 3단을 **차콜 위 합성 등가 solid 그레이**(`#EDEDED`/`#A1A1A6`/`#6E6E73`)로 발행한다 — 위계·눈부심 완화 의도는 동일하게 유지되고, opacity 유틸도 정상 동작한다.
 
 - **테마 3-way 토글:** 시스템 / 라이트 / 다크. 기본=시스템. `prefers-color-scheme` 추종 + 사용자 선택 저장. 구현은 provider(`08` web-dev 파트).
 
 ### accent 축소 (무지개 폐기)
 
-기존 5색(coral/sage/lavender/amber/sky) 무지개를 **무채색 + 브랜드소프트 계열**로 축소한다. 태그/칩/마커는 색으로 구분하지 않고 **면·테두리·라벨(텍스트/아이콘)**로 구분한다. 카테고리별 색 코딩이 꼭 필요하면 brand 계열 톤 변주(soft/base) 안에서만. coral은 **rating 전용**이라 accent에서 제외. (designer가 `accentPalette`를 뉴트럴/브랜드소프트 스케일로 재정의 — `08` 참고.)
+기존 5색(coral/sage/lavender/amber/sky) 무지개를 **웜 뉴트럴 톤 램프 + brand**로 축소했다(`accentPalette` 확정: coral `#736E67` / sage `#8E8A83` / lavender `#A29E97` / amber `#B8B4AD` / sky `#1E7CF8`=brand). 태그/칩/마커는 색이 아니라 **면·테두리·라벨(텍스트/아이콘)·톤**으로 구분한다. coral은 accent에서 빠지고 **rating 전용**. **키는 유지(back-compat)** — `KakaoMap`(경로선)·`AvatarFallback`·`AppShell`(파트너색)이 아직 `accentPalette.coral/lavender`를 참조하므로 08 리스크#2에 따라 **값만 축소, 키 삭제 금지**. web-dev가 소비처를 brand/뉴트럴로 교체한 뒤 키를 정리한다. 이 램프는 **정적**(런타임 테마 미적용) — 어차피 폐기 예정이라 다크 변형을 만들지 않았다.
 
 ### 커버 폴백 단순화 (무지개 그라데이션 폐기)
 
@@ -77,9 +84,9 @@
 ## 타이포 (`packages/tokens/src/typography.ts`)
 
 - **본문·헤딩·UI·숫자 = Pretendard 유지**(clean sans). system sans 폴백.
-- **주아체(BMJUA) = 로고 워드마크(위로그)만.** 제품 UI(헤딩/본문/버튼/숫자)에 쓰지 않는다.
-- **한나3(BMHANNA)·꾸불림(BMKkubulim) = 제품 UI 미사용.** 마케팅/빈 상태 등 **제품 밖**에서만 선택적. 제품 화면엔 절대 넣지 않는다.
-- 폰트 파일 위치: `apps/web/src/fonts/` (`BMHANNA*`, `BMJUA_ttf.ttf`, `BMKkubulimTTF.ttf`).
+- **주아체(BMJUA) = 로고 워드마크(위로그)만.** 제품 UI(헤딩/본문/버튼/숫자)에 쓰지 않는다. 배선 완료: `apps/web/src/app/fonts.ts`가 `next/font/local`로 self-host → `--font-jua` 발행, tailwind `fontFamily.jua`(별칭 `logo`)가 참조, `Logo.tsx`에만 `font-jua` 적용. `display:'swap'`+`preload:false`로 첫 페인트 비블로킹(워드마크 한정 로드).
+- **한나3(BMHANNA)·꾸불림(BMKkubulim) = 제품 UI 미사용 → 지금 배선 안 함.** ttf 파일은 `apps/web/src/fonts/`에 남겨둠(마케팅/후속용). next/font 등록·tailwind 매핑 없음.
+- 폰트 파일 위치: `apps/web/src/fonts/` (`BMHANNA*`, `BMJUA_ttf.ttf`=배선됨, `BMKkubulimTTF.ttf`=미배선).
 
 ### 굵기 위계 정리 (extrabold 남발 제거)
 
@@ -90,10 +97,10 @@ extrabold(800) 남발을 정리하고 **bold 헤딩 + regular/medium 본문**의
 - `textStyle.displayLarge`의 `extrabold` → 재검토(대부분 bold로). designer가 `typography.ts` 조정.
 - **`letterSpacingTight(-0.02em)`를 국문 헤딩에 실제 적용** — display/title/subtitle·큰 숫자·라벨에. 본문/caption은 0 유지(소형 텍스트 tight 금지). tailwind `tracking-tight`(=`theme.font.letterSpacingTight`) 경유, 하드코딩 금지.
 
-### 로고 폰트 배선 (구현: designer 토큰 + web-dev)
+### 로고 폰트 배선 (완료)
 
-- `next/font/local`로 `apps/web/src/fonts/BMJUA_ttf.ttf`를 self-host → CSS 변수(예: `--font-logo`) 발행. `Logo`/워드마크 컴포넌트에서만 이 폰트 클래스 사용.
-- `fontFamily`에 `logo` 계열 추가(주아). `sans`(Pretendard)는 그대로 UI 전역. Pretendard는 기존 방침대로 로드(jsDelivr dynamic-subset 또는 self-host).
+- `next/font/local`로 `apps/web/src/fonts/BMJUA_ttf.ttf` self-host → **`--font-jua`** 발행(`fonts.ts`). CSS 변수명은 `--font-jua`로 확정(08 초안의 `--font-logo`를 대체 — 직접 지시 우선). `layout.tsx`가 `<html className={jua.variable}>`로 노출.
+- tailwind `fontFamily.jua`(+별칭 `logo`) = `['var(--font-jua)', 'Pretendard', 'sans-serif']`. `Logo` 워드마크에만 `font-jua` 사용. `sans`(Pretendard)는 UI 전역 유지 — 본문/헤딩/숫자 불변.
 
 ## 간격 · 라운드 · 섀도 (`packages/tokens/src/spacing.ts`)
 

@@ -1,10 +1,17 @@
 /**
  * maps 디자인 토큰 - 타이포그래피
- * 기본 폰트는 Pretendard 가정. 피그마에서 실제 사용 폰트 확인 후 업데이트 필요.
+ *
+ * 본문·헤딩·UI·숫자 = **Pretendard** (`sans`/`display`). system sans 폴백.
+ * **주아체(BMJUA) = 로고 워드마크(위로그) 전용** (`logo`). 웹은 next/font/local로
+ * self-host 하여 `--font-jua` CSS 변수로 노출하고 `logo`가 그 변수를 참조한다.
+ * 제품 UI(헤딩/본문/버튼/숫자)에는 절대 쓰지 않는다.
+ * 한나3(BMHANNA)·꾸불림(BMKkubulim)은 제품 UI 미사용 — 배선하지 않는다.
  */
 export const fontFamily = {
   sans: 'Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   display: 'Pretendard, -apple-system, BlinkMacSystemFont, sans-serif',
+  /** Logo wordmark only (BMJUA). Web fills the `--font-jua` var via next/font/local. */
+  logo: 'var(--font-jua), Pretendard, -apple-system, BlinkMacSystemFont, sans-serif',
 } as const;
 
 export const fontWeight = {
@@ -36,10 +43,12 @@ export const lineHeight = {
 } as const;
 
 export const textStyle = {
+  // Weight hierarchy: bold(700) headings + regular/medium body. extrabold is
+  // reserved for the logo wordmark only — headings step down to bold.
   displayLarge: {
     fontFamily: fontFamily.display,
     fontSize: fontSize['4xl'],
-    fontWeight: fontWeight.extrabold,
+    fontWeight: fontWeight.bold,
     lineHeight: lineHeight.tight,
   },
   title: {

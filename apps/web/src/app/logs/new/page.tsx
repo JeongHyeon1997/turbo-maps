@@ -59,7 +59,14 @@ export default function NewLogPage() {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const markers: MapMarker[] = places.map((p) => ({ lat: p.lat, lng: p.lng, name: p.name }));
+  // Memoized so the array identity only changes when `places` actually
+  // changes — KakaoMap's init effect depends on `markers`, and re-running it
+  // on every unrelated keystroke (memo text, title, etc.) would needlessly
+  // tear down and rebuild the live map underneath the user's finger.
+  const markers: MapMarker[] = useMemo(
+    () => places.map((p) => ({ lat: p.lat, lng: p.lng, name: p.name })),
+    [places],
+  );
 
   const addPlace = (p: KakaoPlace) => {
     if (places.some((x) => x.kakaoPlaceId === p.kakaoPlaceId)) return;

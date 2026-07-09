@@ -5,12 +5,13 @@
 
 ## 다음 (Next)   ← 새 세션은 여기부터, 위에서 아래로
 1. [ ] **STEP 0 — 실공개 로그 확보 (사용자 작업, 최우선 선행)** — 공개 뷰가 현재 전부 `[]`(공개 로그 0건).
-       커플 실테스트를 겸해 **공개 데이트 코스 8~15건 작성**(공개 토글 ON + 커버 사진 + 장소/평점). `/explore`·`/places`를 빈 화면이 아니게 만든다. → `docs/plan/03-adsense.md` STEP 0. **이게 AdSense·지역탐색·심사의 사실상 공통 선행조건.**
-2. [ ] **AdSense 도입 (STEP 1 코드/페이지)** — STEP 0로 실데이터가 쌓이면 착수. ads.txt·AdSense 스크립트(공개 레이아웃 한정)·AdUnit(공개 페이지만)·CMP. 신청은 사용자. **로그인 후 사적 화면엔 광고 금지.** → `docs/plan/03-adsense.md` STEP 1~2. 담당 web-dev.
-3. [ ] **(Phase 2-C) 지역 탐색** — `/explore/지역/[region]` 등. 지역 = `places.address` **주소 파싱 동/구**(결정됨). 공개 실데이터 쌓인 뒤. → `docs/plan/05-public-enrichment.md` C. 담당 db-dev+web-dev.
-4. [ ] **(Phase 3) 큐레이션·좋아요·코스 따라하기** — → `docs/plan/05-public-enrichment.md` Phase 3.
-5. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.
-6. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
+       커플 실테스트를 겸해 **공개 데이트 코스 8~15건 작성**(공개 토글 ON + 커버 사진 + 장소/평점). `/explore`·`/places`·`/explore/regions`를 빈 화면이 아니게 만든다. → `docs/plan/03-adsense.md` STEP 0. **이게 AdSense·지역탐색·심사의 사실상 공통 선행조건.** (데이터 무관한 아래 2·3은 지금 병행 가능.)
+2. [ ] **색감·테마 + `theme.ts` 정의 (designer+uiux) ← 지금 착수** — 결정됨: **warm 유지 + 톤 리프레시**(다크모드 후속), **배선 통합**(morun 잔재 청산 + 커플앱 시맨틱 재정의 + tailwind가 실제 소비). 데이터 무관, 헤더/커뮤니티 비주얼 토대라 먼저. → `docs/plan/08-theme-tokens.md`. 담당 designer+uiux-reviewer(+web-dev 배선).
+3. [ ] **헤더 & 푸터 — `SiteHeader` 통합 + 전역 푸터** — 결정됨: 로그아웃/로그인 상태별 nav 분기, 공개 탐색(`/explore`·`/places`·지역)·커뮤니티 진입점 자리, 정책/소개 링크 푸터. 헤더 organism 중복 통합. 02(테마) 위에서. → `docs/plan/07-header-footer.md`. 담당 web-dev+designer+uiux-reviewer.
+4. [ ] **AdSense 도입 (STEP 1 코드/페이지)** — STEP 0로 실데이터가 쌓이면 착수. ads.txt·AdSense 스크립트(공개 레이아웃 한정)·AdUnit(공개 페이지만)·CMP. 신청은 사용자. **로그인 후 사적 화면엔 광고 금지.** → `docs/plan/03-adsense.md` STEP 1~2. 담당 web-dev.
+5. [ ] **커뮤니티 공간 (C-1: 좋아요·북마크부터)** — 커플 스코프 넘어 전체 유저 장소/코스 참여·발견. 결정됨: **지금은 헤더 IA에 진입점 자리만, 기능은 STEP0 실데이터 후.** C-1(좋아요·북마크·인기정렬, 익명 유지 가능)→C-2(따라하기)→C-3(정체성, **작성자 익명화 0007과 충돌 → ADR 선행**). → `docs/plan/06-community.md`. 담당 db-dev+web-dev+server-dev.
+6. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.
+7. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
 ## 진행중 (Doing)
 - (없음 — 세션 종료 시점 클린. 다음 세션은 위 `## 다음` 1번부터.)
@@ -18,7 +19,8 @@
 ## 막힘 (Blocked) — 사용자 승인/대시보드 필요
 - [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함) 완료. 사용자가 2계정으로 실검증: A 초대코드 생성 → B `/couple/connect` 입력 → 양쪽 헤더 아바타/status=connected/커플 스코프 공유 확인. (※ `## 다음` STEP 0와 겸해서 진행 가능)
 - [ ] **api CORS_ORIGINS prod 반영** — `.env.example`/로컬엔 `https://maps.weourus.xyz` 추가됨. Vercel production 값은 사용자가 `vercel env`로 반영. (웹은 Supabase 직접 호출이라 당장 blocking 아님)
-- [ ] **SSO 동의화면 앱명 We Log로** — Kakao Developers / Google Cloud OAuth 동의화면 App name·아이콘을 "We Log"로. (코드 아님)
+- [ ] **SSO 동의화면 앱명 위로그로** — Kakao Developers / Google Cloud OAuth 동의화면 App name·아이콘을 "위로그"로. (코드 아님)
+- [ ] **0009 라이브 적용 대기** — `0009_explore_regions`(explore_places.region + explore_regions 뷰) 파일 작성·검증 완료, **프로덕션 DB 적용은 자동 승인 거부**됨(사용자 권한 필요). 공개 로그 0건이라 급하지 않음 — STEP0 실데이터 넣을 때 dba로 함께 적용 권장. 그전까진 웹 지역 페처가 `[]`로 degrade.
 
 ## 완료 (Done)
 
@@ -46,6 +48,10 @@
 - [x] **Phase 2-B — place 축**: `/places/[id]`(장소 상세·단일 마커·평균평점·공개 코스·Place JSON-LD+aggregateRating) + `/places` 카테고리 디렉터리(FilterChip·PlaceCard) + 코스↔장소 내부링크. 집계 뷰 `explore_places`/`explore_place_logs`(`0008`)
 - [x] **uiux-reviewer 정식 패스(19건)** — Top5 + Med/Low 전건 반영. warm cream 배경 실적용·Pretendard 로드·커버 토큰(`coverGradients`/`coverTints`)·접근성(라벨/aria/키보드)·Button 변형·BackLink 등. designer+web-dev 분담
 - [x] **DB 0005–0008 전부 라이브 적용 + 검증(dba)** — anon→공개 뷰 200, anon+auth→base 직결 401/차단, `public-covers` 버킷·정책·컬럼 확인. **SCHEMA.md 라이브 현행화 완료.**
+- [x] **Phase 2-C — 지역 탐색**: `explore_places.region`(주소 파싱 **구/시·군**, `derive_region()`) + 신규 `explore_regions` 집계 뷰(`0009`, public/test·SCHEMA.md). 웹 `/explore/regions`(지역 인덱스·RegionCard) + `/explore/regions/[region]`(지역별 장소·PlaceCard·CollectionPage JSON-LD) + place 상세→지역 링크 + sitemap 확장. **한글 정적 세그먼트 404 버그** → ASCII 슬러그(`/explore/regions`)로 해결(동적 `[region]`엔 한글값 유지). `bun run build`+`next start` 스모크 200 검증. **`0009` 라이브 적용은 Blocked(사용자 권한) 참고.**
+- [x] **SEO 배선 수정**: `/sitemap.xml`·`/robots.txt`가 미들웨어 로그인 리다이렉트로 막히던 것 → `EXACT_PUBLIC`에 추가(크롤러 200 확인).
+- [x] **브랜드 로고·파비콘**: `public/logo.png`(위로그 워드마크) + `app/icon.png`·`apple-icon.png`(Next 자동 파비콘 배선).
+- [x] **표기 위로그 rebrand**: web 사용자 표기 "We Log" → "위로그" 전수 교체(메타데이터/OG/JSON-LD/정책/로그인/Logo·푸터·랜딩). 로고 워드마크는 영문 유지(영/한 병행).
 
 ## 세팅 메모
 - 지도: Kakao Map. web `NEXT_PUBLIC_KAKAO_MAP_KEY`·mobile `EXPO_PUBLIC_KAKAO_MAP_KEY` 채움. api `KAKAO_REST_API_KEY` 미정(장소검색 프록시 시).

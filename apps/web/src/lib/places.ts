@@ -10,7 +10,9 @@ import { ANONYMOUS_AUTHOR, gradientForId } from '@/lib/explore';
 // private covers and real nicknames structurally unreachable here. 0008 may not be
 // live yet, so every export below degrades to `null`/`[]` on any error.
 
-interface ExplorePlaceRow {
+// Exported so `lib/regions.ts` can query the same view/columns for
+// `getPublicPlacesByRegion` without redefining the row shape or mapper.
+export interface ExplorePlaceRow {
   place_id: string;
   kakao_place_id: string;
   name: string;
@@ -20,6 +22,7 @@ interface ExplorePlaceRow {
   lng: number;
   public_log_count: number;
   avg_rating: number | null;
+  region: string | null;
 }
 
 interface ExplorePlaceLogRow {
@@ -41,9 +44,11 @@ export interface PublicPlace {
   lng: number;
   publicLogCount: number;
   avgRating: number;
+  /** Region (구/시·군) derived from address, `null` when it couldn't be parsed. See lib/regions.ts. */
+  region: string | null;
 }
 
-function toPublicPlace(row: ExplorePlaceRow): PublicPlace {
+export function toPublicPlace(row: ExplorePlaceRow): PublicPlace {
   return {
     id: row.place_id,
     kakaoPlaceId: row.kakao_place_id,
@@ -54,8 +59,13 @@ function toPublicPlace(row: ExplorePlaceRow): PublicPlace {
     lng: row.lng,
     publicLogCount: row.public_log_count,
     avgRating: row.avg_rating ?? 0,
+    region: row.region,
   };
 }
+
+/** Select list shared by every `explore_places` query in this file and `lib/regions.ts`. */
+export const EXPLORE_PLACE_COLUMNS =
+  'place_id, kakao_place_id, name, category, address, lat, lng, public_log_count, avg_rating, region';
 
 /**
  * Best-effort single-place fetch for `/places/[id]`. Returns `null` when the
@@ -69,9 +79,7 @@ export async function getPublicPlace(
   try {
     const { data, error } = await supabase
       .from('explore_places')
-      .select(
-        'place_id, kakao_place_id, name, category, address, lat, lng, public_log_count, avg_rating',
-      )
+      .select(EXPLORE_PLACE_COLUMNS)
       .eq('place_id', placeId)
       .maybeSingle();
     if (error || !data) return null;
@@ -128,9 +136,7 @@ export async function getPublicPlaces(
   try {
     let query = supabase
       .from('explore_places')
-      .select(
-        'place_id, kakao_place_id, name, category, address, lat, lng, public_log_count, avg_rating',
-      )
+      .select(EXPLORE_PLACE_COLUMNS)
       .order('public_log_count', { ascending: false });
     if (options.category) query = query.eq('category', options.category);
 

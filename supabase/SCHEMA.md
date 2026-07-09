@@ -5,12 +5,14 @@
 
 **Project:** `giilijttitajvygdosbe` · **Schemas:** `public` (prod), `test` (test data) — kept in sync.
 
-Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`, `0004_visibility`, `0005_date_log_photos`, `0006_public_explore`, `0007_public_detail`, `0008_explore_places`. Mirrored in `public` and `test`.
+Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`, `0004_visibility`, `0005_date_log_photos`, `0006_public_explore`, `0007_public_detail`, `0008_explore_places`, `0009_explore_regions`. Mirrored in `public` and `test`.
 
 **Live DB status:** all migrations through `0008_explore_places` are **applied to the live DB**
 (0005–0008 applied 2026-07-07 — verified: anon+authenticated blocked from base `date_logs`,
-`explore_logs` anonymized, anon can read `explore_places`/`explore_place_logs`). This file matches
-the live schema.
+`explore_logs` anonymized, anon can read `explore_places`/`explore_place_logs`). `0009_explore_regions`
+is written but **not yet applied live** (dba to apply). This file matches the live schema through
+`0008`; the `0009` additions described below (function `derive_region`, `explore_places.region`,
+`explore_regions`) are forward-looking until applied.
 
 ## Tables
 
@@ -39,6 +41,14 @@ Indexes: `couples_partner_a_idx`, `couples_partner_b_idx`.
 
 ### Functions
 - `join_couple(p_code text) → uuid` — SECURITY DEFINER. Sets `partner_b = auth.uid()`, status→connected for a matching pending code. Granted to `authenticated`.
+- `derive_region(addr text) → text` (added `0009`, public + test, **not yet applied live**) — pure
+  `immutable` SQL function (not security definer) that parses a Korean address string into a
+  구/시/군-level region label: first Hangul token ending in `구` wins (regex `([가-힣]+구)`); else
+  first token ending in `시` or `군` (regex `([가-힣]+[시군])`); else `NULL` (no match, or `addr` is
+  `NULL`). No explicit `grant execute` — Postgres grants EXECUTE to PUBLIC by default and nothing
+  has revoked it, so `anon`/`authenticated` can already call it via `explore_places`/
+  `explore_regions`. Used only inside those two views; never called with untrusted-owner privilege
+  escalation since it does no I/O beyond its own text argument.
 
 ## RLS policies (enabled on both tables)
 - **profiles**: select own row + connected partner's row + (since `0004_visibility`) any row when authenticated; insert/update own only.
@@ -153,21 +163,33 @@ explore anymore, but other UI still depends on it.
   tables carry no public-select policy at all anymore. Do not add anon/authenticated public
   grants or policies back onto the base tables — extend the views instead, keeping their column
   list free of `memo`-like fields and (per product decision) real author identity.
-- **`explore_places`** (added `0008`, public + test, **not yet applied live**) — anon-safe
-  place-level aggregate for the future `/places` directory. Columns: `place_id,
-  kakao_place_id, name, category, address, lat, lng, public_log_count, avg_rating`. Source:
-  `places` inner-joined through `date_log_places`/`date_logs` **filtered to
-  `date_logs.visibility = 'public'` only** — private visits never contribute to the count or
-  average, and a place with zero public appearances produces no row (inner join). `avg_rating`
-  ignores null ratings (not treated as 0); rounding is left to callers. No author/couple
-  identity anywhere in this view. `security_invoker = false`, `grant select` to `anon,
-  authenticated`.
-- **`explore_place_logs`** (added `0008`, public + test, **not yet applied live**) — anon-safe
-  list of public date_logs that visited a given place, for `/places/[id]`. Columns: `place_id,
-  date_log_id, title, date, public_cover_path, rating`. Source: `date_log_places` joined to
-  `date_logs` **filtered to `visibility = 'public'`**. **Anonymous by design** — no
-  nickname/author_id/couple_id, no `memo` — same stance as `explore_logs` (`0007`).
+- **`explore_places`** (added `0008`, **live**; redefined `0009` to add `region`, **not yet
+  applied live**) — anon-safe place-level aggregate for the future `/places` directory. Columns
+  (as of `0009`): `place_id, kakao_place_id, name, category, address, lat, lng, region,
+  public_log_count, avg_rating`. `region` is `derive_region(address)` — a 구/시/군-level label,
+  `NULL` if the address didn't parse (see `derive_region` under Functions). Source: `places`
+  inner-joined through `date_log_places`/`date_logs` **filtered to `date_logs.visibility =
+  'public'` only** — private visits never contribute to the count or average, and a place with
+  zero public appearances produces no row (inner join). `avg_rating` ignores null ratings (not
+  treated as 0); rounding is left to callers. No author/couple identity anywhere in this view.
   `security_invoker = false`, `grant select` to `anon, authenticated`.
+- **`explore_place_logs`** (added `0008`, **live**) — anon-safe list of public date_logs that
+  visited a given place, for `/places/[id]`. Columns: `place_id, date_log_id, title, date,
+  public_cover_path, rating`. Source: `date_log_places` joined to `date_logs` **filtered to
+  `visibility = 'public'`**. **Anonymous by design** — no nickname/author_id/couple_id, no
+  `memo` — same stance as `explore_logs` (`0007`). `security_invoker = false`, `grant select`
+  to `anon, authenticated`.
+- **`explore_regions`** (added `0009`, public + test, **not yet applied live**) — anon-safe
+  region-level index/aggregate for the future `/explore/지역/[region]` pages. Columns: `region
+  text, place_count int, public_log_count int`. Same source join as `explore_places`
+  (`places` → `date_log_places` → `date_logs` filtered to `visibility = 'public'`), grouped by
+  `derive_region(places.address)` instead of by place; `place_count` = distinct places in that
+  region with ≥1 public appearance, `public_log_count` = distinct public date_logs whose places
+  resolved to that region. Rows where `derive_region()` returns `NULL` (unparseable address) are
+  excluded — no page to link to for an unresolvable region. Region is a view-time derived
+  expression, not indexable as-is (see migration comment — a stored generated column + btree
+  index is the escalation path if volume ever demands it; not needed now). No author/couple
+  identity. `security_invoker = false`, `grant select` to `anon, authenticated`.
 
 ## Not yet migrated
 그 외 확장(좋아요/댓글/공유 등)은 향후 마이그레이션.

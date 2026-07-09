@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
@@ -87,6 +88,18 @@ export default async function PlaceDetailPage({ params }: PageParams) {
           {place.category && <Tag>{place.category}</Tag>}
         </div>
         {place.address && <p className="text-sm text-text-muted">{place.address}</p>}
+        {place.region && (
+          <Link
+            href={
+              `/explore/regions/${encodeURIComponent(place.region)}` as React.ComponentProps<
+                typeof Link
+              >['href']
+            }
+            className="w-fit text-xs font-medium text-brand hover:underline"
+          >
+            {place.region} 다른 장소 보기 ›
+          </Link>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

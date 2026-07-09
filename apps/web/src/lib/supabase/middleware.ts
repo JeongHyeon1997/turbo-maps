@@ -9,7 +9,10 @@ type CookieToSet = { name: string; value: string; options?: CookieOptions };
 // `/explore` and `/places` (and sub-paths) are public too — they read from
 // anon-safe views (see app/explore/page.tsx, app/places/page.tsx and
 // docs/plan/04-public-surface.md 2단계 / 05-public-enrichment.md B).
-const EXACT_PUBLIC = ['/'];
+// `/sitemap.xml`/`/robots.txt` (app/sitemap.ts, app/robots.ts) must be exact-public
+// too — crawlers hit these with no session, and a redirect to /login here makes
+// the sitemap/robots undiscoverable, defeating the whole SEO effort.
+const EXACT_PUBLIC = ['/', '/sitemap.xml', '/robots.txt'];
 const PUBLIC_PREFIXES = ['/login', '/auth', '/privacy', '/terms', '/explore', '/places'];
 
 const isPublic = (path: string) =>

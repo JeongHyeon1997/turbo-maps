@@ -6,8 +6,8 @@
 ## 다음 (Next)   ← 새 세션은 여기부터, 위에서 아래로
 1. [ ] **STEP 0 — 실공개 로그 확보 (사용자 작업, 최우선 선행)** — 공개 뷰가 현재 전부 `[]`(공개 로그 0건).
        커플 실테스트를 겸해 **공개 데이트 코스 8~15건 작성**(공개 토글 ON + 커버 사진 + 장소/평점). `/explore`·`/places`·`/explore/regions`를 빈 화면이 아니게 만든다. → `docs/plan/03-adsense.md` STEP 0. **이게 AdSense·지역탐색·심사의 사실상 공통 선행조건.** (데이터 무관한 아래 2·3은 지금 병행 가능.)
-2. [ ] **색감·테마 + `theme.ts` 정의 (designer+uiux) ← 지금 착수** — 결정됨: **warm 유지 + 톤 리프레시**(다크모드 후속), **배선 통합**(morun 잔재 청산 + 커플앱 시맨틱 재정의 + tailwind가 실제 소비). 데이터 무관, 헤더/커뮤니티 비주얼 토대라 먼저. → `docs/plan/08-theme-tokens.md`. 담당 designer+uiux-reviewer(+web-dev 배선).
-3. [ ] **헤더 & 푸터 — `SiteHeader` 통합 + 전역 푸터** — 결정됨: 로그아웃/로그인 상태별 nav 분기, 공개 탐색(`/explore`·`/places`·지역)·커뮤니티 진입점 자리, 정책/소개 링크 푸터. 헤더 organism 중복 통합. 02(테마) 위에서. → `docs/plan/07-header-footer.md`. 담당 web-dev+designer+uiux-reviewer.
+2. [ ] **색감·테마 전환 (웜 뉴트럴 미니멀리즘, 토스풍) ← 지금 착수** — 확정(사용자 승인): 크림→**웜 오프화이트 캔버스 + 흰 카드**(토스식 면 분리), 브라운→웜뉴트럴 그레이, **블루 `#1E7CF8` 단일 인터랙션 색**, coral은 rating 전용 강등, 무지개 커버/accent 축소. **다크모드 포함 + 3-way 토글**(뉴트럴 차콜, `#4B9BFF`) — 전제: tailwind 정적hex→**CSS 변수(`--color-*`) + `.dark` 오버라이드** 재구조화. 주아=로고 워드마크만/UI는 Pretendard, extrabold 정리. Button size(lg/md/sm)+TextField atom+CoverFallback 신설. 순서: **A. designer 토큰 → B. web-dev 컴포넌트/토글 → C. 검증**. → `docs/plan/08-theme-tokens.md`, `DESIGN.md`(전환됨). 담당 designer→web-dev, uiux-reviewer+build-qa.
+3. [ ] **헤더 & 푸터 — `SiteHeader` 통합 + 전역 푸터 + ThemeToggle** — 결정됨: 로그아웃/로그인 상태별 nav 분기, 공개 탐색(`/explore`·`/places`·지역)·커뮤니티 진입점 자리, 정책/소개 링크 푸터, 헤더에 3-way ThemeToggle 배치. 헤더 organism 중복 통합. 02(테마) 위에서. → `docs/plan/07-header-footer.md`. 담당 web-dev+designer+uiux-reviewer.
 4. [ ] **AdSense 도입 (STEP 1 코드/페이지)** — STEP 0로 실데이터가 쌓이면 착수. ads.txt·AdSense 스크립트(공개 레이아웃 한정)·AdUnit(공개 페이지만)·CMP. 신청은 사용자. **로그인 후 사적 화면엔 광고 금지.** → `docs/plan/03-adsense.md` STEP 1~2. 담당 web-dev.
 5. [ ] **커뮤니티 공간 (C-1: 좋아요·북마크부터)** — 커플 스코프 넘어 전체 유저 장소/코스 참여·발견. 결정됨: **지금은 헤더 IA에 진입점 자리만, 기능은 STEP0 실데이터 후.** C-1(좋아요·북마크·인기정렬, 익명 유지 가능)→C-2(따라하기)→C-3(정체성, **작성자 익명화 0007과 충돌 → ADR 선행**). → `docs/plan/06-community.md`. 담당 db-dev+web-dev+server-dev.
 6. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업.

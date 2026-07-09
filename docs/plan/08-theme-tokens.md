@@ -1,75 +1,83 @@
 ---
-status: todo
+status: doing
 last-updated: 2026-07-09
 owner: planner
 ---
 
-# 색감·테마 변경 + `theme.ts` 정의
+# 색감·테마 재정의 + 다크모드 토글 (웜 뉴트럴 미니멀리즘, 토스풍)
 
-> 소유 실행: **designer + uiux-reviewer 협업**(실제 색 결정·`theme.ts` 구현·비주얼 검증). planner는 범위·역할분담·산출물·의사결정 포인트만 정의.
-> 연관: `DESIGN.md`(warm/personal 방향·정식 팔레트의 단일 진실), `packages/tokens`, `07-header-footer.md`(새 테마 위에서 헤더/푸터).
-> 목적: 사용자가 **색감/비주얼을 바꾸고 싶어하고, `theme.ts`를 정의해 앱에서 쓰길** 원한다. 현 `packages/tokens`·`DESIGN.md`와의 관계를 진단하고, `theme.ts`가 tokens와 어떻게 공존/대체할지 스코핑.
+> 소유 실행: **designer**(토큰·색·폰트 배선) → **web-dev**(CSS 변수 재구조화·컴포넌트·테마 provider). uiux-reviewer 검증, build-qa 회귀.
+> 연관: `DESIGN.md`(방향·팔레트 단일 진실 — 2026-07-09 전환됨), `07-header-footer.md`(이 테마 위에서 헤더/푸터), `packages/tokens`, `apps/web`.
+> **2026-07-09 방향 확정(사용자 승인).** 아래 "확정 결정"이 단일 진실. 열린 질문은 없다.
 
-## 현황 진단 (2026-07-09)
+## 확정 결정 (사용자 승인 2026-07-09)
 
-### 토큰 구조
-- `packages/tokens/src/`: `colors.ts`(raw 값·팔레트) · `typography.ts` · `spacing.ts` · `theme.ts`(통합 `theme` 객체) · `index.ts`(배럴).
-- **web의 실제 소비 경로 = Tailwind config.** `apps/web/tailwind.config.ts`가 `colors`·`radius`·`spacing` **named export**를 import해 tailwind 클래스(`bg-background`·`text-text-secondary`·`border-divider`…)로 매핑. 컴포넌트는 이 클래스를 씀.
-- 코드에서 직접 import되는 named export: `colors`·`accentPalette`·`coverGradients`(page/logs/login/KakaoMap/AppShell 등 소수).
+1. **팔레트 = 웜 뉴트럴 미니멀리즘.** 크림 배경 → **웜 오프화이트 캔버스 + 흰 카드**(토스식 면 분리). 브라운 텍스트 → **웜기 남긴 뉴트럴 그레이**(AA 여유). **블루 `#1E7CF8` = 단일 인터랙션 색**(링크·CTA·활성·포커스 전부).
+2. **감성색 절제.** 무지개 5색 커버 그라데이션 → **단일 뉴트럴/브랜드소프트 면 + 아이콘** 폴백. 5색 accent → 무채색/브랜드소프트로 축소. **coral `#F26B60` = rating 전용 강등.**
+3. **주아체 = 로고 워드마크(위로그)만.** 본문·헤딩·UI·숫자 = **Pretendard**. extrabold 남발 정리, `letterSpacingTight(-0.02em)` 국문 헤딩 실적용. 한나·꾸불림 제품 UI 미사용. 폰트: `apps/web/src/fonts/`.
+4. **다크모드 포함 + 3-way 토글(시스템/라이트/다크).** 다크 = 웜브라운 아니라 **뉴트럴 차콜**(bg `#17171A`급, surface `#1F1F24`급 계단 elevation, 순수 블랙 금지, 텍스트 rgba 3단, brand `#4B9BFF`급). **DESIGN.md 기존 warm-dark(브라운) 방향 → 뉴트럴 차콜로 수정 완료.**
 
-### 핵심 발견 — `theme.ts`는 **이미 존재하지만 (a) web에서 실제로 안 쓰이고 (b) morun(러닝앱) 잔재로 오염**됨
-- `theme.ts`의 통합 `theme` 객체는 **web 어디서도 import되지 않는다**(tailwind는 `colors`를 직접 소비, 컴포넌트는 클래스 사용). 즉 지금 `theme.ts`는 **사실상 죽은 코드**.
-- 오염된 잔재(러닝앱 morun에서 복제된 흔적):
-  - `medalPalette`(1-2-3 메달), `territoryPalette`(= accent 별칭), `theme.color.territory/medal` — **커플 기록 앱과 무관**.
-  - `ink: '#3C3C3C' — Figma "black"` 주석은 **틀림**(실제 `colors.ink`는 `#2B2622`). `borderSoft: '#EAEAEA' — Figma "gray2"` 주석도 실제 값(`#EFE7DA`)과 불일치 — 러닝앱 주석이 그대로 남음.
-  - `theme.color.tabBarDark`, `theme.layout.appColumnWidth: 428 / appColumnHeight: 926 / tabBarNotchRadius`(러닝앱 Figma 프레임 428×926) — 우리 반응형 웹/커플앱과 무관.
-  - `textStyle`/`textOnDark` 등 일부는 유효하나 전반적으로 **정리 안 된 상태**.
-- `colors.ts`에도 잔재: `medalPalette`, `territoryPalette`, `tabBarDark`, "Rating/highlight tiers (repurposed from a 1-2-3 scale)" 주석.
+## 선행 작업 — CSS 변수 재구조화 (다크 토글의 전제)
 
-### 결론
-사용자의 "`theme.ts` 정의" 요청은 **새 파일 신설이 아니라, 죽고 오염된 기존 `theme.ts`를 (1) 잔재 제거 (2) 커플앱 시맨틱으로 재정의 (3) 실제 앱이 소비하게 배선**하는 작업이다. 동시에 "색감 변경"은 **`colors.ts`의 warm 팔레트를 새 방향으로 교체/조정**하는 작업 — 이건 designer가 실제 색을 정한다.
+**문제:** 현재 `apps/web/tailwind.config.ts`가 `theme.color.*`의 **정적 hex를 빌드타임에 소비** → 런타임 테마 전환 불가.
 
-## 방안 후보 — `theme.ts` ↔ tokens 관계
+**해결:** 시맨틱 색을 **CSS custom properties(`--color-*`)로 발행**하고 tailwind가 그 변수를 소비하도록 전환. 라이트/다크는 `.dark`(또는 `[data-theme="dark"]`) 오버라이드.
 
-### 옵션 A. `theme.ts` = tokens를 조립한 **단일 시맨틱 소비 레이어**(권장)
-- raw 값은 `colors.ts`/`spacing.ts`/`typography.ts`에 유지. `theme.ts`는 이들을 **시맨틱 구조로 조립**한 앱 소비 진입점(`theme.color.*`, `theme.font.*`, `theme.radius`…).
-- **tailwind.config가 `theme`를 소비하도록 전환** — 지금은 `colors`를 직접 읽는데, `theme.color.*`를 읽게 바꿔 "앱은 theme.ts만 본다"를 실현. 컴포넌트가 직접 값이 필요할 때도 `theme.*`.
-- 잔재(medal/territory/tabBarDark/layout 428×926) 제거. 시맨틱만 남김.
-- **장점:** 단일 진입점, DESIGN.md와 1:1, 잔재 청산. **단점:** tailwind 배선 변경(회귀 주의).
+- `globals.css`: `:root { --color-brand: #1E7CF8; --color-background: …; … }` (라이트) + `.dark { --color-brand: #4B9BFF; --color-background: #17171A; … }` (다크).
+- `tailwind.config.ts`: `colors.brand: 'var(--color-brand)'` … 로 매핑(hex 직접 대신 변수 참조).
+- **단일 진실 유지:** `:root`/`.dark`의 변수 값은 `packages/tokens`(`theme.ts`)에서 파생시킨다 — 손으로 hex를 globals.css에 박지 말고, 토큰에서 CSS 변수 문자열을 생성하는 방식(빌드 스크립트 or 토큰이 export하는 `cssVars` 객체)을 designer가 정한다. **하드코딩 금지 원칙 유지.**
 
-### 옵션 B. `theme.ts`를 앱(web) 레벨로 두고 tokens는 raw만
-- `packages/tokens`는 raw 값만, `apps/web`에 앱 전용 `theme.ts`(브랜드 시맨틱). mobile은 별도.
-- **단점:** web/mobile가 시맨틱을 각자 정의 → 교차 플랫폼 일관성 약화. CLAUDE.md의 "토큰은 packages/tokens only" 원칙과 마찰. **비권장.**
+## 작업 순서 (의존성)
 
-### 옵션 C. 최소 — 잔재만 제거, 배선은 현행 유지
-- `theme.ts`/`colors.ts`에서 morun 잔재만 걷어내고 tailwind는 계속 `colors` 직접 소비. `theme.ts`는 여전히 보조.
-- **장점:** 저위험. **단점:** 사용자의 "theme.ts를 앱에서 쓰고 싶다"를 절반만 충족.
+```
+A. designer 토큰 작업  ──┐
+   (선행: 없음)          │  A 완료 후 B 착수
+B. web-dev 컴포넌트 작업 ─┘  (A의 CSS 변수·토큰이 있어야 컴포넌트가 소비)
+   ↓
+C. uiux-reviewer 검증 → build-qa 회귀
+```
 
-> **권장: 옵션 A**(theme.ts 단일 시맨틱 레이어 + tailwind가 소비 + 잔재 청산). 사용자의 요청 의도("theme.ts 정의해서 앱에서 쓴다")에 가장 맞음. 회귀 위험은 build-qa로 통제.
+### A. designer — 토큰 & 배선 (선행)
 
-## 색감 변경 스코프 (designer 주도)
-- **planner는 색을 정하지 않는다.** designer가 DESIGN.md 위에서 새 팔레트를 확정하고 `colors.ts`에 반영. uiux-reviewer가 대비(WCAG AA)·일관성 검증.
-- 의사결정 포인트(designer/사용자):
-  - warm/personal **방향 유지 vs 톤 조정**(예: 코랄 채도·크림 밝기) vs **방향 전환**(예: 다른 액센트 체계).
-  - accent 팔레트(coral/sage/lavender/amber/sky)·`coverGradients`도 함께 갈지(카드 폴백 커버가 여기 묶임).
-  - **다크 모드**를 이번에 열지(DESIGN.md에 "후속 과제"로 이미 언급 — warm dark). 열면 `theme.ts`에 라이트/다크 변형 구조 필요.
+- [ ] **A1. morun 잔재 청산** — `theme.ts`/`colors.ts`의 `medalPalette`·`territoryPalette`·`tabBarDark`·`layout 428×926`·오류 주석(`ink #3C3C3C`, `borderSoft #EAEAEA`) 제거. 커플앱 시맨틱만 남김.
+- [ ] **A2. 라이트 팔레트 = 웜 뉴트럴** — `colors.ts` 교체: 웜 오프화이트 background(`#F7F5F1`급) + **흰 surface(카드)** + surfaceAlt(함몰) + 웜뉴트럴 그레이 텍스트(브라운 제거, AA 여유) + 뉴트럴 border. brand `#1E7CF8` 유지. (DESIGN.md 라이트 표의 방향값을 designer가 확정.)
+- [ ] **A3. 다크 팔레트 = 뉴트럴 차콜** — `theme.ts`에 라이트/다크 **변형 구조** 추가. bg `#17171A`급, surface 계단 elevation, 텍스트 rgba 3단, brand `#4B9BFF`급, 순수블랙 금지.
+- [ ] **A4. CSS 변수 발행 구조** — 시맨틱 색을 `--color-*`로 내보내는 방식 확정(토큰→CSS 변수 파생). tailwind가 변수 소비하도록 `tailwind.config.ts` 매핑 전환. (선행 작업 절 참고. web-dev와 경계 협의: 토큰/발행=designer, globals.css·config 배선=web-dev 가능.)
+- [ ] **A5. accent 축소** — `accentPalette`(5색 무지개) → 무채색/브랜드소프트 스케일로 재정의. coral은 accent에서 빼고 `rating` 전용으로만 유지.
+- [ ] **A6. 커버 폴백 단순화** — `coverGradients`/`coverTints` 폐기 방향. **즉시 삭제 금지**(소비 지점 있음) — 폴백 컴포넌트(`CoverFallback`) 전환 후 dead code로 제거. 토큰엔 폴백 면색(surfaceAlt/brandSoft) + 아이콘 규칙만 남김.
+- [ ] **A7. 타이포 굵기 정리** — `typography.ts` extrabold 남발 정리(displayLarge 등 대부분 bold로). `letterSpacingTight`를 국문 헤딩(display/title/subtitle)에 적용되게 tailwind `tracking-tight` 배선 확인.
+- [ ] **A8. 주아 로고폰트 배선** — `fontFamily`에 `logo`(주아) 계열 추가. `next/font/local`로 `BMJUA_ttf.ttf` self-host → `--font-logo` 발행(web-dev와 협의, 배선 자체는 web-dev). Pretendard(`sans`)는 UI 전역 유지.
 
-## 작업 분해 (역할)
-- **planner** — 범위·옵션 확정(이 문서) + 열린질문 사용자 확답.
-- **designer** — (1) 새 색 팔레트 확정 → `colors.ts` 반영 + DESIGN.md 갱신. (2) `theme.ts` 시맨틱 구조 재정의(잔재 제거·커플앱 시맨틱). (3) 다크모드 열 경우 변형 구조.
-- **uiux-reviewer** — 대비/접근성/일관성·다크모드(열 경우) 검증, DESIGN.md 정합.
-- **web-dev** — (옵션 A 채택 시) tailwind.config가 `theme` 소비하도록 전환, 직접 import 지점(`colors`→`theme.color`) 정리, Pretendard 로딩(DESIGN.md 방침 미구현분) 확인. **회귀 없이.**
-- **app-dev** — mobile도 동일 `theme.ts` 소비하도록 정렬(웹 안정 후).
-- **build-qa** — 색/토큰 전환 후 시각 회귀·빌드·타입 게이트.
+### B. web-dev — 컴포넌트 & 테마 (A 완료 후)
+
+- [ ] **B1. globals.css CSS 변수 + `.dark` 오버라이드** — A4 발행 구조를 `:root`/`.dark`에 배선. 기존 tailwind 유틸 클래스(`bg-background`·`text-text-secondary`…)가 **그대로 동작**하도록 호환 유지(변수 참조로 바뀌어도 클래스명 불변).
+- [ ] **B2. ThemeProvider + ThemeToggle(3-way)** — 시스템/라이트/다크. `prefers-color-scheme` 추종 + 사용자 선택 localStorage 저장 + `<html class="dark">`(또는 `data-theme`) 토글. SSR 깜빡임(FOUC) 방지 스크립트(초기 inline). ThemeToggle atom을 헤더에 배치(07과 연계).
+- [ ] **B3. Button size 도입** — `lg`(52~56, radius 14~16, text-base semibold, fullWidth 기본) / `md`(44~48, radius 12) / `sm`(36~40). pill은 칩·필터·배지 한정. `active:scale-[0.97]` + `focus-visible:ring-2 ring-brand` + `transition-all duration-200 ease-out`. 기존 Button 변형과 병합.
+- [ ] **B4. TextField atom 신설** — 높이 52~56, radius 12, 흰 배경 + 1px 뉴트럴 테두리, focus brand 2px 링, placeholder 토큰. `logs/new`의 반복 input(4곳+)을 이 atom(+`FormField`)으로 교체.
+- [ ] **B5. 카드 정리** — radius 16, 테두리 or 얕은 그림자 **택1**(이중 강조 제거). 흰 카드 on 캔버스. `CoverFallback`(molecule) 신설 — 사진 없을 때 단색 면 + 아이콘. `DateLogCard`/explore/place 카드의 `coverGradients` 소비 지점을 이걸로 교체.
+- [ ] **B6. 모션 베이스라인 적용** — 인터랙티브 `transition-all duration-200 ease-out`, focus-visible 링 전역, 라우트 `loading.tsx` 스켈레톤 셔머, (모바일) bottom sheet 슬라이드업 패턴.
+- [ ] **B7. 여백 조정** — 모바일 컨테이너 패딩 16→20, 섹션 24~32. (07 헤더/푸터와 함께.)
+
+### C. 검증
+
+- [ ] **uiux-reviewer** — 라이트/다크 대비(WCAG AA), 면 분리 일관성, 터치타깃, focus 링, 모션 일관성, DESIGN.md 정합.
+- [ ] **build-qa** — CSS 변수 전환 후 시각 회귀(라이트/다크 각 경로), 빌드·타입·lint 게이트, 테마 토글 스모크.
+- [ ] **app-dev(후속)** — mobile도 동일 `theme.ts`(라이트/다크) 소비하도록 정렬. 웹 안정 후.
+
+## 리스크 (실행 전 인지)
+
+1. **CSS 변수 전환 ↔ 기존 tailwind 클래스 호환** — `tailwind.config`가 정적 hex→`var(--color-*)`로 바뀌면, 클래스명은 같아도 **opacity 유틸(`bg-brand/50`)이 CSS 변수 + `<alpha-value>` 문법**을 요구할 수 있다. tailwind가 알파를 적용하려면 변수를 채널값(`R G B`) 형태로 발행해야 함. designer/web-dev가 알파 유틸 사용처를 먼저 감사하고 채널 발행 방식 채택 여부 결정. **회귀 위험 1순위 → build-qa 시각 확인 필수.**
+2. **커버 그라데이션 제거 ↔ DateLogCard/explore 영향** — `coverGradients`/`coverTints`는 `page.tsx`·`lib/explore.ts`·`DateLogCard`·`KakaoMap`·`AppShell` 등 다수에서 소비. 토큰을 먼저 지우면 빌드 깨짐. **순서 강제:** `CoverFallback` 컴포넌트로 소비 지점 전량 교체 → 그다음 토큰 export 제거(dead code). B5 전에 A6에서 토큰 export를 없애지 말 것.
+3. **다크모드 FOUC** — 초기 렌더에서 라이트→다크 깜빡임. `<head>` inline 스크립트로 첫 페인트 전 클래스 적용 필요(B2).
+4. **다크에서 사진/커버** — 흰 카드 전제가 다크에선 차콜 surface로 바뀜. 사진 없는 폴백 아이콘/면색이 다크에서도 대비되게 별도 확인.
+5. **주아 폰트 self-host 용량** — `BMJUA_ttf.ttf ≈1.5MB`. 워드마크(로고)만 쓰므로 `next/font/local` + 필요 시 subset. 전역 로드 금지(로고 컴포넌트 한정).
 
 ## 완료 기준
-- `theme.ts`가 morun 잔재(medal/territory/tabBarDark/layout 428×926/오류 주석) 없이 커플앱 시맨틱으로 정리됨.
-- (옵션 A) 앱이 `theme.ts`를 실제 소비(tailwind가 theme 경유, 직접값도 `theme.*`).
-- 새 색 팔레트가 `colors.ts`+DESIGN.md에 반영되고 WCAG AA 대비 충족(uiux-reviewer 패스).
-- 하드코딩 UI 값 없음(전부 토큰 경유). build-qa 회귀 통과.
 
-## 열린 질문 (사용자 결정 필요)
-1. **`theme.ts` ↔ tokens 관계** — 옵션 A(theme.ts를 단일 시맨틱 소비 레이어로 + tailwind가 소비)로 갈지, 옵션 C(잔재만 제거·배선 유지)로 최소 변경할지.
-2. **색감 변경 강도** — warm/personal 유지하며 톤만 조정 vs 팔레트 방향 자체를 바꿀지(designer가 시안 제시하면 사용자 선택).
-3. **다크 모드** — 이번에 함께 열지(작업량↑) 아니면 라이트만 유지하고 후속.
-4. **coverGradients/accent 동반 변경** — 색 바꿀 때 카드 폴백 커버·마커 팔레트까지 같이 갈지(묶여 있음).
+- 라이트/다크 팔레트가 `colors.ts`+`theme.ts`(변형 구조)에 반영, CSS 변수로 발행, tailwind가 변수 소비. WCAG AA 충족(uiux 패스).
+- 3-way 테마 토글 동작(시스템/라이트/다크, FOUC 없음, 선택 저장).
+- Button size(lg/md/sm) + TextField atom + CoverFallback 존재, `logs/new` 반복 input 흡수, 카드 이중강조 제거.
+- 주아=로고 워드마크만, UI는 Pretendard, extrabold 정리, 국문 헤딩 tracking-tight 적용.
+- morun 잔재 없음, 하드코딩 UI 값 없음(전부 토큰/변수 경유), build-qa 회귀 통과.
+</content>
+</invoke>

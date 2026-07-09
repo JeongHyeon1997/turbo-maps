@@ -61,38 +61,39 @@ export * from "./Input";
 
 ## Import rules
 
-- **Tokens:** `import { colors, spacing, typography } from "@maps/tokens"`. No hard-coded hex, no magic pixel numbers.
+- **Tokens:** `import { theme } from "@maps/tokens"` — the single semantic layer (`theme.color.*`, `theme.space`, `theme.radius`, `theme.font.*`). On web prefer the wired Tailwind classes (generated from `theme.color`). No hard-coded hex, no magic pixel numbers.
 - **Schemas:** `import { ... } from "@maps/shared"`. Validators live in `packages/shared`, never redefined in components.
 - **Cross-level imports:** atoms → nothing. molecules → atoms only. organisms → atoms + molecules. templates → organisms + molecules + atoms. Never import upward.
 
 ## Web component template (atoms/Button.tsx)
 
+On web, **prefer Tailwind classes** — the wired classes come from `theme.color.*`
+(e.g. `bg-brand`, `text-text-primary`, `border-border`, `rounded-lg`, `shadow-md`).
+Reach for `theme.*` in a `style={}` only when a token has no class (dynamic hex).
+
 ```tsx
-import { colors, spacing, typography } from "@maps/tokens";
+import { theme } from "@maps/tokens";
 import { ButtonHTMLAttributes, ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "brand" | "secondary" | "ghost";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   children: ReactNode;
 }
 
-export function Button({ variant = "primary", children, style, ...rest }: ButtonProps) {
+const cls: Record<Variant, string> = {
+  brand: "bg-brand text-white hover:bg-brand-pressed",
+  secondary: "border border-brand text-brand",
+  ghost: "text-text-primary",
+};
+
+export function Button({ variant = "brand", children, className = "", ...rest }: ButtonProps) {
   return (
     <button
       {...rest}
-      style={{
-        padding: `${spacing.sm}px ${spacing.md}px`,
-        background: variant === "primary" ? colors.primary : "transparent",
-        color: variant === "primary" ? colors.onPrimary : colors.primary,
-        border: variant === "ghost" ? "none" : `1px solid ${colors.primary}`,
-        borderRadius: 8,
-        fontSize: typography.body.size,
-        fontWeight: typography.body.weight,
-        cursor: "pointer",
-        ...style,
-      }}
+      className={`rounded-lg px-4 py-2 text-md font-bold ${cls[variant]} ${className}`}
+      style={{ letterSpacing: theme.font.letterSpacingTight }}
     >
       {children}
     </button>
@@ -100,45 +101,46 @@ export function Button({ variant = "primary", children, style, ...rest }: Button
 }
 ```
 
-Prefer CSS-in-JS only until a styling system is chosen. For Next.js we may switch to Tailwind utility classes — if `tailwind.config.ts` is wired and `globals.css` has the directives, use `className` with tokens exposed as CSS variables instead.
-
 ## Mobile component template (atoms/Button.tsx)
 
+Mobile has no Tailwind — consume `theme.*` (the same semantic layer) in `StyleSheet`.
+
 ```tsx
-import { colors, spacing, typography } from "@maps/tokens";
+import { theme } from "@maps/tokens";
 import { Pressable, PressableProps, Text, StyleSheet } from "react-native";
 import { ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "brand" | "secondary" | "ghost";
 
 export interface ButtonProps extends Omit<PressableProps, "children"> {
   variant?: Variant;
   children: ReactNode;
 }
 
-export function Button({ variant = "primary", children, style, ...rest }: ButtonProps) {
+export function Button({ variant = "brand", children, style, ...rest }: ButtonProps) {
   return (
     <Pressable
       {...rest}
       style={[
         styles.base,
-        variant === "primary" && styles.primary,
+        variant === "brand" && styles.brand,
         variant === "secondary" && styles.secondary,
         variant === "ghost" && styles.ghost,
         typeof style === "function" ? undefined : style,
       ]}
     >
-      <Text style={styles.label}>{children}</Text>
+      <Text style={[styles.label, variant === "brand" && styles.labelOnBrand]}>{children}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  base: { paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: 8 },
-  primary: { backgroundColor: colors.primary },
-  secondary: { borderWidth: 1, borderColor: colors.primary },
+  base: { paddingVertical: theme.space[3], paddingHorizontal: theme.space[4], borderRadius: theme.radius.lg },
+  brand: { backgroundColor: theme.color.brand },
+  secondary: { borderWidth: 1, borderColor: theme.color.brand },
   ghost: { backgroundColor: "transparent" },
-  label: { fontSize: typography.body.size, fontWeight: typography.body.weight as "600", color: colors.onPrimary },
+  label: { fontSize: theme.font.size.md, fontWeight: theme.font.weight.bold, color: theme.color.textPrimary },
+  labelOnBrand: { color: theme.color.textOnBrand },
 });
 ```
 

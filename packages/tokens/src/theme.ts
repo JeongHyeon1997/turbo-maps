@@ -1,39 +1,46 @@
 /**
- * maps unified design theme.
- * All design tokens in one place. Import from `@maps/tokens` and reach in:
+ * maps (WeLog) unified design theme — the single SEMANTIC layer.
+ *
+ * Raw values live in `colors.ts` / `spacing.ts` / `typography.ts`; this file
+ * assembles them into the semantic names apps actually consume. It is the one
+ * entry point — `tailwind.config.ts` reads `theme.color.*` to generate classes,
+ * and non-Tailwind consumers (RN, inline styles) reach in the same way:
+ *
  *   import { theme } from '@maps/tokens';
- *   theme.color.ink, theme.font.size.lg, theme.radius.lg, ...
+ *   theme.color.brand, theme.color.textPrimary, theme.radius.lg, ...
  *
  * Per-token re-exports (`colors`, `spacing`, `fontSize`, ...) still exist for
- * backward compatibility; new code should prefer `theme.*`.
+ * direct access; prefer `theme.*` for anything semantic.
  */
-import { colors, medalPalette, territoryPalette } from './colors';
+import { accentPalette, colors } from './colors';
 import { fontFamily, fontSize, fontWeight, lineHeight, textStyle } from './typography';
 import { radius, shadow, spacing } from './spacing';
 
 export const theme = {
-  /** Color tokens — semantic + raw palettes. */
+  /** Semantic color tokens. */
   color: {
-    // Brand / surface
-    primary: colors.primary,
-    primaryPressed: colors.primaryPressed,
+    // Brand — WeLog blue
+    brand: colors.brand,
+    brandPressed: colors.brandPressed,
+    brandSoft: colors.brandSoft,
+
+    // Surface — warm cream
     background: colors.background,
     surface: colors.surface,
     surfaceAlt: colors.surfaceAlt,
 
     // Text
-    ink: colors.ink,                 // #3C3C3C — Figma "black"
     textPrimary: colors.textPrimary,
     textSecondary: colors.textSecondary,
     textMuted: colors.textMuted,
     textDisabled: colors.textDisabled,
-    textOnPrimary: colors.textOnPrimary,
-    textOnDark: '#FEFEFE',
+    textOnBrand: colors.textOnBrand,
+    textOnAccent: '#FFFFFF',
 
     // Border / divider
     border: colors.border,
     borderStrong: colors.borderStrong,
-    borderSoft: colors.borderSoft,   // #EAEAEA — Figma "gray2"
+    borderSoft: colors.borderSoft,
     divider: colors.divider,
 
     // States
@@ -42,15 +49,16 @@ export const theme = {
     warning: colors.warning,
     info: colors.info,
 
-    // Input
-    inputUnderline: colors.inputUnderline,
-    inputUnderlineFocus: colors.inputUnderlineFocus,
-    inputPlaceholder: colors.inputPlaceholder,
+    // Rating (romance coral) + full accent palette (tags / markers)
+    rating: colors.rating,
+    accent: accentPalette,
 
-    // Territory game
-    tabBarDark: colors.tabBarDark,   // #3A3A3A — bottom tab bar background
-    territory: territoryPalette,
-    medal: medalPalette,
+    // Input
+    input: {
+      underline: colors.inputUnderline,
+      underlineFocus: colors.inputUnderlineFocus,
+      placeholder: colors.inputPlaceholder,
+    },
   },
 
   /** Spacing scale (px). */
@@ -59,15 +67,14 @@ export const theme = {
   /** Border-radius scale. */
   radius,
 
-  /** Box-shadow scale (CSS strings). */
+  /** Box-shadow scale (CSS strings) — warm brown tint, never pure black. */
   shadow,
 
-  /** Border presets used across the territory UI. */
+  /** Border presets (width + color) for RN / inline use. */
   border: {
     soft: { width: 1, color: colors.borderSoft },
     strong: { width: 1, color: colors.borderStrong },
     divider: { width: 1, color: colors.divider },
-    podium: { width: 1, color: colors.borderSoft }, // Figma cards use 1px gray2 border
   },
 
   /** Typography. */
@@ -77,17 +84,8 @@ export const theme = {
     weight: fontWeight,
     lineHeight,
     style: textStyle,
-    /** Figma uses -0.02em letter spacing for nearly all Korean text. */
+    /** Tight tracking for Korean headings / titles (not body/caption). */
     letterSpacingTight: '-0.02em',
-  },
-
-  /** Layout constants. */
-  layout: {
-    /** Mobile / web app preview column width (Figma frame is 428×926). */
-    appColumnWidth: 428,
-    appColumnHeight: 926,
-    tabBarHeight: 92,
-    tabBarNotchRadius: 50,
   },
 } as const;
 

@@ -134,7 +134,7 @@ export default async function DateLogDetailPage({
           style={{
             backgroundImage: coverUrl
               ? `url(${coverUrl})`
-              : `linear-gradient(135deg, ${colors.surfaceAlt}, ${colors.primary})`,
+              : `linear-gradient(135deg, ${colors.surfaceAlt}, ${colors.rating})`,
           }}
         >
           <span className="w-fit rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">

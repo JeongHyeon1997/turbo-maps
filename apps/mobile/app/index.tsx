@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 42,
     fontWeight: '800',
-    color: colors.primary,
+    color: colors.brand,
     letterSpacing: -1,
   },
   tagline: {

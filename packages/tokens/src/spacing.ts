@@ -25,9 +25,11 @@ export const radius = {
   full: 9999,
 } as const;
 
+// Warm brown-tinted shadows (rgba of textPrimary #2A2521) — never pure black,
+// so elevation stays soft/warm per DESIGN.md.
 export const shadow = {
   none: 'none',
-  sm: '0 1px 2px rgba(0,0,0,0.05)',
-  md: '0 2px 8px rgba(0,0,0,0.08)',
-  lg: '0 8px 24px rgba(0,0,0,0.12)',
+  sm: '0 1px 2px rgba(42,37,33,0.06)',
+  md: '0 2px 8px rgba(42,37,33,0.08)',
+  lg: '0 10px 28px rgba(42,37,33,0.12)',
 } as const;

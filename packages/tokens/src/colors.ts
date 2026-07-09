@@ -1,57 +1,60 @@
 /**
- * maps 디자인 토큰 - 컬러
- * 방향: 따뜻하고 개인적인(warm/personal) 톤 — 크림 배경 + 코랄 액센트.
- * 정식 팔레트/근거는 DESIGN.md, 확정은 designer 역할이 관리.
+ * maps (WeLog) design tokens — raw color palette.
+ *
+ * Direction: warm / personal — a cream "paper" canvas with a blue "ink" brand,
+ * echoing the WeLog notebook logo (warm cream + blue accent reads like a diary
+ * written in blue pen). This file is the RAW value source; the semantic layer
+ * that apps consume lives in `theme.ts`. See DESIGN.md for rationale + contrast.
  */
 export const colors = {
-  // Brand — warm coral
-  primary: '#E8635C',
-  primaryPressed: '#C94E48',
+  // Brand — WeLog blue (sampled from the logo notebook outline)
+  brand: '#1E7CF8',
+  brandPressed: '#135FD6',
+  brandSoft: '#E9F1FE', // tint for hover / selected surfaces
 
   // Surface — warm cream canvas
-  background: '#FFFCF7',
-  surface: '#FBF6EE',
-  surfaceAlt: '#F3ECE0',
+  background: '#FFFBF5',
+  surface: '#FBF5EC',
+  surfaceAlt: '#F4ECDF',
 
-  // Text — warm neutral
-  textPrimary: '#2B2622',
-  textSecondary: '#6B6259',
-  textMuted: '#9C9288',
-  textDisabled: '#C7BFB4',
-  textOnPrimary: '#FFFFFF',
+  // Text — warm neutral (espresso → taupe)
+  textPrimary: '#2A2521',
+  textSecondary: '#6A6058',
+  textMuted: '#9A9086',
+  textDisabled: '#C4BCB0',
+  textOnBrand: '#FFFFFF',
 
   // Border / divider
-  border: '#EAE1D4',
-  borderStrong: '#D8CDBC',
-  divider: '#F0E9DD',
+  border: '#E9E0D3',
+  borderStrong: '#D6CBB9',
+  borderSoft: '#EFE7DA',
+  divider: '#F1EADE',
 
   // States
-  danger: '#D64545',
-  success: '#3C9A5F',
-  warning: '#E0912F',
-  info: '#3A7BD5',
+  danger: '#D0453C',
+  success: '#2F9E5B',
+  warning: '#DE912F',
+  info: '#1E7CF8', // aligns with the brand blue
+
+  // Rating — warm coral heart/star (romance accent, distinct from brand)
+  rating: '#F26B60',
 
   // Input
   inputUnderline: '#E5DCCD',
-  inputUnderlineFocus: '#E8635C',
-  inputPlaceholder: '#B5AB9E',
-
-  // Misc neutrals (kept for token compatibility)
-  ink: '#2B2622',
-  borderSoft: '#EFE7DA',
-  tabBarDark: '#2B2622',
+  inputUnderlineFocus: '#1E7CF8',
+  inputPlaceholder: '#B3A99C',
 } as const;
 
 export type ColorToken = keyof typeof colors;
 
-// Accent palette — used for tags/markers (e.g. place categories on the map).
-// Repurpose freely; designer finalizes semantics in DESIGN.md.
+// Accent palette — tags / markers (e.g. place categories on the map).
+// Warm, softened hues; `coral` doubles as the rating color for a unified voice.
 export const accentPalette = {
-  coral: '#E8635C',
-  sage: '#8FB08A',
-  lavender: '#B79BD9',
-  amber: '#E7A54B',
-  sky: '#7FB4E0',
+  coral: '#F26B60',
+  sage: '#83AC83',
+  lavender: '#AE93DB',
+  amber: '#E7A23F',
+  sky: '#6FAEE6',
 } as const;
 
 export type AccentColor = (typeof accentPalette)[keyof typeof accentPalette];
@@ -62,11 +65,11 @@ export type AccentColor = (typeof accentPalette)[keyof typeof accentPalette];
  * dark (bottom-right) stop. Named by hue so consumers read intent, not hex.
  */
 export const coverTints = {
-  peach: '#F6C6A8', // pairs with accentPalette.coral
-  mint: '#BFE3C0', // pairs with accentPalette.sage
-  lilac: '#D9C6EE', // pairs with accentPalette.lavender
-  honey: '#FCE1A8', // pairs with accentPalette.amber
-  powder: '#BFE0F5', // pairs with accentPalette.sky
+  peach: '#F8C9AC', // pairs with accentPalette.coral
+  mint: '#BCE3BD', // pairs with accentPalette.sage
+  lilac: '#D6C4EC', // pairs with accentPalette.lavender
+  honey: '#FBE0A6', // pairs with accentPalette.amber
+  powder: '#BEDFF4', // pairs with accentPalette.sky
 } as const;
 
 export type CoverTint = (typeof coverTints)[keyof typeof coverTints];
@@ -87,13 +90,3 @@ export const coverGradients = [
 
 /** A single `[from, to]` cover-gradient stop pair. */
 export type CoverGradient = readonly [from: string, to: string];
-
-// Rating / highlight tiers (repurposed from a 1-2-3 scale).
-export const medalPalette = {
-  1: { fill: '#FFD438', dark: '#D4A317' },
-  2: { fill: '#B8AFA2', dark: '#8A8175' },
-  3: { fill: '#C79A6E', dark: '#9C6F44' },
-} as const;
-
-// Back-compat alias — older imports referenced `territoryPalette`.
-export const territoryPalette = accentPalette;

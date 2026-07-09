@@ -32,15 +32,16 @@ AdSense 신청 전에 반드시 선행. **커플 실테스트를 겸해** 실제
 - **담당:** 사용자(콘텐츠 작성) + reviewer/build-qa(공개 URL 렌더·비노출 검증).
 
 ## STEP 1 (착수, 다음 세션이 바로 실행) — 코드/페이지 준비
-STEP 0로 실데이터가 어느 정도 쌓인 뒤 착수.
-1. [ ] **소유권 확인 파일** — `apps/web/public/ads.txt`:
-       `google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0` (pub-id는 계정 발급 후 교체).
-       + AdSense가 주는 verification `<meta>` 또는 스니펫(신청 단계에서 받음).
-2. [ ] **스크립트 로드** — 루트 layout에서 `next/script`(strategy `afterInteractive`)로
-       `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXX`.
-       env `NEXT_PUBLIC_ADSENSE_CLIENT`(없으면 스크립트 미로드 → graceful). **공개 표면 레이아웃에만** 걸리게 배선.
+STEP 0로 실데이터가 어느 정도 쌓인 뒤 착수. **발급된 publisher id: `ca-pub-5362531643629275`.**
+1. [x] **소유권 확인 파일** — `apps/web/public/ads.txt` 생성됨:
+       `google.com, pub-5362531643629275, DIRECT, f08c47fec0942fa0`.
+       (신청 단계에서 AdSense가 주는 verification `<meta>`/스니펫은 그때 추가.)
+2. [x] **스크립트 로드** — `src/lib/adsense.tsx`의 `<AdSenseScript>`(`next/script`, `afterInteractive`)를
+       **`PublicShell`에만** 마운트(공개 표면 전용 → 로그인 AppShell 사적 화면엔 미로드). env
+       `NEXT_PUBLIC_ADSENSE_CLIENT`(미설정 시 렌더 안 함 → graceful). **⚠️ 프로덕션 반영엔 Vercel env에
+       `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-5362531643629275` 설정 필요**(PROGRESS Blocked 참고).
 3. [ ] **AdUnit 컴포넌트**(atom/molecule) — `<ins class="adsbygoogle" .../>` + `(adsbygoogle=window.adsbygoogle||[]).push({})`.
-       토큰 사용·재사용. env 없으면 렌더 스킵.
+       토큰 사용·재사용. env 없으면 렌더 스킵. **승인 후 발급되는 slot id 필요 → STEP 2 이후.**
 4. [ ] **배치(공개 페이지 한정)** — `/`(랜딩)·`/explore`·`/explore/[id]`·`/places`·`/places/[id]`에만.
        **로그인 후 개인 기록·작성·프로필 화면엔 광고 절대 금지**(사적 공간 + 정책 리스크). 자동광고보다 수동 배치.
 5. [ ] **동의(CMP / Consent Mode v2)** — 한국/EU 개인화 광고 동의 관리. Google 인증 CMP 또는 Consent Mode v2 연동.

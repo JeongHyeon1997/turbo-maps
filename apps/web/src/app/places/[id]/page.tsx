@@ -8,6 +8,7 @@ import { BackLink, HeartRating, JsonLd, Tag } from '@/components/atoms';
 import { EmptyState } from '@/components/molecules';
 import { getPublicPlace, getPublicPlaceLogs } from '@/lib/places';
 import { SITE_URL } from '@/lib/site-url';
+import { ogImage } from '@/lib/og-image';
 
 // Public place page — reachable signed out (`/places` prefix is public, see
 // middleware.ts). Reads only the anon-safe `explore_places` / `explore_place_logs`
@@ -26,22 +27,32 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const place = await getPublicPlace(supabase, id);
   if (!place) return {};
 
+  // `logs` is already newest-first (see `getPublicPlaceLogs`), so this is the
+  // most recent public course's cover — this page has no cover of its own.
   const logs = await getPublicPlaceLogs(supabase, id);
   const coverImage = logs.find((l) => !!l.coverImage)?.coverImage ?? undefined;
 
   const parts = [place.category, place.address].filter((v): v is string => !!v);
   const description = `${parts.length > 0 ? `${parts.join(' · ')} — ` : ''}익명 커플들의 공개 데이트 코스 ${place.publicLogCount}건에 등장한 장소예요.`;
+  const title = `${place.name} · 장소`;
+  const image = ogImage(coverImage, place.name);
 
   return {
-    title: `${place.name} · 장소`,
+    title,
     description,
     alternates: { canonical: `/places/${place.id}` },
     openGraph: {
       type: 'website',
-      title: `${place.name} · 장소`,
+      title,
       description,
       url: `${SITE_URL}/places/${place.id}`,
-      images: coverImage ? [{ url: coverImage }] : undefined,
+      images: [image],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image.url],
     },
   };
 }

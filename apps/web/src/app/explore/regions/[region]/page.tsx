@@ -6,6 +6,7 @@ import { BackLink, JsonLd } from '@/components/atoms';
 import { PlaceCard } from '@/components/molecules';
 import { getPublicPlacesByRegion } from '@/lib/regions';
 import { SITE_URL } from '@/lib/site-url';
+import { ogImage } from '@/lib/og-image';
 
 // Public region detail — reachable signed out (`/explore` prefix is public, see
 // middleware.ts). Reads only the anon-safe `explore_places` view (0009), never a
@@ -25,16 +26,31 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   if (places.length === 0) return {};
 
   const description = `${region}에서 다른 커플이 다녀간 데이트 코스·맛집 ${places.length}곳을 둘러보세요.`;
+  const title = `${region} 데이트 코스·맛집`;
+  // Region pages have no cover of their own (they're a place aggregate, not a
+  // single course/place) — always the brand default OG image. NOTE: this
+  // `images` key must stay explicit here (not omitted) — this segment's
+  // `generateMetadata` already returns an `openGraph` object, which replaces
+  // (not merges with) whatever the root layout resolved, so omitting `images`
+  // would silently drop the inherited default OG image rather than keep it.
+  const image = ogImage(undefined, title);
 
   return {
-    title: `${region} 데이트 코스·맛집`,
+    title,
     description,
     alternates: { canonical: `/explore/regions/${encodeURIComponent(region)}` },
     openGraph: {
       type: 'website',
-      title: `${region} 데이트 코스·맛집`,
+      title,
       description,
       url: `${SITE_URL}/explore/regions/${encodeURIComponent(region)}`,
+      images: [image],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image.url],
     },
   };
 }

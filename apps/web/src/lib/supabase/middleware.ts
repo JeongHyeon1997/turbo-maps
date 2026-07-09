@@ -12,6 +12,9 @@ type CookieToSet = { name: string; value: string; options?: CookieOptions };
 // `/sitemap.xml`/`/robots.txt` (app/sitemap.ts, app/robots.ts) must be exact-public
 // too — crawlers hit these with no session, and a redirect to /login here makes
 // the sitemap/robots undiscoverable, defeating the whole SEO effort.
+// (The brand default OG image, `public/og-default.png`, needs no entry here —
+// it's a static asset under `/public`, and the middleware `matcher` config in
+// `middleware.ts` already excludes `.png` paths from running this file at all.)
 const EXACT_PUBLIC = ['/', '/sitemap.xml', '/robots.txt'];
 const PUBLIC_PREFIXES = ['/login', '/auth', '/privacy', '/terms', '/explore', '/places'];
 

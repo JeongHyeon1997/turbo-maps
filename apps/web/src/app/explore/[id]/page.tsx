@@ -8,6 +8,7 @@ import { VisitedPlaceItem } from '@/components/molecules';
 import { getPublicExploreLog } from '@/lib/explore';
 import { formatLogDate } from '@/lib/format-date';
 import { SITE_URL } from '@/lib/site-url';
+import { ogImage } from '@/lib/og-image';
 
 // Public detail page — reachable signed out (`/explore` prefix is public, see
 // middleware.ts). Reads only the anon-safe `explore_logs` / `explore_log_places`
@@ -32,6 +33,12 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       ? `${placeNames.join(', ')} — 익명 커플이 공개한 데이트 코스, ${formatLogDate(log.date)}`
       : `익명 커플이 공개한 데이트 코스, ${formatLogDate(log.date)}`;
 
+  // Always resolves to *some* absolute image URL — the course cover when one was
+  // copied on publish (0006/0007), otherwise the brand default OG image. Kakao's
+  // link-share scraper only renders a thumbnail when `og:image` is present and
+  // absolute, so this must never be left unset.
+  const image = ogImage(log.coverImage, log.title);
+
   return {
     title: log.title,
     description,
@@ -41,7 +48,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       title: log.title,
       description,
       url: `${SITE_URL}/explore/${log.id}`,
-      images: log.coverImage ? [{ url: log.coverImage }] : undefined,
+      images: [image],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: log.title,
+      description,
+      images: [image.url],
     },
   };
 }

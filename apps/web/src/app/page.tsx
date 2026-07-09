@@ -11,9 +11,9 @@ import { SITE_URL } from '@/lib/site-url';
 const LANDING_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'We Log',
+  name: '위로그',
   url: SITE_URL,
-  publisher: { '@type': 'Organization', name: 'We Log' },
+  publisher: { '@type': 'Organization', name: '위로그' },
 };
 
 interface Row {

@@ -73,7 +73,7 @@ export default async function ExploreLogDetailPage({ params }: PageParams) {
     url: `${SITE_URL}/explore/${log.id}`,
     image: log.coverImage ? [log.coverImage] : undefined,
     author: { '@type': 'Organization', name: log.author },
-    publisher: { '@type': 'Organization', name: 'We Log' },
+    publisher: { '@type': 'Organization', name: '위로그' },
     mentions: log.places.map((p) => ({
       '@type': 'Place',
       name: p.name,

@@ -45,7 +45,7 @@ function LoginForm() {
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-8 px-6">
       <div className="flex flex-col gap-2 text-center">
-        <h1 className="text-3xl font-extrabold text-brand">We Log</h1>
+        <h1 className="text-3xl font-extrabold text-brand">위로그</h1>
         <p className="text-sm text-text-secondary">
           둘이 함께한 순간을 기록해요.
           <br />

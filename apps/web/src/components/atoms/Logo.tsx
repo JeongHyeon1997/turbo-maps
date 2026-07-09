@@ -11,7 +11,7 @@ export function Logo({ href = '/' }: LogoProps) {
       href={href as React.ComponentProps<typeof Link>['href']}
       className="text-xl font-extrabold tracking-tight text-brand"
     >
-      We Log
+      위로그
     </Link>
   );
 }

@@ -8,7 +8,7 @@ export function SiteFooter() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-10 text-sm text-text-muted md:flex-row md:items-center md:justify-between md:px-8">
         <div className="flex flex-col gap-1">
           <Logo />
-          <p>&copy; 2026 We Log. All rights reserved.</p>
+          <p>&copy; 2026 위로그. All rights reserved.</p>
         </div>
         <nav aria-label="정책 링크" className="flex gap-4">
           <Link

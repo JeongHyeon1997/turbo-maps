@@ -11,7 +11,7 @@ const OPTIONS: { value: ThemePreference; label: string }[] = [
 
 function SystemIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2}>
       <rect x="3" y="4" width="18" height="13" rx="1.5" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M8 20h8M12 17v3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -20,7 +20,7 @@ function SystemIcon() {
 
 function SunIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2}>
       <circle cx="12" cy="12" r="4" />
       <path
         d="M12 2v2M12 20v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M2 12h2M20 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"
@@ -32,7 +32,7 @@ function SunIcon() {
 
 function MoonIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" stroke="none">
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" stroke="none">
       <path d="M20.5 14.7A8.5 8.5 0 1110.3 3.5a7 7 0 0010.2 11.2z" />
     </svg>
   );
@@ -50,6 +50,13 @@ const ICONS: Record<ThemePreference, React.ReactNode> = {
  * non-interactive shell until mounted so SSR markup never has to guess which
  * option is "active" (that guess is exactly what the `<head>` FOUC script
  * already resolved visually, just not into React state yet).
+ *
+ * Each segment is a **44×44 touch target** (DESIGN.md accessibility floor) —
+ * the icon itself stays small and centered, the button hit-area is what's
+ * enlarged. Uses `role="group"` + `aria-pressed` per-button (a plain toggle
+ * group) rather than a `radiogroup`/roving-tabindex pattern, since a 3-item
+ * segmented control reads and operates more simply as independent pressable
+ * toggles than as ARIA radios needing arrow-key navigation.
  */
 export function ThemeToggle() {
   const [pref, setPref] = useState<ThemePreference>('system');
@@ -76,12 +83,13 @@ export function ThemeToggle() {
   }, [mounted, pref]);
 
   if (!mounted) {
-    return <div className="h-8 w-[84px] rounded-full bg-surface-alt" aria-hidden="true" />;
+    // Real mounted footprint: 3 × 44px buttons + 2 × 2px gaps + 2 × 2px padding = 140×48.
+    return <div className="h-12 w-[140px] rounded-full bg-surface-alt" aria-hidden="true" />;
   }
 
   return (
     <div
-      role="radiogroup"
+      role="group"
       aria-label="테마 선택"
       className="inline-flex items-center gap-0.5 rounded-full bg-surface-alt p-0.5"
     >
@@ -91,11 +99,10 @@ export function ThemeToggle() {
           <button
             key={opt.value}
             type="button"
-            role="radio"
-            aria-checked={active}
+            aria-pressed={active}
             aria-label={opt.label}
             onClick={() => setPref(opt.value)}
-            className={`flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+            className={`flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
               active
                 ? 'bg-surface text-brand shadow-sm'
                 : 'text-text-muted hover:text-text-secondary'

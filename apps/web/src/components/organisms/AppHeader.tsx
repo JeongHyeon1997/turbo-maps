@@ -51,7 +51,7 @@ export function AppHeader({ avatars = [], signedIn = true }: AppHeaderProps) {
               ))}
             </Link>
           ) : !signedIn ? (
-            <Button href="/login" variant="primary" size="sm">
+            <Button href="/login" variant="primary" size="md">
               로그인
             </Button>
           ) : null}

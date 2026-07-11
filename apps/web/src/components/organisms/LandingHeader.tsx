@@ -8,7 +8,7 @@ export function LandingHeader() {
         <Logo />
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Button href="/login" variant="primary" size="sm">
+          <Button href="/login" variant="primary" size="md">
             로그인
           </Button>
         </div>

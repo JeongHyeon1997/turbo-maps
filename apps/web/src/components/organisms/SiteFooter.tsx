@@ -1,5 +1,5 @@
 import { Logo } from '@/components/atoms';
-import { FooterColumn, type FooterLinkItem } from '@/components/molecules';
+import { CookieSettingsLink, FooterColumn, type FooterLinkItem } from '@/components/molecules';
 
 const exploreLinks: readonly FooterLinkItem[] = [
   { label: '탐색', href: '/explore' },
@@ -20,6 +20,10 @@ export interface SiteFooterProps {
   /** Adds mobile-only bottom padding so content doesn't sit under `BottomNav`'s fixed bar
    * (only relevant in `AppShell` — `PublicShell` has no bottom tab bar). */
   withNavOffset?: boolean;
+  /** Appends a "쿠키 설정" link to the 정책 column that reopens `ConsentBanner`
+   * (docs/plan/03-adsense.md STEP1 item 5). Only passed `true` from `PublicShell` — the
+   * banner never mounts in `AppShell`, so a link there would just do nothing. */
+  showCookieSettings?: boolean;
 }
 
 /**
@@ -27,7 +31,7 @@ export interface SiteFooterProps {
  * decision 4) so policy links stay reachable while signed in too. Four groups: brand, 둘러보기
  * (public discovery), 서비스 (about/contact), 정책 (privacy/terms).
  */
-export function SiteFooter({ withNavOffset = false }: SiteFooterProps = {}) {
+export function SiteFooter({ withNavOffset = false, showCookieSettings = false }: SiteFooterProps = {}) {
   return (
     <footer
       className={`border-t border-divider bg-surface ${withNavOffset ? 'pb-24 md:pb-0' : ''}`}
@@ -43,7 +47,11 @@ export function SiteFooter({ withNavOffset = false }: SiteFooterProps = {}) {
 
         <FooterColumn title="둘러보기" links={exploreLinks} />
         <FooterColumn title="서비스" links={serviceLinks} />
-        <FooterColumn title="정책" links={policyLinks} />
+        <FooterColumn
+          title="정책"
+          links={policyLinks}
+          extra={showCookieSettings ? <CookieSettingsLink /> : undefined}
+        />
       </div>
     </footer>
   );

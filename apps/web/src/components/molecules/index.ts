@@ -18,5 +18,7 @@ export { HeaderNav } from './HeaderNav';
 export type { HeaderNavItem, HeaderNavVariant } from './HeaderNav';
 export { AuthAction } from './AuthAction';
 export type { AvatarDescriptor } from './AuthAction';
-export { FooterColumn } from './FooterColumn';
+export { FooterColumn, footerLinkClassName } from './FooterColumn';
 export type { FooterLinkItem } from './FooterColumn';
+export { ConsentBanner, reopenConsentBanner } from './ConsentBanner';
+export { CookieSettingsLink } from './CookieSettingsLink';

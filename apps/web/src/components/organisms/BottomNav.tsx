@@ -23,14 +23,19 @@ const tabs: Tab[] = [
   { href: '/map', label: '지도', icon: I('M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15') },
   { href: '/logs/new', label: '기록', icon: I('M12 5v14M5 12h14'), center: true },
   { href: '/explore', label: '탐색', icon: I('M12 22a10 10 0 100-20 10 10 0 000 20zM15.5 8.5l-2 5-5 2 2-5 5-2z') },
-  { href: '/profile', label: '내정보', icon: I('M12 12a4 4 0 100-8 4 4 0 000 8zM5 21a7 7 0 0114 0') },
+  // 로그인 모바일에서 /profile 도달은 헤더 아바타(AuthAction, 44px 터치타깃)가 담당한다 —
+  // 캘린더가 이 다섯 번째 슬롯을 대체(docs/plan/07-header-footer.md uiux-reviewer fix #2).
+  { href: '/calendar', label: '캘린더', icon: I('M7 2v4M17 2v4M3.5 10h17M4 4h16v16H4V4z') },
 ];
 
 /** Mobile-only fixed bottom tab bar. Hidden on md+ (desktop uses header nav). */
 export function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-divider bg-background/95 backdrop-blur md:hidden">
+    <nav
+      aria-label="하단 탐색"
+      className="fixed inset-x-0 bottom-0 z-20 border-t border-divider bg-background/95 backdrop-blur md:hidden"
+    >
       <ul className="mx-auto flex max-w-md items-center justify-around px-2 py-1.5">
         {tabs.map((t) => {
           const active = t.href === '/' ? pathname === '/' : pathname.startsWith(t.href);

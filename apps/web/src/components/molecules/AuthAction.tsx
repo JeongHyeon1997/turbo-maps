@@ -24,7 +24,11 @@ export interface AuthActionProps {
 export function AuthAction({ avatars = [], signedIn = false }: AuthActionProps) {
   if (avatars.length > 0) {
     return (
-      <Link href="/profile" aria-label="내 프로필" className="flex -space-x-2">
+      <Link
+        href="/profile"
+        aria-label="내 프로필"
+        className="flex min-h-11 min-w-11 items-center justify-center -space-x-2"
+      >
         {avatars.map((a, i) => (
           <Avatar key={i} initial={a.initial} color={a.color} imageUrl={a.imageUrl} name={a.name} />
         ))}

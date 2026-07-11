@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { Logo, ThemeToggle } from '@/components/atoms';
 import { AuthAction, HeaderNav, type AvatarDescriptor, type HeaderNavItem } from '@/components/molecules';
 
@@ -25,46 +24,48 @@ const signedOutNav: readonly HeaderNavItem[] = [
 ];
 
 /**
- * Unified sticky top bar for both signed-in (`AppShell`) and signed-out (`PublicShell`) surfaces
- * — replaces the former `AppHeader`/`LandingHeader` split (docs/plan/07-header-footer.md decision
+ * Unified top bar for both signed-in (`AppShell`) and signed-out (`PublicShell`) surfaces —
+ * replaces the former `AppHeader`/`LandingHeader` split (docs/plan/07-header-footer.md decision
  * 1). Nav items and the auth affordance both switch on `signedIn`.
  *
  * Signed-out visitors also get a thin, JS-free link bar under the header on mobile (decision 2)
  * so `/explore` and `/places` stay reachable without a hamburger/drawer — the desktop nav is
- * already visible at that width via `HeaderNav`.
+ * already visible at that width via `HeaderNav`. That link bar shares `HeaderNav`'s
+ * active-route logic (aria-current) instead of hand-rolling its own markup (uiux-reviewer fix
+ * #3), and only the **top row** is `sticky` — the link bar sits in normal flow below it so
+ * scrolling pins just the compact top bar instead of ~108px of combined header (fix #6). At
+ * mobile widths `ThemeToggle` renders its own compact single-button cycle internally (fix #1);
+ * the right cluster gets `min-w-0` and the logo `shrink-0` so neither can force overflow at a
+ * 320px viewport.
  */
 export function SiteHeader({ avatars = [], signedIn = false }: SiteHeaderProps) {
   const navItems = signedIn ? signedInNav : signedOutNav;
 
   return (
-    <header className="sticky top-0 z-10 border-b border-divider bg-background/90 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4 md:px-8">
-        <div className="flex items-center gap-8">
-          <Logo />
-          <HeaderNav items={navItems} className="hidden gap-6 md:flex" />
+    <>
+      <header className="sticky top-0 z-10 border-b border-divider bg-background/90 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4 md:px-8">
+          <div className="flex min-w-0 items-center gap-8">
+            <span className="shrink-0">
+              <Logo />
+            </span>
+            <HeaderNav items={navItems} className="hidden gap-6 md:flex" />
+          </div>
+          <div className="flex min-w-0 items-center gap-3">
+            <ThemeToggle />
+            <AuthAction signedIn={signedIn} avatars={avatars} />
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <AuthAction signedIn={signedIn} avatars={avatars} />
-        </div>
-      </div>
+      </header>
 
       {!signedIn && (
-        <nav
-          aria-label="탐색 메뉴"
-          className="flex border-t border-divider px-3 md:hidden"
-        >
-          {signedOutNav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href as React.ComponentProps<typeof Link>['href']}
-              className="flex h-11 flex-1 items-center justify-center rounded-md text-sm font-medium text-text-secondary transition-colors duration-200 ease-out hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <HeaderNav
+          items={signedOutNav}
+          ariaLabel="탐색 메뉴"
+          className="flex border-b border-divider bg-background px-3 md:hidden"
+          variant="mobileBar"
+        />
       )}
-    </header>
+    </>
   );
 }

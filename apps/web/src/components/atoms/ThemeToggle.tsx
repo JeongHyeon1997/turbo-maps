@@ -44,19 +44,35 @@ const ICONS: Record<ThemePreference, React.ReactNode> = {
   dark: <MoonIcon />,
 };
 
+/** Tap order for the compact mobile cycle button: system → light → dark → system. */
+const NEXT_PREF: Record<ThemePreference, ThemePreference> = {
+  system: 'light',
+  light: 'dark',
+  dark: 'system',
+};
+
+const PREF_LABEL: Record<ThemePreference, string> = {
+  system: '시스템 테마',
+  light: '라이트 테마',
+  dark: '다크 테마',
+};
+
 /**
- * 3-way (system/light/dark) segmented control. Reads/writes `localStorage` and
- * flips `<html class="dark">` — see `lib/theme.ts`. Renders a neutral,
- * non-interactive shell until mounted so SSR markup never has to guess which
- * option is "active" (that guess is exactly what the `<head>` FOUC script
- * already resolved visually, just not into React state yet).
+ * 3-way (system/light/dark) theme control, rendered as two responsive variants that share
+ * state: a **compact single-button cycle** on mobile (`< md`) and the full **segmented
+ * control** on desktop (`md+`) — a 3-segment toggle (140px) plus the login CTA overflows a
+ * 320px viewport, so mobile gets one 44×44 icon button that cycles system→light→dark on tap
+ * (docs/plan/07-header-footer.md uiux-reviewer fix #1). Reads/writes `localStorage` and flips
+ * `<html class="dark">` — see `lib/theme.ts`. Renders a neutral, non-interactive shell (for both
+ * variants) until mounted so SSR markup never has to guess which option is "active" (that guess
+ * is exactly what the `<head>` FOUC script already resolved visually, just not into React state
+ * yet).
  *
- * Each segment is a **44×44 touch target** (DESIGN.md accessibility floor) —
- * the icon itself stays small and centered, the button hit-area is what's
- * enlarged. Uses `role="group"` + `aria-pressed` per-button (a plain toggle
- * group) rather than a `radiogroup`/roving-tabindex pattern, since a 3-item
- * segmented control reads and operates more simply as independent pressable
- * toggles than as ARIA radios needing arrow-key navigation.
+ * Desktop segments are a **44×44 touch target** each (DESIGN.md accessibility floor) — the icon
+ * itself stays small and centered, the button hit-area is what's enlarged. Uses `role="group"` +
+ * `aria-pressed` per-button (a plain toggle group) rather than a `radiogroup`/roving-tabindex
+ * pattern, since a 3-item segmented control reads and operates more simply as independent
+ * pressable toggles than as ARIA radios needing arrow-key navigation.
  */
 export function ThemeToggle() {
   const [pref, setPref] = useState<ThemePreference>('system');
@@ -83,35 +99,57 @@ export function ThemeToggle() {
   }, [mounted, pref]);
 
   if (!mounted) {
-    // Real mounted footprint: 3 × 44px buttons + 2 × 2px gaps + 2 × 2px padding = 140×48.
-    return <div className="h-12 w-[140px] rounded-full bg-surface-alt" aria-hidden="true" />;
+    return (
+      <>
+        {/* Compact mobile shell: 44×44 icon button. */}
+        <div className="h-11 w-11 rounded-full bg-surface-alt md:hidden" aria-hidden="true" />
+        {/* Desktop shell: 3 × 44px buttons + 2 × 2px gaps + 2 × 2px padding = 140×48. */}
+        <div
+          className="hidden h-12 w-[140px] rounded-full bg-surface-alt md:block"
+          aria-hidden="true"
+        />
+      </>
+    );
   }
 
+  const next = NEXT_PREF[pref];
+
   return (
-    <div
-      role="group"
-      aria-label="테마 선택"
-      className="inline-flex items-center gap-0.5 rounded-full bg-surface-alt p-0.5"
-    >
-      {OPTIONS.map((opt) => {
-        const active = pref === opt.value;
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            aria-pressed={active}
-            aria-label={opt.label}
-            onClick={() => setPref(opt.value)}
-            className={`flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
-              active
-                ? 'bg-surface text-brand shadow-sm'
-                : 'text-text-muted hover:text-text-secondary'
-            }`}
-          >
-            {ICONS[opt.value]}
-          </button>
-        );
-      })}
-    </div>
+    <>
+      <button
+        type="button"
+        onClick={() => setPref(next)}
+        aria-label={`현재 ${PREF_LABEL[pref]}. 탭하면 ${PREF_LABEL[next]}로 전환`}
+        className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-alt text-text-secondary transition-all duration-200 ease-out hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand md:hidden"
+      >
+        {ICONS[pref]}
+      </button>
+
+      <div
+        role="group"
+        aria-label="테마 선택"
+        className="hidden items-center gap-0.5 rounded-full bg-surface-alt p-0.5 md:inline-flex"
+      >
+        {OPTIONS.map((opt) => {
+          const active = pref === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              aria-pressed={active}
+              aria-label={opt.label}
+              onClick={() => setPref(opt.value)}
+              className={`flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+                active
+                  ? 'bg-surface text-brand shadow-sm'
+                  : 'text-text-muted hover:text-text-secondary'
+              }`}
+            >
+              {ICONS[opt.value]}
+            </button>
+          );
+        })}
+      </div>
+    </>
   );
 }

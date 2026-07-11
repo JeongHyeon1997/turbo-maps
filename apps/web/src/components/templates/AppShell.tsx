@@ -64,7 +64,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <AppHeader avatars={avatars} signedIn={signedIn} />
-      <main className="mx-auto w-full max-w-6xl px-4 pb-24 pt-6 md:px-8 md:pb-10 md:pt-10">
+      <main className="mx-auto w-full max-w-6xl px-5 pb-24 pt-6 md:px-8 md:pb-10 md:pt-10">
         {children}
       </main>
       <BottomNav />

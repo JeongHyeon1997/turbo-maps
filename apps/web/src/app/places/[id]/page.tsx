@@ -106,7 +106,7 @@ export default async function PlaceDetailPage({ params }: PageParams) {
                 typeof Link
               >['href']
             }
-            className="w-fit text-xs font-medium text-brand hover:underline"
+            className="w-fit rounded text-xs font-medium text-brand transition-colors duration-200 ease-out hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             {place.region} 다른 장소 보기 ›
           </Link>
@@ -139,7 +139,7 @@ export default async function PlaceDetailPage({ params }: PageParams) {
   if (!user) {
     return (
       <PublicShell>
-        <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-8 md:py-16">{content}</div>
+        <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-8 md:py-16">{content}</div>
       </PublicShell>
     );
   }

@@ -53,7 +53,7 @@ export default async function ProfilePage() {
           ) : (
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm text-text-secondary">아직 커플 연결 전이에요.</p>
-              <Button href="/couple/connect" variant="ghost">
+              <Button href="/couple/connect" variant="ghost" size="sm">
                 연결하기
               </Button>
             </div>

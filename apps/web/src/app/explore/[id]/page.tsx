@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { KakaoMap, type MapMarker } from '@/components/organisms';
 import { BackLink, HeartRating, JsonLd } from '@/components/atoms';
-import { VisitedPlaceItem } from '@/components/molecules';
+import { CoverHero, VisitedPlaceItem } from '@/components/molecules';
 import { getPublicExploreLog } from '@/lib/explore';
 import { formatLogDate } from '@/lib/format-date';
 import { SITE_URL } from '@/lib/site-url';
@@ -100,19 +100,7 @@ export default async function ExploreLogDetailPage({ params }: PageParams) {
       <JsonLd data={jsonLd} />
       <BackLink fallbackHref="/explore">‹ 탐색으로 돌아가기</BackLink>
 
-      <div
-        className="flex h-48 flex-col justify-end gap-2 rounded-2xl bg-cover bg-center p-6 md:h-64"
-        style={{
-          backgroundImage: log.coverImage
-            ? `url(${log.coverImage})`
-            : `linear-gradient(135deg, ${log.cover[0]}, ${log.cover[1]})`,
-        }}
-      >
-        <span className="w-fit rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
-          {formatLogDate(log.date)}
-        </span>
-        <h1 className="text-2xl font-extrabold text-white drop-shadow md:text-3xl">{log.title}</h1>
-      </div>
+      <CoverHero title={log.title} dateLabel={formatLogDate(log.date)} coverImage={log.coverImage} />
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         {avgRating > 0 && <HeartRating value={avgRating} />}
@@ -146,7 +134,7 @@ export default async function ExploreLogDetailPage({ params }: PageParams) {
   if (!user) {
     return (
       <PublicShell>
-        <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-8 md:py-16">{content}</div>
+        <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-8 md:py-16">{content}</div>
       </PublicShell>
     );
   }

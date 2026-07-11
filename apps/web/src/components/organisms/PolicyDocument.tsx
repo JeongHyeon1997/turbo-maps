@@ -8,7 +8,7 @@ export interface PolicyDocumentProps {
 /** Shared "title + prose body" shell for /privacy and /terms — keeps both pages in sync visually. */
 export function PolicyDocument({ title, intro, effectiveDate, children }: PolicyDocumentProps) {
   return (
-    <article className="mx-auto flex w-full max-w-2xl flex-col gap-10 px-4 py-12 md:px-8 md:py-16">
+    <article className="mx-auto flex w-full max-w-2xl flex-col gap-10 px-5 py-12 md:px-8 md:py-16">
       <header className="flex flex-col gap-3 border-b border-divider pb-8">
         <h1 className="text-2xl font-extrabold text-text-primary md:text-3xl">{title}</h1>
         <p className="text-sm leading-relaxed text-text-secondary">{intro}</p>

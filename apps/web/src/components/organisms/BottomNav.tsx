@@ -40,7 +40,7 @@ export function BottomNav() {
                 <Link
                   href={t.href as Href}
                   aria-label={t.label}
-                  className="flex h-12 w-12 -translate-y-2 items-center justify-center rounded-full bg-brand text-white shadow-md"
+                  className="flex h-12 w-12 -translate-y-2 items-center justify-center rounded-full bg-brand text-white shadow-md transition-all duration-200 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                   {t.icon}
                 </Link>
@@ -51,7 +51,7 @@ export function BottomNav() {
             <li key={t.href}>
               <Link
                 href={t.href as Href}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 text-xs ${
+                className={`flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-xs transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
                   active ? 'text-brand' : 'text-text-muted'
                 }`}
               >

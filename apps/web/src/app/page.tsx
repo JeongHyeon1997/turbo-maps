@@ -1,4 +1,3 @@
-import { coverGradients } from '@maps/tokens';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { DateLogFeed, LandingHero, LandingFeatures, ExplorePreview } from '@/components/organisms';
@@ -25,7 +24,7 @@ interface Row {
   date_log_places: { visit_order: number; rating: number | null; places: { name: string; category: string | null } | null }[];
 }
 
-function toCard(row: Row, i: number, coverUrl?: string | null): MockDateLog {
+function toCard(row: Row, coverUrl?: string | null): MockDateLog {
   const dlp = [...(row.date_log_places ?? [])].sort((a, b) => a.visit_order - b.visit_order);
   const ratings = dlp.map((p) => p.rating ?? 0).filter((r) => r > 0);
   const avg = ratings.length ? Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
@@ -36,7 +35,6 @@ function toCard(row: Row, i: number, coverUrl?: string | null): MockDateLog {
     memo: row.memo ?? '',
     rating: avg,
     places: dlp.map((p) => ({ name: p.places?.name ?? '', category: p.places?.category ?? '' })),
-    cover: coverGradients[i % coverGradients.length]!,
     coverImage: coverUrl ?? null,
   };
 }
@@ -53,7 +51,7 @@ export default async function HomePage() {
     const previewLogs = await getPublicExploreLogs(supabase, 3);
     return (
       <PublicShell>
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 py-10 md:gap-24 md:px-8 md:py-16">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-5 py-10 md:gap-24 md:px-8 md:py-16">
           <JsonLd data={LANDING_JSON_LD} />
           <LandingHero />
           <LandingFeatures />
@@ -95,8 +93,8 @@ export default async function HomePage() {
     });
   }
 
-  const logs = typed.map((r, i) =>
-    toCard(r, i, r.cover_photo_path ? signed.get(r.cover_photo_path) : null),
+  const logs = typed.map((r) =>
+    toCard(r, r.cover_photo_path ? signed.get(r.cover_photo_path) : null),
   );
 
   return (
@@ -114,7 +112,7 @@ export default async function HomePage() {
         <SectionHeader
           title="최근 데이트"
           action={
-            <Button href="/logs/new" variant="primary">
+            <Button href="/logs/new" variant="primary" size="sm">
               + 기록 추가
             </Button>
           }
@@ -123,10 +121,10 @@ export default async function HomePage() {
         {logs.length > 0 ? (
           <DateLogFeed logs={logs} />
         ) : (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-surface px-6 py-14 text-center">
-            <p className="text-sm text-text-secondary">아직 기록이 없어요.</p>
-            <Button href="/logs/new">첫 데이트 기록하기</Button>
-          </div>
+          <EmptyState
+            message="아직 기록이 없어요."
+            action={<Button href="/logs/new">첫 데이트 기록하기</Button>}
+          />
         )}
       </div>
     </AppShell>

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { Button } from '@/components/atoms';
+import { Button, TextField } from '@/components/atoms';
 
 async function createCouple() {
   'use server';
@@ -56,7 +56,7 @@ export default async function ConnectPage({
         </div>
       ) : (
         <form action={createCouple}>
-          <Button type="submit" fullWidth>
+          <Button type="submit" size="lg">
             커플 만들고 초대코드 받기
           </Button>
         </form>
@@ -71,15 +71,17 @@ export default async function ConnectPage({
             초대코드
           </label>
           <div className="flex gap-2">
-            <input
+            <TextField
               id="invite-code"
               name="code"
               placeholder="예: A1B2C3"
               maxLength={6}
               aria-describedby="invite-code-hint"
-              className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm uppercase outline-none focus:border-brand"
+              className="flex-1 uppercase"
             />
-            <Button type="submit">연결</Button>
+            <Button type="submit" size="lg" fullWidth={false}>
+              연결
+            </Button>
           </div>
           <p id="invite-code-hint" className="text-center text-xs text-text-muted">
             영문·숫자 6자리 코드를 입력하세요.

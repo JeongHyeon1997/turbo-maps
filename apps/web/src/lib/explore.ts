@@ -1,4 +1,3 @@
-import { coverGradients } from '@maps/tokens';
 import type { createClient } from '@/lib/supabase/server';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 import { publicCoverUrl } from '@/lib/storage/public-cover-url';
@@ -57,18 +56,7 @@ export interface PublicExploreLogDetail {
   /** always '익명 커플' — public surfaces never expose real nicknames. */
   author: string;
   coverImage: string | null;
-  cover: (typeof coverGradients)[number];
   places: PublicExplorePlace[];
-}
-
-/**
- * Deterministic gradient pick for a single record (no list index to hash off of).
- * Exported for reuse by `lib/places.ts` (place-attributed course cards).
- */
-export function gradientForId(id: string) {
-  let hash = 0;
-  for (let i = 0; i < id.length; i += 1) hash = (hash * 31 + id.charCodeAt(i)) % coverGradients.length;
-  return coverGradients[Math.abs(hash) % coverGradients.length]!;
 }
 
 function toPublicPlace(row: ExploreLogPlaceRow): PublicExplorePlace {
@@ -120,7 +108,7 @@ export async function getPublicExploreLogs(
       });
     }
 
-    return logs.map((log, i) => {
+    return logs.map((log) => {
       const places = (placesByLog.get(log.id) ?? []).sort((a, b) => a.visit_order - b.visit_order);
       const ratings = places.map((p) => p.rating ?? 0).filter((r) => r > 0);
       const avg = ratings.length ? Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
@@ -131,7 +119,6 @@ export async function getPublicExploreLogs(
         memo: '', // private memo — never exposed on the public feed
         rating: avg,
         places: places.map((p) => ({ name: p.name, category: p.category ?? '' })),
-        cover: coverGradients[i % coverGradients.length]!,
         coverImage: publicCoverUrl(log.public_cover_path),
         author: ANONYMOUS_AUTHOR,
       };
@@ -178,7 +165,6 @@ export async function getPublicExploreLog(
       title: log.title ?? '무제 데이트',
       author: ANONYMOUS_AUTHOR,
       coverImage: publicCoverUrl(log.public_cover_path),
-      cover: gradientForId(log.id),
       places,
     };
   } catch {

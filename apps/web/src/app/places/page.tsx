@@ -72,7 +72,7 @@ export default async function PlacesDirectoryPage({ searchParams }: PageProps) {
   if (!user) {
     return (
       <PublicShell>
-        <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-8 md:py-16">{content}</div>
+        <div className="mx-auto w-full max-w-6xl px-5 py-10 md:px-8 md:py-16">{content}</div>
       </PublicShell>
     );
   }

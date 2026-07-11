@@ -1,7 +1,7 @@
 import type { createClient } from '@/lib/supabase/server';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 import { publicCoverUrl } from '@/lib/storage/public-cover-url';
-import { ANONYMOUS_AUTHOR, gradientForId } from '@/lib/explore';
+import { ANONYMOUS_AUTHOR } from '@/lib/explore';
 
 // Backs `/places` and `/places/[id]` — anon-safe place aggregates from the 0008
 // migration (docs/plan/05-public-enrichment.md B). Same rule as `lib/explore.ts`:
@@ -115,7 +115,6 @@ export async function getPublicPlaceLogs(
       memo: '', // private memo — never exposed on public surfaces
       rating: row.rating ?? 0,
       places: [],
-      cover: gradientForId(row.date_log_id),
       coverImage: publicCoverUrl(row.public_cover_path),
       author: ANONYMOUS_AUTHOR,
     }));

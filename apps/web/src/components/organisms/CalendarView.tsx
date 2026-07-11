@@ -71,13 +71,19 @@ export function CalendarView({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <button onClick={() => shift(-1)} className="rounded-lg px-3 py-1 text-text-secondary hover:bg-surface-alt">
+        <button
+          onClick={() => shift(-1)}
+          className="rounded-lg px-3 py-1 text-text-secondary transition-colors duration-200 ease-out hover:bg-surface-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        >
           ‹
         </button>
-        <span className="text-lg font-bold text-text-primary">
+        <span className="text-lg font-bold tracking-tight text-text-primary">
           {year}년 {month}월
         </span>
-        <button onClick={() => shift(1)} className="rounded-lg px-3 py-1 text-text-secondary hover:bg-surface-alt">
+        <button
+          onClick={() => shift(1)}
+          className="rounded-lg px-3 py-1 text-text-secondary transition-colors duration-200 ease-out hover:bg-surface-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        >
           ›
         </button>
       </div>
@@ -94,7 +100,7 @@ export function CalendarView({
           const has = byDate.has(ds);
           const isSel = selected === ds;
           const isToday = today === ds;
-          const cellClasses = `flex aspect-square flex-col items-center justify-center rounded-xl text-sm ${
+          const cellClasses = `flex aspect-square flex-col items-center justify-center rounded-xl text-sm transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
             isSel ? 'bg-brand text-white' : has ? 'bg-surface-alt text-text-primary' : 'text-text-secondary'
           } ${isToday && !isSel ? 'ring-2 ring-inset ring-brand' : ''}`;
 
@@ -130,7 +136,7 @@ export function CalendarView({
             <li key={it.id}>
               <Link
                 href={`/logs/${it.id}` as React.ComponentProps<typeof Link>['href']}
-                className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3 hover:bg-surface-alt"
+                className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3 transition-all duration-200 ease-out hover:border-border-strong hover:bg-surface-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 <span className="text-sm font-semibold text-text-primary">{it.title}</span>
                 <span className="text-xs text-text-muted">{it.placeCount}곳</span>

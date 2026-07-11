@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { loadKakao } from '@/lib/kakao/loader';
+import { TextField } from '@/components/atoms';
 
 export interface KakaoPlace {
   kakaoPlaceId: string;
@@ -57,7 +58,7 @@ export function PlaceSearch({ onSelect }: { onSelect: (p: KakaoPlace) => void })
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
-        <input
+        <TextField
           value={q}
           onChange={(e) => {
             setQ(e.target.value);
@@ -66,12 +67,12 @@ export function PlaceSearch({ onSelect }: { onSelect: (p: KakaoPlace) => void })
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), search())}
           placeholder="장소 검색 (예: 연남동 카페)"
           aria-label="장소 검색"
-          className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand"
+          className="flex-1"
         />
         <button
           type="button"
           onClick={search}
-          className="rounded-xl bg-surface-alt px-4 py-2.5 text-sm font-semibold text-text-primary"
+          className="h-14 shrink-0 rounded-lg bg-surface-alt px-4 text-sm font-semibold text-text-primary transition-all duration-200 ease-out hover:bg-border-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-[0.97]"
         >
           검색
         </button>
@@ -96,7 +97,7 @@ export function PlaceSearch({ onSelect }: { onSelect: (p: KakaoPlace) => void })
                   setResults([]);
                   setQ('');
                 }}
-                className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left hover:bg-surface"
+                className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left transition-colors duration-200 ease-out hover:bg-surface-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
               >
                 <span className="text-sm font-medium text-text-primary">
                   {r.name}

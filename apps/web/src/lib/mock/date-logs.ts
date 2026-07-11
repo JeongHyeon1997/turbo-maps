@@ -1,8 +1,6 @@
 // Mock data for the home feed until the DB (db-dev) + API (server-dev) land.
 // Shapes intentionally mirror the planned @maps/shared schema (schema-dev).
 
-import { coverGradients, type CoverGradient } from '@maps/tokens';
-
 export interface MockPlace {
   name: string;
   category: string;
@@ -15,9 +13,7 @@ export interface MockDateLog {
   memo: string;
   rating: number; // 0-5
   places: MockPlace[];
-  /** two color stops for the cover gradient (fallback when no photo) — from `@maps/tokens` */
-  cover: CoverGradient;
-  /** signed URL of the cover photo, when one was uploaded */
+  /** signed URL of the cover photo, when one was uploaded — `null`/absent renders `CoverFallback` */
   coverImage?: string | null;
   /** author nickname — shown on the public explore feed */
   author?: string;
@@ -35,7 +31,6 @@ export const mockDateLogs: MockDateLog[] = [
       { name: '카페 리브레', category: '카페' },
       { name: '경의선숲길', category: '산책' },
     ],
-    cover: coverGradients[0],
   },
   {
     id: '2',
@@ -47,7 +42,6 @@ export const mockDateLogs: MockDateLog[] = [
       { name: '뚝섬한강공원', category: '공원' },
       { name: '치킨플러스', category: '맛집' },
     ],
-    cover: coverGradients[1],
   },
   {
     id: '3',
@@ -60,6 +54,5 @@ export const mockDateLogs: MockDateLog[] = [
       { name: '대림창고', category: '카페' },
       { name: '포인트오브뷰', category: '소품샵' },
     ],
-    cover: coverGradients[2],
   },
 ];

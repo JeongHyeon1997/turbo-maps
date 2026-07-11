@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { KakaoMap, PlaceSearch, type KakaoPlace, type MapMarker } from '@/components/organisms';
-import { Button, RatingInput } from '@/components/atoms';
-import { PhotoThumb } from '@/components/molecules';
+import { Button, RatingInput, TextField } from '@/components/atoms';
+import { FormField, PhotoThumb } from '@/components/molecules';
 
 interface Selected extends KakaoPlace {
   rating: number;
@@ -222,33 +222,28 @@ export default function NewLogPage() {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col gap-5 px-4 py-6">
+    <main className="mx-auto flex min-h-screen max-w-lg flex-col gap-5 px-5 py-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-extrabold text-text-primary">데이트 기록</h1>
-        <button onClick={() => router.push('/')} className="text-sm text-text-muted">
+        <button
+          onClick={() => router.push('/')}
+          className="rounded-md text-sm text-text-muted transition-colors duration-200 ease-out hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        >
           취소
         </button>
       </div>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-text-secondary">날짜</span>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand"
-        />
-      </label>
+      <FormField label="날짜">
+        <TextField type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+      </FormField>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-text-secondary">제목</span>
-        <input
+      <FormField label="제목">
+        <TextField
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="예: 연남동 나들이"
-          className="rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand"
         />
-      </label>
+      </FormField>
 
       <div className="flex flex-col gap-1.5">
         <span className="text-sm font-medium text-text-secondary">대표 사진</span>
@@ -308,7 +303,7 @@ export default function NewLogPage() {
                   </div>
                   <button
                     onClick={() => removePlace(p.kakaoPlaceId)}
-                    className="text-xs text-text-muted"
+                    className="rounded text-xs text-text-muted transition-colors duration-200 ease-out hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     삭제
                   </button>
@@ -322,18 +317,17 @@ export default function NewLogPage() {
 
       {places.length > 0 && <KakaoMap markers={markers} />}
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-text-secondary">메모</span>
-        <textarea
+      <FormField label="메모">
+        <TextField
+          multiline
           value={memo}
           onChange={(e) => setMemo(e.target.value)}
           rows={3}
           placeholder="그날의 기억을 적어보세요"
-          className="rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand"
         />
-      </label>
+      </FormField>
 
-      <label className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3">
+      <label className="flex items-center justify-between rounded-xl border border-border bg-surface px-5 py-3">
         <span className="flex flex-col">
           <span className="text-sm font-medium text-text-primary">탐색에 공개</span>
           <span className="text-xs text-text-muted">
@@ -350,7 +344,7 @@ export default function NewLogPage() {
 
       {error && <p className="text-sm text-danger">{error}</p>}
 
-      <Button onClick={save} disabled={saving} fullWidth>
+      <Button onClick={save} disabled={saving} size="lg">
         {saving ? '저장 중…' : '기록 저장'}
       </Button>
     </main>

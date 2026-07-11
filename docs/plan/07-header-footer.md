@@ -1,8 +1,10 @@
 ---
-status: doing
+status: done # 2026-07-11 완료. 커뮤니티 진입점 배선만 06 진행 시 후속(SiteHeader의 signedInNav/signedOutNav 배열이 삽입 지점).
 last-updated: 2026-07-11
 owner: planner
 ---
+
+> **✅ 구현 완료 (2026-07-11)** — 커밋 `252a3f7`(SiteHeader 통합·HeaderNav/AuthAction/FooterColumn·푸터 4그룹·전역화) + uiux 지적 6건 반영 `ad12dc7`·`e88fcaa`·`30b8538`·`1a80975`(모바일 컴팩트 테마토글·BottomNav 내정보→캘린더(사용자 확정, /profile은 헤더 아바타로)·링크바 aria-current·푸터 44px 터치타깃·링크바 비-sticky 분리). build-qa 전 항목 PASS(ads.txt 200 포함), uiux-reviewer High 0.
 
 # 헤더 & 푸터 — 생성·정리 및 정보구조
 

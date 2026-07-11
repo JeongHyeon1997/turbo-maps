@@ -6,15 +6,14 @@
 ## 다음 (Next)   ← 새 세션은 여기부터, 위에서 아래로
 1. [ ] **STEP 0 — 실공개 로그 확보 (사용자 작업, 최우선 선행)** — 공개 뷰가 현재 전부 `[]`(공개 로그 0건).
        커플 실테스트를 겸해 **공개 데이트 코스 8~15건 작성**(공개 토글 ON + 커버 사진 + 장소/평점). `/explore`·`/places`·`/explore/regions`를 빈 화면이 아니게 만든다. → `docs/plan/03-adsense.md` STEP 0. **이게 AdSense·지역탐색·심사의 사실상 공통 선행조건.** (데이터 무관한 아래 2·3은 지금 병행 가능.)
-2. [ ] **헤더 & 푸터 — `SiteHeader` 통합 + 전역 푸터** ★ 다음 세션 여기부터 — 결정됨: 로그아웃/로그인 상태별 nav 분기, 공개 탐색(`/explore`·`/places`·지역)·커뮤니티 진입점 자리, 정책/소개 링크 푸터. ThemeToggle은 **이미 AppHeader/LandingHeader에 배치됨**(08 테마에서 완료) — 통합 헤더로 옮길 때 유지. 헤더 organism 중복 통합. **주의: `PublicShell`에 `<AdSenseScript/>`가 마운트돼 있으니 헤더 리팩터 시 유지할 것.** → `docs/plan/07-header-footer.md`. 담당 web-dev+designer+uiux-reviewer.
-3. [ ] **AdSense STEP 1 잔여** — 로더(`src/lib/adsense.tsx`, PublicShell 마운트)·`ads.txt`(pub `ca-pub-5362531643629275`)·env는 **완료**. 남은 것: **AdUnit 컴포넌트(승인 후 slot id 필요)·공개 페이지 배치·CMP/Consent Mode v2**. 실제 광고 노출은 STEP0 실데이터 + STEP2 승인 후. **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT` 설정은 Blocked 참고.** → `docs/plan/03-adsense.md`. 담당 web-dev.
-4. [ ] **커뮤니티 공간 (C-1: 좋아요·북마크부터)** — 커플 스코프 넘어 전체 유저 장소/코스 참여·발견. 결정됨: **지금은 헤더 IA에 진입점 자리만, 기능은 STEP0 실데이터 후.** C-1(좋아요·북마크·인기정렬, 익명 유지 가능)→C-2(따라하기)→C-3(정체성, **작성자 익명화 0007과 충돌 → ADR 선행**). → `docs/plan/06-community.md`. 담당 db-dev+web-dev+server-dev.
-5. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업. 08 테마 후속(mobile 라이트/다크 `theme.ts` 소비 정렬) 포함. ⚠️ 로컬 `expo export`가 `babel-preset-expo` 링크 문제로 실패 중(세팅 메모 참고) — 착수 시 `bun install` 재링크부터.
-6. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
+2. [ ] **AdSense STEP 1 잔여** — 로더(`src/lib/adsense.tsx`, PublicShell 마운트)·`ads.txt`(pub `ca-pub-5362531643629275`)·env는 **완료**. 남은 것: **AdUnit 컴포넌트(승인 후 slot id 필요)·공개 페이지 배치·CMP/Consent Mode v2**. 실제 광고 노출은 STEP0 실데이터 + STEP2 승인 후. **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT` 설정은 Blocked 참고.** → `docs/plan/03-adsense.md`. 담당 web-dev.
+3. [ ] **커뮤니티 공간 (C-1: 좋아요·북마크부터)** — 커플 스코프 넘어 전체 유저 장소/코스 참여·발견. 결정됨: **지금은 헤더 IA에 진입점 자리만, 기능은 STEP0 실데이터 후.** C-1(좋아요·북마크·인기정렬, 익명 유지 가능)→C-2(따라하기)→C-3(정체성, **작성자 익명화 0007과 충돌 → ADR 선행**). → `docs/plan/06-community.md`. 담당 db-dev+web-dev+server-dev.
+4. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업. 08 테마 후속(mobile 라이트/다크 `theme.ts` 소비 정렬) 포함. ⚠️ 로컬 `expo export`가 `babel-preset-expo` 링크 문제로 실패 중(세팅 메모 참고) — 착수 시 `bun install` 재링크부터.
+5. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
 ## 진행중 (Doing)
-- **08 토스풍 테마 전환 웹 완료(A+B+C, 2026-07-11)** — 작업 트리 클린, 전부 커밋·푸시됨. 상세는 아래 완료 섹션.
-- **다음 세션 시작점: `## 다음` 2번 — 07 헤더 & 푸터.** 처음에 `docs/plan/07-header-footer.md` + `DESIGN.md` 읽고 착수. ThemeToggle·PageTitle 등 08에서 만든 atom 재사용, PublicShell의 AdSenseScript 유지 주의.
+- **08 토스풍 테마 + 07 헤더/푸터 웹 완료(2026-07-11)** — 작업 트리 클린, 전부 커밋·푸시됨. 상세는 아래 완료 섹션.
+- **다음 세션 시작점: 개발 측 큰 건은 사실상 STEP 0(사용자 실데이터) 대기.** `## 다음` 2번(AdSense 잔여 중 CMP/Consent Mode v2는 데이터 무관하게 착수 가능), 4번(mobile)이 지금 가능한 개발 작업. 커뮤니티(3번)는 STEP 0 후.
 
 ## 막힘 (Blocked) — 사용자 승인/대시보드 필요
 - [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함) 완료. 사용자가 2계정으로 실검증: A 초대코드 생성 → B `/couple/connect` 입력 → 양쪽 헤더 아바타/status=connected/커플 스코프 공유 확인. (※ `## 다음` STEP 0와 겸해서 진행 가능)
@@ -54,6 +53,11 @@
 - [x] **SEO 배선 수정**: `/sitemap.xml`·`/robots.txt`가 미들웨어 로그인 리다이렉트로 막히던 것 → `EXACT_PUBLIC`에 추가(크롤러 200 확인).
 - [x] **브랜드 로고·파비콘**: `public/logo.png`(위로그 워드마크) + `app/icon.png`·`apple-icon.png`(Next 자동 파비콘 배선).
 - [x] **표기 위로그 rebrand**: web 사용자 표기 "We Log" → "위로그" 전수 교체(메타데이터/OG/JSON-LD/정책/로그인/Logo·푸터·랜딩). 로고 워드마크는 영문 유지(영/한 병행).
+
+### 헤더 & 푸터 완료 (2026-07-11 세션, `docs/plan/07`)
+- [x] **열린질문 5건 사용자 확정** — SiteHeader 통합 / About은 랜딩 `/` 대체 / 로그아웃 모바일 얇은 링크바 / 푸터 전 페이지 / 문의 메일(`ojh@pitin-ev.com`, privacy·terms에 이미 공개된 주소 재사용).
+- [x] **구현 (커밋 `252a3f7`)** — `SiteHeader` organism 통합(AppHeader/LandingHeader 삭제) + `HeaderNav`(aria-current)/`AuthAction`/`FooterColumn` molecule, 로그아웃 nav 탐색/장소(커뮤니티는 06 이후 — `signedInNav`/`signedOutNav` 배열이 삽입 지점), 모바일 링크바(서버렌더·44px), `SiteFooter` 4그룹(브랜드/둘러보기/서비스/정책), AppShell 전 페이지 푸터(`withNavOffset` pb-24). PublicShell AdSenseScript 유지.
+- [x] **검증 + 지적 반영 (커밋 `ad12dc7`·`e88fcaa`·`30b8538`·`1a80975`)** — build-qa 전 항목 PASS(ads.txt 200 포함, 헤더 잔재 0). uiux High 0, Med 2·Low 4 전건 반영: **모바일 컴팩트 테마토글**(단일 순환 버튼, 데스크톱 3-세그먼트 유지 — 사용자 확정), **BottomNav 내정보→캘린더 교체**(사용자 확정, /profile은 헤더 아바타 44px 링크로), 링크바 aria-current(HeaderNav variant 공유), BottomNav aria-label, 푸터 링크 44px, 링크바 비-sticky 분리(상단바만 고정).
 
 ### 토스풍 테마 전환 완료 (2026-07-11 세션, `docs/plan/08` A+B+C)
 - [x] **B. web-dev 컴포넌트/토글 (커밋 `3f1c3a7`·`d221335`·`ff1ad10`·`f0cbba4`)** — `ThemeProvider` 로직(`lib/theme.ts`) + **3-way ThemeToggle**(system/light/dark, html `.dark`+localStorage+`THEME_INIT_SCRIPT` FOUC 방지, AppHeader/LandingHeader 배치), Button size lg/md/sm(+press/focus링, pill은 칩 한정), `TextField` atom+`FormField` molecule(logs/new·profile·connect·PlaceSearch 반복 input 흡수), `CoverFallback` atom+`CoverHero` molecule(explore/logs 상세 히어로 통합), **coverGradients/coverTints 소비처 전량 교체 후 tokens export 제거**, 카드 이중강조 제거(bg-surface+border 택1), `Skeleton`+`CardGridSkeleton`+5개 라우트 `loading.tsx`, focus-visible 링/모션 전역, 컨테이너 px-4→px-5.

@@ -11,11 +11,13 @@ type CookieToSet = { name: string; value: string; options?: CookieOptions };
 // docs/plan/04-public-surface.md 2단계 / 05-public-enrichment.md B).
 // `/sitemap.xml`/`/robots.txt` (app/sitemap.ts, app/robots.ts) must be exact-public
 // too — crawlers hit these with no session, and a redirect to /login here makes
-// the sitemap/robots undiscoverable, defeating the whole SEO effort.
+// the sitemap/robots undiscoverable, defeating the whole SEO effort. Same for
+// `/ads.txt` (public/ads.txt) — the AdSense crawler must read it anonymously,
+// and `.txt` is NOT excluded by the middleware `matcher` in `middleware.ts`.
 // (The brand default OG image, `public/og-default.png`, needs no entry here —
 // it's a static asset under `/public`, and the middleware `matcher` config in
 // `middleware.ts` already excludes `.png` paths from running this file at all.)
-const EXACT_PUBLIC = ['/', '/sitemap.xml', '/robots.txt'];
+const EXACT_PUBLIC = ['/', '/sitemap.xml', '/robots.txt', '/ads.txt'];
 const PUBLIC_PREFIXES = ['/login', '/auth', '/privacy', '/terms', '/explore', '/places'];
 
 const isPublic = (path: string) =>

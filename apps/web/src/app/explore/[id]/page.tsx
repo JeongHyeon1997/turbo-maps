@@ -104,7 +104,7 @@ export default async function ExploreLogDetailPage({ params }: PageParams) {
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         {avgRating > 0 && <HeartRating value={avgRating} />}
-        <p className="text-sm text-text-muted">by {log.author}</p>
+        <p className="text-sm text-text-secondary">by {log.author}</p>
       </div>
 
       {markers.length > 0 && <KakaoMap markers={markers} height={320} route={false} />}

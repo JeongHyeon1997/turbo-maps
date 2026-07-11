@@ -18,7 +18,7 @@ export interface DateLogCardProps {
 
 function CardBody({ log }: { log: MockDateLog }) {
   return (
-    <article className="overflow-hidden rounded-2xl border border-border bg-surface transition-all duration-200 ease-out hover:border-border-strong">
+    <article className="overflow-hidden rounded-2xl border border-border bg-surface transition-all duration-200 ease-out hover:border-border-strong dark:border-border-strong">
       <div className="relative flex h-40 items-end p-4">
         {log.coverImage ? (
           <div
@@ -49,13 +49,13 @@ function CardBody({ log }: { log: MockDateLog }) {
           ))}
         </div>
 
-        {log.author && <p className="pt-1 text-xs text-text-muted">by {log.author}</p>}
+        {log.author && <p className="pt-1 text-xs text-text-secondary">by {log.author}</p>}
       </div>
     </article>
   );
 }
 
-/** One date-log entry in the feed: gradient cover + meta + places. Links to `${hrefBase}/[id]` unless `linkable={false}`. */
+/** One date-log entry in the feed: cover (photo or `CoverFallback`) + meta + places. Links to `${hrefBase}/[id]` unless `linkable={false}`. */
 export function DateLogCard({ log, hrefBase = '/logs', linkable = true }: DateLogCardProps) {
   if (!linkable) {
     return <CardBody log={log} />;

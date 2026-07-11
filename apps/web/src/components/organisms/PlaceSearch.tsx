@@ -78,12 +78,12 @@ export function PlaceSearch({ onSelect }: { onSelect: (p: KakaoPlace) => void })
         </button>
       </div>
 
-      {searching && <p className="px-1 text-xs text-text-muted">검색 중…</p>}
+      {searching && <p className="px-1 text-xs text-text-secondary">검색 중…</p>}
 
       {!searching && error && <p className="px-1 text-xs text-danger">{error}</p>}
 
       {!searching && !error && searched && results.length === 0 && (
-        <p className="px-1 text-xs text-text-muted">검색 결과가 없어요. 다른 검색어로 시도해보세요.</p>
+        <p className="px-1 text-xs text-text-secondary">검색 결과가 없어요. 다른 검색어로 시도해보세요.</p>
       )}
 
       {results.length > 0 && (
@@ -103,7 +103,7 @@ export function PlaceSearch({ onSelect }: { onSelect: (p: KakaoPlace) => void })
                   {r.name}
                   {r.category ? <span className="text-text-muted"> · {r.category}</span> : null}
                 </span>
-                {r.address && <span className="text-xs text-text-muted">{r.address}</span>}
+                {r.address && <span className="text-xs text-text-secondary">{r.address}</span>}
               </button>
             </li>
           ))}

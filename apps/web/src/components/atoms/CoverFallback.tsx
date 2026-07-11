@@ -19,7 +19,7 @@ export function CoverFallback({ className = '', tone = 'neutral' }: CoverFallbac
     >
       <svg
         viewBox="0 0 24 24"
-        className={`h-8 w-8 ${tone === 'brand' ? 'text-brand' : 'text-text-muted'}`}
+        className={`h-8 w-8 ${tone === 'brand' ? 'text-brand' : 'text-text-muted dark:text-text-secondary'}`}
         fill="none"
         stroke="currentColor"
         strokeWidth={1.5}

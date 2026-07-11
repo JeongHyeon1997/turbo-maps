@@ -28,7 +28,7 @@ export const colors = {
   // Text — warm neutral gray (brown removed, only warmth retained).
   textPrimary: '#1F1D1B', // ~15:1 on background (AA large + body)
   textSecondary: '#5C5852', // ~6.5:1 on background (AA body)
-  textMuted: '#8A857E', // ~3.6:1 on background — meta / non-essential (AA large)
+  textMuted: '#8A857E', // ~3.36:1 on background (measured) — meta / non-essential (AA large; NOT sufficient for regular-size body copy)
   textDisabled: '#B8B4AD',
   textOnBrand: '#FFFFFF',
 

@@ -5,7 +5,7 @@ import { Logo } from '@/components/atoms';
 export function SiteFooter() {
   return (
     <footer className="border-t border-divider bg-surface">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-text-muted md:flex-row md:items-center md:justify-between md:px-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-text-secondary md:flex-row md:items-center md:justify-between md:px-8">
         <div className="flex flex-col gap-1">
           <Logo />
           <p>&copy; 2026 위로그. All rights reserved.</p>

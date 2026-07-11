@@ -28,7 +28,7 @@ export function BackLink({ fallbackHref, children }: BackLinkProps) {
     <button
       type="button"
       onClick={goBack}
-      className="w-fit rounded text-sm font-medium text-text-muted transition-colors duration-200 ease-out hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+      className="w-fit rounded text-sm font-medium text-text-secondary transition-colors duration-200 ease-out hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       {children}
     </button>

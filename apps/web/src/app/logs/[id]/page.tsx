@@ -136,7 +136,7 @@ export default async function DateLogDetailPage({
 
         <div className="flex flex-wrap items-center justify-between gap-2">
           {avgRating > 0 && <HeartRating value={avgRating} />}
-          {author?.nickname && <p className="text-sm text-text-muted">by {author.nickname}</p>}
+          {author?.nickname && <p className="text-sm text-text-secondary">by {author.nickname}</p>}
         </div>
 
         {row.memo && (

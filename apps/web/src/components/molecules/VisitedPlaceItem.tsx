@@ -50,7 +50,7 @@ export function VisitedPlaceItem({
           </div>
           {!!rating && <HeartRating value={rating} />}
         </div>
-        {address && <p className="text-xs text-text-muted">{address}</p>}
+        {address && <p className="text-xs text-text-secondary">{address}</p>}
         {memo && <p className="text-sm leading-relaxed text-text-secondary">{memo}</p>}
       </div>
     </li>

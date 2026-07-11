@@ -11,7 +11,7 @@ export function FormField({ label, htmlFor, hint, children }: FormFieldProps) {
     <label htmlFor={htmlFor} className="flex flex-col gap-1.5">
       <span className="text-sm font-medium text-text-secondary">{label}</span>
       {children}
-      {hint && <span className="text-xs text-text-muted">{hint}</span>}
+      {hint && <span className="text-xs text-text-secondary">{hint}</span>}
     </label>
   );
 }

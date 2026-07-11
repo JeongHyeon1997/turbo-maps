@@ -1,6 +1,6 @@
 ---
-status: todo
-last-updated: 2026-07-09
+status: doing
+last-updated: 2026-07-11
 owner: planner
 ---
 
@@ -78,9 +78,9 @@ owner: planner
 - 헤더 골격 중복 제거(단일 organism 또는 공용 molecule) — 반복 JSX 없음.
 - 반응형·접근성(nav 랜드마크·aria-current) uiux-reviewer 패스.
 
-## 열린 질문 (사용자 결정 필요)
-1. **헤더 통합 vs 최소 변경** — `SiteHeader` 하나로 통합(권장, 리팩터폭 큼) vs LandingHeader에 nav만 추가(저비용).
-2. **소개(About) 페이지 신설 여부** — 푸터 "서비스" 그룹에 `/about`을 새로 만들지, 아니면 랜딩 `/`으로 대체할지.
-3. **로그아웃 모바일 탐색 UI** — 햄버거 drawer vs 얇은 탐색 링크 바 vs 생략(모바일은 로그인 유도 위주).
-4. **AppShell 푸터 노출 범위** — 전 페이지 vs 데스크톱만 vs 특정 공개 페이지만(BottomNav 간섭 고려).
-5. **문의 채널** — 푸터 "문의"를 메일 링크로 둘지, 폼/채널을 만들지.
+## 열린 질문 — ✅ 전부 확정 (사용자 결정 2026-07-11)
+1. **헤더 통합 vs 최소 변경** → **`SiteHeader` 단일 organism 통합** + `HeaderNav`/`AuthAction` molecule 추출.
+2. **소개(About) 페이지** → **신설하지 않음.** 푸터 소개 링크는 랜딩 `/`으로. (나중에 `/about` 신설 가능)
+3. **로그아웃 모바일 탐색 UI** → **얇은 탐색 링크 바**(헤더 하단, JS 없이 동작·크롤러 friendly).
+4. **AppShell 푸터 노출 범위** → **전 페이지.** 모바일은 BottomNav와 겹치지 않게 하단 여백(pb) 확보.
+5. **문의 채널** → **메일 링크**로 시작(폼/채널은 후속).

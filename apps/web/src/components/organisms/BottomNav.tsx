@@ -40,7 +40,7 @@ export function BottomNav() {
                 <Link
                   href={t.href as Href}
                   aria-label={t.label}
-                  className="flex h-12 w-12 -translate-y-2 items-center justify-center rounded-full bg-brand text-white shadow-md transition-all duration-200 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                  className="flex h-12 w-12 -translate-y-2 items-center justify-center rounded-full bg-brand text-text-on-brand shadow-md transition-all duration-200 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                   {t.icon}
                 </Link>

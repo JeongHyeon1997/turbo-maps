@@ -101,7 +101,7 @@ export function CalendarView({
           const isSel = selected === ds;
           const isToday = today === ds;
           const cellClasses = `flex aspect-square flex-col items-center justify-center rounded-xl text-sm transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
-            isSel ? 'bg-brand text-white' : has ? 'bg-surface-alt text-text-primary' : 'text-text-secondary'
+            isSel ? 'bg-brand text-text-on-brand' : has ? 'bg-surface-alt text-text-primary' : 'text-text-secondary'
           } ${isToday && !isSel ? 'ring-2 ring-inset ring-brand' : ''}`;
 
           // Days without a record aren't interactive — a plain `<div>` avoids
@@ -124,7 +124,7 @@ export function CalendarView({
               className={cellClasses}
             >
               {day}
-              <span className={`mt-0.5 h-1.5 w-1.5 rounded-full ${isSel ? 'bg-white' : 'bg-brand'}`} />
+              <span className={`mt-0.5 h-1.5 w-1.5 rounded-full ${isSel ? 'bg-surface' : 'bg-brand'}`} />
             </button>
           );
         })}

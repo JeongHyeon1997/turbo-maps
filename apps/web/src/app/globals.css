@@ -14,7 +14,11 @@ html, body {
 
 /* Thin, subtle scrollbar for in-app scroll containers.
    Webkit gets a 4px transparent-track / soft-gray thumb that fades in on hover.
-   Firefox gets the equivalent via scrollbar-width + scrollbar-color. */
+   Firefox gets the equivalent via scrollbar-width + scrollbar-color.
+   Thumb color is built from the `--color-text-secondary` channel (published by
+   @maps/tokens, see tailwind.config.ts) rather than a raw `rgba(0,0,0,…)` —
+   that value flips per-theme, so the thumb stays visible against the dark
+   charcoal surface instead of disappearing into it (uiux-reviewer B-round #9). */
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
@@ -22,7 +26,7 @@ html, body {
     transition: scrollbar-color 0.2s ease;
   }
   .scrollbar-thin:hover {
-    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    scrollbar-color: rgb(var(--color-text-secondary) / 0.35) transparent;
   }
   .scrollbar-thin::-webkit-scrollbar {
     width: 4px;
@@ -37,9 +41,9 @@ html, body {
     transition: background-color 0.2s ease;
   }
   .scrollbar-thin:hover::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.18);
+    background-color: rgb(var(--color-text-secondary) / 0.3);
   }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgb(var(--color-text-secondary) / 0.45);
   }
 }

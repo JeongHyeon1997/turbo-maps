@@ -25,7 +25,7 @@ const base =
   'inline-flex items-center justify-center gap-1.5 font-semibold transition-all duration-200 ease-out active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100';
 
 const variantStyles: Record<NonNullable<ButtonProps['variant']>, string> = {
-  primary: 'bg-brand text-white hover:bg-brand-pressed',
+  primary: 'bg-brand text-text-on-brand hover:bg-brand-pressed',
   ghost: 'bg-surface-alt text-text-primary hover:bg-border-soft',
 };
 

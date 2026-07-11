@@ -15,7 +15,7 @@ export { FormField } from './FormField';
 export { CoverHero } from './CoverHero';
 export { CardGridSkeleton } from './CardGridSkeleton';
 export { HeaderNav } from './HeaderNav';
-export type { HeaderNavItem } from './HeaderNav';
+export type { HeaderNavItem, HeaderNavVariant } from './HeaderNav';
 export { AuthAction } from './AuthAction';
 export type { AvatarDescriptor } from './AuthAction';
 export { FooterColumn } from './FooterColumn';

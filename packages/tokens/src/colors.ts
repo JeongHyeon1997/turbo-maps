@@ -115,37 +115,10 @@ export const accentPalette = {
 
 export type AccentColor = (typeof accentPalette)[keyof typeof accentPalette];
 
-/**
- * Cover gradient tints — light stop of the photo-less date-log cover fallback.
- *
- * **Reduced (2026-07)** from warm pastels to neutral / brand-soft light planes.
- * Kept (not deleted) because `page.tsx` / `explore.ts` / `mock` still index into
- * `coverGradients`; the eventual `CoverFallback` component (web-dev) replaces
- * these, then this export is removed as dead code (08 risk #2, order enforced).
- */
-export const coverTints = {
-  peach: '#EFECE6', // → surfaceAlt-ish neutral
-  mint: '#EAE7E1',
-  lilac: '#E9F1FE', // → brandSoft
-  honey: '#EDEAE4',
-  powder: '#E6EEFB', // → soft brand tint
-} as const;
-
-export type CoverTint = (typeof coverTints)[keyof typeof coverTints];
-
-/**
- * Date-log cover gradients — photo-less fallback pairs `[from, to]`.
- * Now subtle neutral / brand-soft planes (reduced from the 5-hue rainbow).
- * Length preserved (5) so existing `i % length` indexing stays valid.
- * Single source of truth; do not hard-code these in apps.
- */
-export const coverGradients = [
-  [coverTints.peach, accentPalette.coral],
-  [coverTints.mint, accentPalette.sage],
-  [coverTints.lilac, accentPalette.lavender],
-  [coverTints.honey, accentPalette.amber],
-  [coverTints.powder, accentPalette.sky],
-] as const satisfies readonly (readonly [from: string, to: string])[];
-
-/** A single `[from, to]` cover-gradient stop pair. */
-export type CoverGradient = readonly [from: string, to: string];
+// Cover gradients/tints (the 5-hue rainbow photo-less fallback) were retired
+// 2026-07 — replaced by the `CoverFallback` atom (apps/web), a single
+// surfaceAlt/brandSoft plane + icon (DESIGN.md "커버 폴백 단순화"). Every
+// consumer (`page.tsx`, `lib/explore.ts`, `lib/places.ts`, `lib/mock/date-logs.ts`,
+// `DateLogCard`) migrated off `coverGradients`/`coverTints` before this export
+// was removed (08 risk #2, order enforced) — do not re-add without a component
+// to justify it.

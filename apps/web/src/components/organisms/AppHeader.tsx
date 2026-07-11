@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Avatar, Button, Logo } from '@/components/atoms';
+import { Avatar, Button, Logo, ThemeToggle } from '@/components/atoms';
 
 export interface AvatarDescriptor {
   initial: string;
@@ -27,7 +27,7 @@ const nav = [
 export function AppHeader({ avatars = [], signedIn = true }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-10 border-b border-divider bg-background/90 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 md:px-8">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4 md:px-8">
         <div className="flex items-center gap-8">
           <Logo />
           <nav className="hidden gap-6 md:flex">
@@ -35,24 +35,27 @@ export function AppHeader({ avatars = [], signedIn = true }: AppHeaderProps) {
               <Link
                 key={n.label}
                 href={n.href}
-                className="text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
+                className="rounded-md text-sm font-medium text-text-secondary transition-all duration-200 ease-out hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 {n.label}
               </Link>
             ))}
           </nav>
         </div>
-        {avatars.length > 0 ? (
-          <Link href="/profile" aria-label="내 프로필" className="flex -space-x-2">
-            {avatars.map((a, i) => (
-              <Avatar key={i} initial={a.initial} color={a.color} imageUrl={a.imageUrl} name={a.name} />
-            ))}
-          </Link>
-        ) : !signedIn ? (
-          <Button href="/login" variant="primary">
-            로그인
-          </Button>
-        ) : null}
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          {avatars.length > 0 ? (
+            <Link href="/profile" aria-label="내 프로필" className="flex -space-x-2">
+              {avatars.map((a, i) => (
+                <Avatar key={i} initial={a.initial} color={a.color} imageUrl={a.imageUrl} name={a.name} />
+              ))}
+            </Link>
+          ) : !signedIn ? (
+            <Button href="/login" variant="primary" size="sm">
+              로그인
+            </Button>
+          ) : null}
+        </div>
       </div>
     </header>
   );

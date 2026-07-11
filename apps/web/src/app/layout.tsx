@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { jua } from './fonts';
 import { SITE_URL } from '@/lib/site-url';
+import { THEME_INIT_SCRIPT } from '@/lib/theme';
 import {
   DEFAULT_OG_IMAGE_ALT,
   DEFAULT_OG_IMAGE_HEIGHT,
@@ -53,7 +54,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={jua.variable}>
+    <html lang="ko" className={jua.variable} suppressHydrationWarning>
+      <head>
+        {/* Runs before first paint so light→dark never flashes (08 risk #3):
+            reads the stored preference and flips `.dark` ahead of hydration. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="font-sans text-text-primary bg-background antialiased">{children}</body>
     </html>
   );

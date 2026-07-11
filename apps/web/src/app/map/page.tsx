@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/templates';
 import { KakaoMap, type MapMarker } from '@/components/organisms';
+import { PageTitle } from '@/components/atoms';
 
 interface Row {
   places: { name: string; lat: number | null; lng: number | null } | null;
@@ -34,10 +35,8 @@ export default async function MapPage() {
     <AppShell>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <p className="text-sm text-text-muted">우리가 함께 다닌</p>
-          <h1 className="text-2xl font-extrabold text-text-primary md:text-4xl">
-            {markers.length}곳의 지도
-          </h1>
+          <p className="text-sm text-text-secondary">우리가 함께 다닌</p>
+          <PageTitle className="text-2xl md:text-4xl">{markers.length}곳의 지도</PageTitle>
         </div>
         {markers.length > 0 ? (
           <KakaoMap markers={markers} route={false} height={520} />

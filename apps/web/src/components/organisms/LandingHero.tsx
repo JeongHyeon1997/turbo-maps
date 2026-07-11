@@ -5,7 +5,7 @@ export function LandingHero() {
   return (
     <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-surface via-background to-brand/10 px-6 py-16 text-center md:px-12 md:py-24">
       <p className="text-sm font-semibold uppercase tracking-wide text-brand">위로그</p>
-      <h1 className="mx-auto mt-3 max-w-2xl text-3xl font-extrabold leading-tight text-text-primary md:text-5xl">
+      <h1 className="mx-auto mt-3 max-w-2xl text-3xl font-extrabold tracking-tight leading-tight text-text-primary md:text-5xl">
         우리가 함께한 순간을,
         <br className="hidden md:block" /> 지도 위에 기록해요
       </h1>

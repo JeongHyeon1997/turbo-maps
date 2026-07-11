@@ -11,7 +11,7 @@ export function ExplorePreview({ children }: ExplorePreviewProps) {
   return (
     <section className="flex flex-col gap-5">
       <div className="text-center">
-        <h2 className="text-2xl font-extrabold text-text-primary md:text-3xl">
+        <h2 className="text-2xl font-bold tracking-tight text-text-primary md:text-3xl">
           공개된 데이트 코스 둘러보기
         </h2>
         <p className="mt-2 text-sm text-text-secondary">

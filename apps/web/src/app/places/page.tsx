@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
-import { FilterChip } from '@/components/atoms';
+import { FilterChip, PageTitle } from '@/components/atoms';
 import { PlaceCard, EmptyState } from '@/components/molecules';
 import { getPublicPlaces } from '@/lib/places';
 
@@ -37,7 +37,7 @@ export default async function PlacesDirectoryPage({ searchParams }: PageProps) {
   const content = (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-extrabold text-text-primary md:text-4xl">장소 디렉터리</h1>
+        <PageTitle className="text-2xl md:text-4xl">장소 디렉터리</PageTitle>
         <p className="text-sm text-text-secondary">
           다른 커플이 다녀간 공개 장소를 카테고리별로 둘러보세요.
         </p>

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/templates';
 import { ProfileActions } from '@/components/molecules';
-import { Avatar, Button } from '@/components/atoms';
+import { Avatar, Button, PageTitle } from '@/components/atoms';
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -35,7 +35,7 @@ export default async function ProfilePage() {
         <div className="flex items-center gap-4">
           <Avatar initial={nickname.slice(0, 1)} imageUrl={profile?.avatar_url} name={nickname} size={56} />
           <div className="flex flex-col">
-            <h1 className="text-xl font-extrabold text-text-primary">{nickname}</h1>
+            <PageTitle className="text-xl">{nickname}</PageTitle>
             <span className="text-sm text-text-muted">기록 {count ?? 0}개</span>
           </div>
         </div>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { RegionCard, EmptyState } from '@/components/molecules';
+import { PageTitle } from '@/components/atoms';
 import { getPublicRegions } from '@/lib/regions';
 
 // Public region index — reachable signed out (`/explore` prefix is public, see
@@ -26,7 +27,7 @@ export default async function RegionIndexPage() {
   const content = (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-extrabold text-text-primary md:text-4xl">지역별 데이트 코스</h1>
+        <PageTitle className="text-2xl md:text-4xl">지역별 데이트 코스</PageTitle>
         <p className="text-sm text-text-secondary">
           다른 커플이 다녀간 공개 데이트 코스를 지역별로 둘러보세요.
         </p>

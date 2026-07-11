@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/templates';
 import { CalendarView, type CalendarItem } from '@/components/organisms';
+import { PageTitle } from '@/components/atoms';
 
 interface Row {
   id: string;
@@ -37,7 +38,7 @@ export default async function CalendarPage() {
   return (
     <AppShell>
       <div className="flex flex-col gap-5">
-        <h1 className="text-2xl font-extrabold text-text-primary">캘린더</h1>
+        <PageTitle className="text-2xl">캘린더</PageTitle>
         <CalendarView items={items} initialMonth={initialMonth} />
       </div>
     </AppShell>

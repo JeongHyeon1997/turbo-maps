@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { DateLogFeed } from '@/components/organisms';
+import { PageTitle } from '@/components/atoms';
 import { getPublicExploreLogs } from '@/lib/explore';
 
 // Public page — reachable signed out (see PUBLIC_PREFIXES in middleware.ts).
@@ -17,7 +18,7 @@ export default async function ExplorePage() {
   const content = (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-extrabold text-text-primary md:text-4xl">탐색</h1>
+        <PageTitle className="text-2xl md:text-4xl">탐색</PageTitle>
         <p className="text-sm text-text-secondary">다른 커플이 공개한 데이트 코스를 구경해보세요.</p>
       </div>
       {logs.length > 0 ? (

@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { KakaoMap, type MapMarker, DateLogFeed } from '@/components/organisms';
-import { BackLink, HeartRating, JsonLd, Tag } from '@/components/atoms';
+import { BackLink, HeartRating, JsonLd, PageTitle, Tag } from '@/components/atoms';
 import { EmptyState } from '@/components/molecules';
 import { getPublicPlace, getPublicPlaceLogs } from '@/lib/places';
 import { SITE_URL } from '@/lib/site-url';
@@ -95,10 +95,10 @@ export default async function PlaceDetailPage({ params }: PageParams) {
 
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="text-2xl font-extrabold text-text-primary md:text-3xl">{place.name}</h1>
+          <PageTitle className="text-2xl md:text-3xl">{place.name}</PageTitle>
           {place.category && <Tag>{place.category}</Tag>}
         </div>
-        {place.address && <p className="text-sm text-text-muted">{place.address}</p>}
+        {place.address && <p className="text-sm text-text-secondary">{place.address}</p>}
         {place.region && (
           <Link
             href={

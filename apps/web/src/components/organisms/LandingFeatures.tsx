@@ -27,7 +27,7 @@ const FEATURES = [
 export function LandingFeatures() {
   return (
     <section className="flex flex-col gap-6">
-      <h2 className="text-center text-2xl font-extrabold text-text-primary md:text-3xl">
+      <h2 className="text-center text-2xl font-bold tracking-tight text-text-primary md:text-3xl">
         위로그와 함께라면
       </h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">

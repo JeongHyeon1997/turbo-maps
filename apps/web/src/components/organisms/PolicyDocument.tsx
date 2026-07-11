@@ -1,3 +1,5 @@
+import { PageTitle } from '@/components/atoms';
+
 export interface PolicyDocumentProps {
   title: string;
   intro: string;
@@ -10,9 +12,9 @@ export function PolicyDocument({ title, intro, effectiveDate, children }: Policy
   return (
     <article className="mx-auto flex w-full max-w-2xl flex-col gap-10 px-5 py-12 md:px-8 md:py-16">
       <header className="flex flex-col gap-3 border-b border-divider pb-8">
-        <h1 className="text-2xl font-extrabold text-text-primary md:text-3xl">{title}</h1>
+        <PageTitle className="text-2xl md:text-3xl">{title}</PageTitle>
         <p className="text-sm leading-relaxed text-text-secondary">{intro}</p>
-        <p className="text-xs text-text-muted">시행일: {effectiveDate}</p>
+        <p className="text-xs text-text-secondary">시행일: {effectiveDate}</p>
       </header>
       <div className="flex flex-col gap-8">{children}</div>
     </article>

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { KakaoMap, PlaceSearch, type KakaoPlace, type MapMarker } from '@/components/organisms';
-import { Button, RatingInput, TextField } from '@/components/atoms';
+import { Button, PageTitle, RatingInput, TextField } from '@/components/atoms';
 import { FormField, PhotoThumb } from '@/components/molecules';
 
 interface Selected extends KakaoPlace {
@@ -224,7 +224,7 @@ export default function NewLogPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col gap-5 px-5 py-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-extrabold text-text-primary">데이트 기록</h1>
+        <PageTitle className="text-xl">데이트 기록</PageTitle>
         <button
           onClick={() => router.push('/')}
           className="rounded-md text-sm text-text-muted transition-colors duration-200 ease-out hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
@@ -247,12 +247,12 @@ export default function NewLogPage() {
 
       <div className="flex flex-col gap-1.5">
         <span className="text-sm font-medium text-text-secondary">대표 사진</span>
-        <label className="flex cursor-pointer items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-surface">
+        <label className="flex cursor-pointer items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-surface focus-within:ring-2 focus-within:ring-brand">
           {coverPreview ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={coverPreview} alt="대표 사진 미리보기" className="h-40 w-full object-cover" />
           ) : (
-            <span className="py-10 text-sm text-text-muted">사진 추가 (선택)</span>
+            <span className="py-10 text-sm text-text-secondary">사진 추가 (선택)</span>
           )}
           <input
             type="file"
@@ -265,7 +265,7 @@ export default function NewLogPage() {
 
       <div className="flex flex-col gap-1.5">
         <span className="text-sm font-medium text-text-secondary">사진</span>
-        <label className="flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-border bg-surface py-6 text-sm text-text-muted">
+        <label className="flex cursor-pointer items-center justify-center rounded-2xl border border-dashed border-border bg-surface py-6 text-sm text-text-secondary focus-within:ring-2 focus-within:ring-brand">
           사진 추가 (여러 장 선택 가능)
           <input
             type="file"
@@ -299,7 +299,7 @@ export default function NewLogPage() {
                     <span className="text-sm font-semibold text-text-primary">
                       {i + 1}. {p.name}
                     </span>
-                    {p.address && <span className="text-xs text-text-muted">{p.address}</span>}
+                    {p.address && <span className="text-xs text-text-secondary">{p.address}</span>}
                   </div>
                   <button
                     onClick={() => removePlace(p.kakaoPlaceId)}
@@ -330,7 +330,7 @@ export default function NewLogPage() {
       <label className="flex items-center justify-between rounded-xl border border-border bg-surface px-5 py-3">
         <span className="flex flex-col">
           <span className="text-sm font-medium text-text-primary">탐색에 공개</span>
-          <span className="text-xs text-text-muted">
+          <span className="text-xs text-text-secondary">
             다른 커플이 장소·평점을 볼 수 있어요 (개인 메모는 비공개)
           </span>
         </span>

@@ -15,3 +15,4 @@ export { ThemeToggle } from './ThemeToggle';
 export { CoverFallback } from './CoverFallback';
 export { TextField } from './TextField';
 export { Skeleton } from './Skeleton';
+export { PageTitle } from './PageTitle';

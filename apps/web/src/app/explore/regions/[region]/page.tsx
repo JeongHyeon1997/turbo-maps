@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
-import { BackLink, JsonLd } from '@/components/atoms';
+import { BackLink, JsonLd, PageTitle } from '@/components/atoms';
 import { PlaceCard } from '@/components/molecules';
 import { getPublicPlacesByRegion } from '@/lib/regions';
 import { SITE_URL } from '@/lib/site-url';
@@ -88,7 +88,7 @@ export default async function RegionDetailPage({ params }: PageParams) {
       <BackLink fallbackHref="/explore/regions">‹ 지역 목록으로 돌아가기</BackLink>
 
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-extrabold text-text-primary md:text-3xl">{region} 데이트 장소</h1>
+        <PageTitle className="text-2xl md:text-3xl">{region} 데이트 장소</PageTitle>
         <p className="text-sm text-text-secondary">
           다른 커플이 공개한 {region} 데이트 코스에 등장한 장소 {places.length}곳이에요.
         </p>

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { Button, TextField } from '@/components/atoms';
+import { Button, PageTitle, TextField } from '@/components/atoms';
 
 async function createCouple() {
   'use server';
@@ -44,15 +44,15 @@ export default async function ConnectPage({
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-8 px-6">
       <div className="flex flex-col gap-2 text-center">
-        <h1 className="text-2xl font-extrabold text-text-primary">커플 연결</h1>
+        <PageTitle className="text-2xl">커플 연결</PageTitle>
         <p className="text-sm text-text-secondary">파트너와 연결하면 함께 기록을 쌓을 수 있어요.</p>
       </div>
 
       {couple ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface p-6">
           <p className="text-sm text-text-secondary">파트너에게 이 초대 코드를 알려주세요</p>
-          <p className="text-3xl font-extrabold tracking-widest text-brand">{couple.invite_code}</p>
-          <p className="text-xs text-text-muted">파트너가 코드를 입력하면 연결이 완료돼요.</p>
+          <p className="text-3xl font-bold tracking-widest text-brand">{couple.invite_code}</p>
+          <p className="text-xs text-text-secondary">파트너가 코드를 입력하면 연결이 완료돼요.</p>
         </div>
       ) : (
         <form action={createCouple}>
@@ -83,7 +83,7 @@ export default async function ConnectPage({
               연결
             </Button>
           </div>
-          <p id="invite-code-hint" className="text-center text-xs text-text-muted">
+          <p id="invite-code-hint" className="text-center text-xs text-text-secondary">
             영문·숫자 6자리 코드를 입력하세요.
           </p>
         </form>

@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { DateLogFeed, LandingHero, LandingFeatures, ExplorePreview } from '@/components/organisms';
 import { SectionHeader, ConnectBanner, EmptyState } from '@/components/molecules';
-import { Button, JsonLd } from '@/components/atoms';
+import { Button, JsonLd, PageTitle } from '@/components/atoms';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 import { getPublicExploreLogs } from '@/lib/explore';
 import { SITE_URL } from '@/lib/site-url';
@@ -103,10 +103,8 @@ export default async function HomePage() {
         {!connected && <ConnectBanner />}
 
         <div className="flex flex-col gap-1">
-          <p className="text-sm text-text-muted">우리가 함께한 날</p>
-          <h1 className="text-2xl font-extrabold text-text-primary md:text-4xl">
-            {logs.length}개의 기록
-          </h1>
+          <p className="text-sm text-text-secondary">우리가 함께한 날</p>
+          <PageTitle className="text-2xl md:text-4xl">{logs.length}개의 기록</PageTitle>
         </div>
 
         <SectionHeader

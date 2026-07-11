@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Button } from '@/components/atoms';
+import { Button, TextField } from '@/components/atoms';
 
 /** Editable nickname + sign-out for the profile page. */
 export function ProfileActions({ initialNickname }: { initialNickname: string }) {
@@ -34,18 +34,18 @@ export function ProfileActions({ initialNickname }: { initialNickname: string })
 
   return (
     <div className="flex flex-col gap-4">
-      <label className="flex flex-col gap-1">
+      <label className="flex flex-col gap-1.5">
         <span className="text-sm font-medium text-text-secondary">닉네임</span>
         <div className="flex gap-2">
-          <input
+          <TextField
             value={nickname}
             onChange={(e) => {
               setNickname(e.target.value);
               setSaved(false);
             }}
-            className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-brand"
+            className="flex-1"
           />
-          <Button onClick={save} disabled={saving}>
+          <Button onClick={save} disabled={saving} size="lg" fullWidth={false}>
             {saving ? '저장 중' : saved ? '저장됨' : '저장'}
           </Button>
         </div>
@@ -53,7 +53,7 @@ export function ProfileActions({ initialNickname }: { initialNickname: string })
 
       <button
         onClick={signOut}
-        className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-text-secondary hover:bg-surface-alt"
+        className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-text-secondary transition-all duration-200 ease-out hover:bg-surface-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
       >
         로그아웃
       </button>

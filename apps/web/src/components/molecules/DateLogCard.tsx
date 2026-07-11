@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Tag, HeartRating } from '@/components/atoms';
+import { Tag, HeartRating, CoverFallback } from '@/components/atoms';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 import { formatLogDate } from '@/lib/format-date';
 
@@ -18,23 +18,24 @@ export interface DateLogCardProps {
 
 function CardBody({ log }: { log: MockDateLog }) {
   return (
-    <article className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm transition-shadow hover:shadow-md">
-      <div
-        className="flex h-40 items-end bg-cover bg-center p-4"
-        style={{
-          backgroundImage: log.coverImage
-            ? `url(${log.coverImage})`
-            : `linear-gradient(135deg, ${log.cover[0]}, ${log.cover[1]})`,
-        }}
-      >
-        <span className="rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+    <article className="overflow-hidden rounded-2xl border border-border bg-surface transition-all duration-200 ease-out hover:border-border-strong">
+      <div className="relative flex h-40 items-end p-4">
+        {log.coverImage ? (
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${log.coverImage})` }}
+          />
+        ) : (
+          <CoverFallback className="absolute inset-0" />
+        )}
+        <span className="relative rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
           {formatLogDate(log.date)}
         </span>
       </div>
 
       <div className="flex flex-col gap-3 p-4">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="text-base font-bold text-text-primary">{log.title}</h3>
+          <h3 className="text-base font-bold tracking-tight text-text-primary">{log.title}</h3>
           <HeartRating value={log.rating} />
         </div>
 
@@ -63,7 +64,7 @@ export function DateLogCard({ log, hrefBase = '/logs', linkable = true }: DateLo
   return (
     <Link
       href={`${hrefBase}/${log.id}` as React.ComponentProps<typeof Link>['href']}
-      className="block"
+      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       <CardBody log={log} />
     </Link>

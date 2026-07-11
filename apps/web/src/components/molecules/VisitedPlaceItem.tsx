@@ -39,12 +39,12 @@ export function VisitedPlaceItem({
             {placeId ? (
               <Link
                 href={`/places/${placeId}` as React.ComponentProps<typeof Link>['href']}
-                className="text-base font-bold text-text-primary hover:text-brand hover:underline"
+                className="rounded text-base font-bold tracking-tight text-text-primary transition-colors duration-200 ease-out hover:text-brand hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 {name}
               </Link>
             ) : (
-              <span className="text-base font-bold text-text-primary">{name}</span>
+              <span className="text-base font-bold tracking-tight text-text-primary">{name}</span>
             )}
             {category && <Tag>{category}</Tag>}
           </div>

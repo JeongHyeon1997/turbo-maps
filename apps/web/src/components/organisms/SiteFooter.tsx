@@ -1,29 +1,49 @@
-import Link from 'next/link';
 import { Logo } from '@/components/atoms';
+import { FooterColumn, type FooterLinkItem } from '@/components/molecules';
 
-/** Shared footer for logged-out pages: brand mark, copyright, policy links. */
-export function SiteFooter() {
+const exploreLinks: readonly FooterLinkItem[] = [
+  { label: '탐색', href: '/explore' },
+  { label: '장소', href: '/places' },
+];
+
+const serviceLinks: readonly FooterLinkItem[] = [
+  { label: '소개', href: '/' },
+  { label: '문의', href: 'mailto:ojh@pitin-ev.com' },
+];
+
+const policyLinks: readonly FooterLinkItem[] = [
+  { label: '개인정보처리방침', href: '/privacy' },
+  { label: '이용약관', href: '/terms' },
+];
+
+export interface SiteFooterProps {
+  /** Adds mobile-only bottom padding so content doesn't sit under `BottomNav`'s fixed bar
+   * (only relevant in `AppShell` — `PublicShell` has no bottom tab bar). */
+  withNavOffset?: boolean;
+}
+
+/**
+ * Global footer — rendered from both `AppShell` and `PublicShell` (docs/plan/07-header-footer.md
+ * decision 4) so policy links stay reachable while signed in too. Four groups: brand, 둘러보기
+ * (public discovery), 서비스 (about/contact), 정책 (privacy/terms).
+ */
+export function SiteFooter({ withNavOffset = false }: SiteFooterProps = {}) {
   return (
-    <footer className="border-t border-divider bg-surface">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-5 py-10 text-sm text-text-secondary md:flex-row md:items-center md:justify-between md:px-8">
-        <div className="flex flex-col gap-1">
+    <footer
+      className={`border-t border-divider bg-surface ${withNavOffset ? 'pb-24 md:pb-0' : ''}`}
+    >
+      <div className="mx-auto grid w-full max-w-6xl grid-cols-2 gap-x-6 gap-y-10 px-5 py-12 md:grid-cols-4 md:gap-x-10 md:px-8">
+        <div className="col-span-2 flex flex-col gap-3 md:col-span-1">
           <Logo />
-          <p>&copy; 2026 위로그. All rights reserved.</p>
+          <p className="text-sm text-text-secondary">
+            커플이 함께한 데이트·맛집·경로를 기록하는 공간이에요.
+          </p>
+          <p className="text-xs text-text-muted">&copy; 2026 위로그. All rights reserved.</p>
         </div>
-        <nav aria-label="정책 링크" className="flex gap-4">
-          <Link
-            href={'/privacy' as React.ComponentProps<typeof Link>['href']}
-            className="rounded transition-colors duration-200 ease-out hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-          >
-            개인정보처리방침
-          </Link>
-          <Link
-            href={'/terms' as React.ComponentProps<typeof Link>['href']}
-            className="rounded transition-colors duration-200 ease-out hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-          >
-            이용약관
-          </Link>
-        </nav>
+
+        <FooterColumn title="둘러보기" links={exploreLinks} />
+        <FooterColumn title="서비스" links={serviceLinks} />
+        <FooterColumn title="정책" links={policyLinks} />
       </div>
     </footer>
   );

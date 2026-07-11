@@ -4,7 +4,7 @@ export interface LogoProps {
   href?: string;
 }
 
-/** Brand wordmark link. Shared by the signed-in AppHeader and the logged-out landing header. */
+/** Brand wordmark link. Shared by `SiteHeader` (signed-in and signed-out) and `SiteFooter`. */
 export function Logo({ href = '/' }: LogoProps) {
   return (
     <Link

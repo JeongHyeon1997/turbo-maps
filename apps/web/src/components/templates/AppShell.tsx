@@ -1,6 +1,6 @@
 import { accentPalette } from '@maps/tokens';
 import { createClient } from '@/lib/supabase/server';
-import { AppHeader, BottomNav, type AvatarDescriptor } from '@/components/organisms';
+import { SiteHeader, SiteFooter, BottomNav, type AvatarDescriptor } from '@/components/organisms';
 
 interface ProfileRow {
   id: string;
@@ -62,11 +62,12 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const { avatars, signedIn } = await resolveAvatars();
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader avatars={avatars} signedIn={signedIn} />
-      <main className="mx-auto w-full max-w-6xl px-5 pb-24 pt-6 md:px-8 md:pb-10 md:pt-10">
+    <div className="flex min-h-screen flex-col bg-background">
+      <SiteHeader avatars={avatars} signedIn={signedIn} />
+      <main className="mx-auto w-full max-w-6xl flex-1 px-5 pb-10 pt-6 md:px-8 md:pt-10">
         {children}
       </main>
+      <SiteFooter withNavOffset />
       <BottomNav />
     </div>
   );

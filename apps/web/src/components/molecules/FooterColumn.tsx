@@ -18,15 +18,18 @@ function isExternalHref(href: string) {
   return href.startsWith('mailto:') || href.startsWith('http://') || href.startsWith('https://');
 }
 
+// `min-h-11` gives each link a 44px touch target (DESIGN.md floor); the row's own height now
+// carries most of the vertical rhythm, so the list gap below is kept tight rather than adding
+// gap on top of it (uiux-reviewer fix #5).
 const linkClassName =
-  'rounded text-sm text-text-secondary transition-colors duration-200 ease-out hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand';
+  'inline-flex min-h-11 items-center rounded text-sm text-text-secondary transition-colors duration-200 ease-out hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand';
 
 /** One labeled link group in `SiteFooter` (둘러보기 / 서비스 / 정책). */
 export function FooterColumn({ title, links }: FooterColumnProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted">{title}</h3>
-      <ul className="flex flex-col gap-2.5">
+      <ul className="flex flex-col">
         {links.map((link) => (
           <li key={link.href}>
             {isExternalHref(link.href) ? (

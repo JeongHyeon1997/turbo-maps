@@ -1,6 +1,6 @@
 ---
-status: doing
-last-updated: 2026-07-09
+status: done # 웹 A+B+C 완료 (2026-07-11). 남은 것: app-dev 후속(mobile 다크 소비) — 웹 안정 후.
+last-updated: 2026-07-11
 owner: planner
 ---
 
@@ -37,31 +37,31 @@ B. web-dev 컴포넌트 작업 ─┘  (A의 CSS 변수·토큰이 있어야 컴
 C. uiux-reviewer 검증 → build-qa 회귀
 ```
 
-### A. designer — 토큰 & 배선 (선행)
+### A. designer — 토큰 & 배선 (선행) — ✅ 완료 (커밋 `e601a95`)
 
-- [ ] **A1. morun 잔재 청산** — `theme.ts`/`colors.ts`의 `medalPalette`·`territoryPalette`·`tabBarDark`·`layout 428×926`·오류 주석(`ink #3C3C3C`, `borderSoft #EAEAEA`) 제거. 커플앱 시맨틱만 남김.
-- [ ] **A2. 라이트 팔레트 = 웜 뉴트럴** — `colors.ts` 교체: 웜 오프화이트 background(`#F7F5F1`급) + **흰 surface(카드)** + surfaceAlt(함몰) + 웜뉴트럴 그레이 텍스트(브라운 제거, AA 여유) + 뉴트럴 border. brand `#1E7CF8` 유지. (DESIGN.md 라이트 표의 방향값을 designer가 확정.)
-- [ ] **A3. 다크 팔레트 = 뉴트럴 차콜** — `theme.ts`에 라이트/다크 **변형 구조** 추가. bg `#17171A`급, surface 계단 elevation, 텍스트 rgba 3단, brand `#4B9BFF`급, 순수블랙 금지.
-- [ ] **A4. CSS 변수 발행 구조** — 시맨틱 색을 `--color-*`로 내보내는 방식 확정(토큰→CSS 변수 파생). tailwind가 변수 소비하도록 `tailwind.config.ts` 매핑 전환. (선행 작업 절 참고. web-dev와 경계 협의: 토큰/발행=designer, globals.css·config 배선=web-dev 가능.)
-- [ ] **A5. accent 축소** — `accentPalette`(5색 무지개) → 무채색/브랜드소프트 스케일로 재정의. coral은 accent에서 빼고 `rating` 전용으로만 유지.
-- [ ] **A6. 커버 폴백 단순화** — `coverGradients`/`coverTints` 폐기 방향. **즉시 삭제 금지**(소비 지점 있음) — 폴백 컴포넌트(`CoverFallback`) 전환 후 dead code로 제거. 토큰엔 폴백 면색(surfaceAlt/brandSoft) + 아이콘 규칙만 남김.
-- [ ] **A7. 타이포 굵기 정리** — `typography.ts` extrabold 남발 정리(displayLarge 등 대부분 bold로). `letterSpacingTight`를 국문 헤딩(display/title/subtitle)에 적용되게 tailwind `tracking-tight` 배선 확인.
-- [ ] **A8. 주아 로고폰트 배선** — `fontFamily`에 `logo`(주아) 계열 추가. `next/font/local`로 `BMJUA_ttf.ttf` self-host → `--font-logo` 발행(web-dev와 협의, 배선 자체는 web-dev). Pretendard(`sans`)는 UI 전역 유지.
+- [x] **A1. morun 잔재 청산** — `theme.ts`/`colors.ts`의 `medalPalette`·`territoryPalette`·`tabBarDark`·`layout 428×926`·오류 주석(`ink #3C3C3C`, `borderSoft #EAEAEA`) 제거. 커플앱 시맨틱만 남김.
+- [x] **A2. 라이트 팔레트 = 웜 뉴트럴** — `colors.ts` 교체: 웜 오프화이트 background(`#F7F5F1`급) + **흰 surface(카드)** + surfaceAlt(함몰) + 웜뉴트럴 그레이 텍스트(브라운 제거, AA 여유) + 뉴트럴 border. brand `#1E7CF8` 유지. (DESIGN.md 라이트 표의 방향값을 designer가 확정.)
+- [x] **A3. 다크 팔레트 = 뉴트럴 차콜** — `theme.ts`에 라이트/다크 **변형 구조** 추가. bg `#17171A`급, surface 계단 elevation, 텍스트 rgba 3단, brand `#4B9BFF`급, 순수블랙 금지.
+- [x] **A4. CSS 변수 발행 구조** — 시맨틱 색을 `--color-*`로 내보내는 방식 확정(토큰→CSS 변수 파생). tailwind가 변수 소비하도록 `tailwind.config.ts` 매핑 전환. (선행 작업 절 참고. web-dev와 경계 협의: 토큰/발행=designer, globals.css·config 배선=web-dev 가능.)
+- [x] **A5. accent 축소** — `accentPalette`(5색 무지개) → 무채색/브랜드소프트 스케일로 재정의. coral은 accent에서 빼고 `rating` 전용으로만 유지.
+- [x] **A6. 커버 폴백 단순화** — `coverGradients`/`coverTints` 폐기 방향. **즉시 삭제 금지**(소비 지점 있음) — 폴백 컴포넌트(`CoverFallback`) 전환 후 dead code로 제거. 토큰엔 폴백 면색(surfaceAlt/brandSoft) + 아이콘 규칙만 남김.
+- [x] **A7. 타이포 굵기 정리** — `typography.ts` extrabold 남발 정리(displayLarge 등 대부분 bold로). `letterSpacingTight`를 국문 헤딩(display/title/subtitle)에 적용되게 tailwind `tracking-tight` 배선 확인.
+- [x] **A8. 주아 로고폰트 배선** — `fontFamily`에 `logo`(주아) 계열 추가. `next/font/local`로 `BMJUA_ttf.ttf` self-host → `--font-logo` 발행(web-dev와 협의, 배선 자체는 web-dev). Pretendard(`sans`)는 UI 전역 유지.
 
-### B. web-dev — 컴포넌트 & 테마 (A 완료 후)
+### B. web-dev — 컴포넌트 & 테마 (A 완료 후) — ✅ 완료 (커밋 `3f1c3a7`·`d221335`·`ff1ad10`·`f0cbba4`, 2026-07-11)
 
-- [ ] **B1. globals.css CSS 변수 + `.dark` 오버라이드** — A4 발행 구조를 `:root`/`.dark`에 배선. 기존 tailwind 유틸 클래스(`bg-background`·`text-text-secondary`…)가 **그대로 동작**하도록 호환 유지(변수 참조로 바뀌어도 클래스명 불변).
-- [ ] **B2. ThemeProvider + ThemeToggle(3-way)** — 시스템/라이트/다크. `prefers-color-scheme` 추종 + 사용자 선택 localStorage 저장 + `<html class="dark">`(또는 `data-theme`) 토글. SSR 깜빡임(FOUC) 방지 스크립트(초기 inline). ThemeToggle atom을 헤더에 배치(07과 연계).
-- [ ] **B3. Button size 도입** — `lg`(52~56, radius 14~16, text-base semibold, fullWidth 기본) / `md`(44~48, radius 12) / `sm`(36~40). pill은 칩·필터·배지 한정. `active:scale-[0.97]` + `focus-visible:ring-2 ring-brand` + `transition-all duration-200 ease-out`. 기존 Button 변형과 병합.
-- [ ] **B4. TextField atom 신설** — 높이 52~56, radius 12, 흰 배경 + 1px 뉴트럴 테두리, focus brand 2px 링, placeholder 토큰. `logs/new`의 반복 input(4곳+)을 이 atom(+`FormField`)으로 교체.
-- [ ] **B5. 카드 정리** — radius 16, 테두리 or 얕은 그림자 **택1**(이중 강조 제거). 흰 카드 on 캔버스. `CoverFallback`(molecule) 신설 — 사진 없을 때 단색 면 + 아이콘. `DateLogCard`/explore/place 카드의 `coverGradients` 소비 지점을 이걸로 교체.
-- [ ] **B6. 모션 베이스라인 적용** — 인터랙티브 `transition-all duration-200 ease-out`, focus-visible 링 전역, 라우트 `loading.tsx` 스켈레톤 셔머, (모바일) bottom sheet 슬라이드업 패턴.
-- [ ] **B7. 여백 조정** — 모바일 컨테이너 패딩 16→20, 섹션 24~32. (07 헤더/푸터와 함께.)
+- [x] **B1. globals.css CSS 변수 + `.dark` 오버라이드** — A4 발행 구조를 `:root`/`.dark`에 배선. 기존 tailwind 유틸 클래스(`bg-background`·`text-text-secondary`…)가 **그대로 동작**하도록 호환 유지(변수 참조로 바뀌어도 클래스명 불변).
+- [x] **B2. ThemeProvider + ThemeToggle(3-way)** — 시스템/라이트/다크. `prefers-color-scheme` 추종 + 사용자 선택 localStorage 저장 + `<html class="dark">`(또는 `data-theme`) 토글. SSR 깜빡임(FOUC) 방지 스크립트(초기 inline). ThemeToggle atom을 헤더에 배치(07과 연계).
+- [x] **B3. Button size 도입** — `lg`(52~56, radius 14~16, text-base semibold, fullWidth 기본) / `md`(44~48, radius 12) / `sm`(36~40). pill은 칩·필터·배지 한정. `active:scale-[0.97]` + `focus-visible:ring-2 ring-brand` + `transition-all duration-200 ease-out`. 기존 Button 변형과 병합.
+- [x] **B4. TextField atom 신설** — 높이 52~56, radius 12, 흰 배경 + 1px 뉴트럴 테두리, focus brand 2px 링, placeholder 토큰. `logs/new`의 반복 input(4곳+)을 이 atom(+`FormField`)으로 교체.
+- [x] **B5. 카드 정리** — radius 16, 테두리 or 얕은 그림자 **택1**(이중 강조 제거). 흰 카드 on 캔버스. `CoverFallback`(molecule) 신설 — 사진 없을 때 단색 면 + 아이콘. `DateLogCard`/explore/place 카드의 `coverGradients` 소비 지점을 이걸로 교체.
+- [x] **B6. 모션 베이스라인 적용** — 인터랙티브 `transition-all duration-200 ease-out`, focus-visible 링 전역, 라우트 `loading.tsx` 스켈레톤 셔머, (모바일) bottom sheet 슬라이드업 패턴.
+- [x] **B7. 여백 조정** — 모바일 컨테이너 패딩 16→20, 섹션 24~32. (07 헤더/푸터와 함께.)
 
 ### C. 검증
 
-- [ ] **uiux-reviewer** — 라이트/다크 대비(WCAG AA), 면 분리 일관성, 터치타깃, focus 링, 모션 일관성, DESIGN.md 정합.
-- [ ] **build-qa** — CSS 변수 전환 후 시각 회귀(라이트/다크 각 경로), 빌드·타입·lint 게이트, 테마 토글 스모크.
+- [x] **uiux-reviewer** — 완료(2026-07-11). 지적 11건(High 1·Med 5·Low 5) → web-dev가 전건 반영(커밋 `cc15459`·`8bc8fb3`·`6e05bde`·`09a858d`): ThemeToggle 44px 터치타깃, textMuted→secondary 승격(읽히는 문구), 다크 카드 `dark:border-border-strong`·폴백 아이콘 대비, `PageTitle` atom(tracking-tight)+extrabold→bold, 업로드 라벨 focus-within 링, aria-pressed 토글그룹, raw white/black 토큰화, 헤더 CTA md.
+- [x] **build-qa** — 완료(2026-07-11). typecheck/lint/build 전 패키지 PASS, 라이트/다크 CSS 변수 블록·FOUC 스크립트·주요 라우트 200 스모크 PASS. 부수 발견: `/ads.txt` 미들웨어 로그인 리다이렉트(기존 버그) → `EXACT_PUBLIC` 추가로 수정(`cb75af7`). mobile `expo export`는 `babel-preset-expo` 링크 문제(기존 로컬 환경 이슈, diff 무관 — typecheck/lint는 PASS).
 - [ ] **app-dev(후속)** — mobile도 동일 `theme.ts`(라이트/다크) 소비하도록 정렬. 웹 안정 후.
 
 ## 리스크 (실행 전 인지)

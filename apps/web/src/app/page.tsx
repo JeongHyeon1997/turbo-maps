@@ -1,6 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
-import { DateLogFeed, LandingHero, LandingFeatures, ExplorePreview } from '@/components/organisms';
+import {
+  DateLogFeed,
+  LandingHero,
+  LandingFeatures,
+  LandingHowTo,
+  ExplorePreview,
+  LandingPrivacy,
+} from '@/components/organisms';
 import { SectionHeader, ConnectBanner, EmptyState } from '@/components/molecules';
 import { Button, JsonLd, PageTitle } from '@/components/atoms';
 import type { MockDateLog } from '@/lib/mock/date-logs';
@@ -55,6 +62,7 @@ export default async function HomePage() {
           <JsonLd data={LANDING_JSON_LD} />
           <LandingHero />
           <LandingFeatures />
+          <LandingHowTo />
           <ExplorePreview>
             {previewLogs.length > 0 ? (
               <DateLogFeed logs={previewLogs} hrefBase="/explore" />
@@ -62,6 +70,7 @@ export default async function HomePage() {
               <EmptyState icon="🌤️" message="공개된 데이트 코스가 곧 채워질 예정이에요." />
             )}
           </ExplorePreview>
+          <LandingPrivacy />
         </div>
       </PublicShell>
     );

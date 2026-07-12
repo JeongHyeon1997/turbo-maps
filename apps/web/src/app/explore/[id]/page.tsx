@@ -26,7 +26,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   // `React.cache`-wrapped (see lib/explore.ts) — deduped against the same call
   // the page component below makes (docs/plan/12-performance.md STEP C, item 10).
   const log = await getPublicExploreLog(id);
-  if (!log) return {};
+  // `notFound()` here (not just in the page component below) resolves the HTTP
+  // status to 404 before the initial shell is flushed — metadata generation
+  // blocks the head/body stream, so this runs ahead of `loading.tsx`'s Suspense
+  // boundary, which would otherwise ship a 200 shell first (see
+  // docs/plan/12-performance.md STEP E). `getPublicExploreLog` is `React.cache`-
+  // wrapped, so this doesn't add a second DB round trip.
+  if (!log) notFound();
 
   const placeNames = log.places.map((p) => p.name).filter(Boolean);
   const description =

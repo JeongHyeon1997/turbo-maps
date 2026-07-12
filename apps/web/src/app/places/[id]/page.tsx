@@ -27,7 +27,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   // calls the page component below makes (docs/plan/12-performance.md STEP C,
   // item 10), and independent of each other so fetched in parallel.
   const [place, logs] = await Promise.all([getPublicPlace(id), getPublicPlaceLogs(id)]);
-  if (!place) return {};
+  // `notFound()` here (not just in the page component below) resolves the HTTP
+  // status to 404 before the initial shell is flushed — metadata generation
+  // blocks the head/body stream, so this runs ahead of `loading.tsx`'s Suspense
+  // boundary, which would otherwise ship a 200 shell first (see
+  // docs/plan/12-performance.md STEP E). Both fetchers are `React.cache`-wrapped,
+  // so this doesn't add a second DB round trip.
+  if (!place) notFound();
 
   // `logs` is already newest-first (see `getPublicPlaceLogs`), so this is the
   // most recent public course's cover — this page has no cover of its own.

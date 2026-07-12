@@ -4,10 +4,15 @@ import { AuthAction, HeaderNav, type AvatarDescriptor, type HeaderNavItem } from
 export type { AvatarDescriptor };
 
 export interface SiteHeaderProps {
-  /** Signed-in profile avatars (self first, then partner), already resolved server-side. */
+  /** Signed-in profile avatars (self first, then partner), already resolved server-side. Ignored
+   * when `authSlot` is provided. */
   avatars?: AvatarDescriptor[];
   /** False when there's no session — shows the signed-out nav + login CTA instead of avatars. */
   signedIn?: boolean;
+  /** Overrides the built-in `avatars`/`signedIn`-driven `AuthAction` render entirely. `AppShell`
+   * passes a `Suspense`-wrapped async avatar resolver here so the couples+profiles query doesn't
+   * block the header/body shell from streaming (docs/plan/12-performance.md STEP E, item 9). */
+  authSlot?: React.ReactNode;
 }
 
 const signedInNav: readonly HeaderNavItem[] = [
@@ -38,7 +43,7 @@ const signedOutNav: readonly HeaderNavItem[] = [
  * the right cluster gets `min-w-0` and the logo `shrink-0` so neither can force overflow at a
  * 320px viewport.
  */
-export function SiteHeader({ avatars = [], signedIn = false }: SiteHeaderProps) {
+export function SiteHeader({ avatars = [], signedIn = false, authSlot }: SiteHeaderProps) {
   const navItems = signedIn ? signedInNav : signedOutNav;
 
   return (
@@ -53,7 +58,7 @@ export function SiteHeader({ avatars = [], signedIn = false }: SiteHeaderProps) 
           </div>
           <div className="flex min-w-0 items-center gap-3">
             <ThemeToggle />
-            <AuthAction signedIn={signedIn} avatars={avatars} />
+            {authSlot ?? <AuthAction signedIn={signedIn} avatars={avatars} />}
           </div>
         </div>
       </header>

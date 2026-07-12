@@ -24,7 +24,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   // `React.cache`-wrapped (see lib/regions.ts) — deduped against the same call
   // the page component below makes (docs/plan/12-performance.md STEP C, item 10).
   const places = await getPublicPlacesByRegion(region);
-  if (places.length === 0) return {};
+  // `notFound()` here (not just in the page component below) resolves the HTTP
+  // status to 404 before the initial shell is flushed — metadata generation
+  // blocks the head/body stream, so this runs ahead of `loading.tsx`'s Suspense
+  // boundary, which would otherwise ship a 200 shell first (see
+  // docs/plan/12-performance.md STEP E). `getPublicPlacesByRegion` is
+  // `React.cache`-wrapped, so this doesn't add a second DB round trip.
+  if (places.length === 0) notFound();
 
   const description = `${region}에서 다른 커플이 다녀간 데이트 코스·맛집 ${places.length}곳을 둘러보세요.`;
   const title = `${region} 데이트 코스·맛집`;

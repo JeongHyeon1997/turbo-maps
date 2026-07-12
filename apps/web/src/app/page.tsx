@@ -79,14 +79,22 @@ export default async function HomePage() {
   // (docs/plan/12-performance.md STEP C, item 6). `getCouple` is the same
   // `React.cache`-wrapped helper `AppShell` calls for the partner avatar, so a
   // signed-in request hits `couples` once total, not twice.
-  const [couple, { data: rows }] = await Promise.all([
+  const [couple, { data: rows, count: totalCount }] = await Promise.all([
     getCouple(user.id),
     supabase
       .from('date_logs')
       .select(
         'id, date, title, memo, cover_photo_path, date_log_places(visit_order, rating, places(name, category))',
+        // `count` rides along on the same request — the "N개의 기록" headline
+        // must stay the true total, not the feed cap below.
+        { count: 'exact' },
       )
-      .order('date', { ascending: false }),
+      .order('date', { ascending: false })
+      // Cap the home feed — no couple has more than 20 logs yet, so this is a
+      // guard against unbounded growth rather than a fix for an observed
+      // problem. Client-side pagination ("더 보기") is deferred until it's
+      // actually needed (docs/plan/12-performance.md STEP E, item 7).
+      .limit(20),
   ]);
   const connected = couple?.status === 'connected';
 
@@ -113,7 +121,7 @@ export default async function HomePage() {
 
         <div className="flex flex-col gap-1">
           <p className="text-sm text-text-secondary">우리가 함께한 날</p>
-          <PageTitle className="text-2xl md:text-4xl">{logs.length}개의 기록</PageTitle>
+          <PageTitle className="text-2xl md:text-4xl">{totalCount ?? logs.length}개의 기록</PageTitle>
         </div>
 
         <SectionHeader

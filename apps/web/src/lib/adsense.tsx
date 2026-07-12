@@ -18,6 +18,14 @@ import { CONSENT_DEFAULT_SCRIPT } from '@/lib/consent';
  * placement on public pages are STEP 1 items 3–4 and are still TODO (need slot
  * ids issued after approval). Consent Mode v2 defaults (item 5) are shipped —
  * see `ConsentDefaultScript` below and `ConsentBanner` (components/molecules).
+ *
+ * `strategy="lazyOnload"` (not `afterInteractive`) — with no ad units placed yet,
+ * there's nothing for this script to paint, so deferring it until the browser is
+ * idle costs nothing today (docs/plan/12-performance.md STEP E, item 11). **Revisit
+ * this once an `AdUnit` is actually placed on a public page** — real ad slots
+ * generally want `afterInteractive` (or at least `lazyOnload` re-verified against
+ * measured fill/viewability) so they don't render so late they're missed on fast
+ * scrolls/short sessions.
  */
 export function AdSenseScript() {
   const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
@@ -26,7 +34,7 @@ export function AdSenseScript() {
   return (
     <Script
       id="adsbygoogle-loader"
-      strategy="afterInteractive"
+      strategy="lazyOnload"
       crossOrigin="anonymous"
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`}
     />

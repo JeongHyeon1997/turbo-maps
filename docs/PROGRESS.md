@@ -8,11 +8,11 @@
        커플 실테스트를 겸해 **공개 데이트 코스 8~15건 작성**(공개 토글 ON + 커버 사진 + 장소/평점). `/explore`·`/places`·`/explore/regions`를 빈 화면이 아니게 만든다. → `docs/plan/03-adsense.md` STEP 0. **이게 AdSense·지역탐색·심사의 사실상 공통 선행조건.** (데이터 무관한 아래 2·3은 지금 병행 가능.)
 2. [ ] **AdSense STEP 1 잔여** — 로더·`ads.txt`(pub `ca-pub-5362531643629275`)·env·**CMP/Consent Mode v2(커밋 `67d5e7e`, 배너+푸터 쿠키설정+privacy 문구)** 전부 **완료**. 남은 것: **AdUnit 컴포넌트 + 공개 페이지 배치 — 둘 다 STEP2 승인 후 slot id 발급돼야 가능(지금 개발 불가)**. **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT` 설정은 Blocked 참고.** → `docs/plan/03-adsense.md`. 담당 web-dev.
 3. [ ] **커뮤니티 공간 (C-1: 좋아요·북마크부터)** — 커플 스코프 넘어 전체 유저 장소/코스 참여·발견. 결정됨: **지금은 헤더 IA에 진입점 자리만, 기능은 STEP0 실데이터 후.** C-1(좋아요·북마크·인기정렬, 익명 유지 가능)→C-2(따라하기)→C-3(정체성, **작성자 익명화 0007과 충돌 → ADR 선행**). → `docs/plan/06-community.md`. 담당 db-dev+web-dev+server-dev.
-4. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름** (로그인→커플→피드→상세→사진) — 웹 안정 후 큰 작업. 08 테마 후속(mobile 라이트/다크 `theme.ts` 소비 정렬) 포함. ⚠️ 로컬 `expo export`가 `babel-preset-expo` 링크 문제로 실패 중(세팅 메모 참고) — 착수 시 `bun install` 재링크부터.
+4. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름 — STEP 2(OAuth 딥링크 인증)부터** — STEP 0(환경·deps·브랜드)+STEP 1(ThemeProvider+기초 atoms)은 완료(아래 Done). 계획서 `docs/plan/09-mobile.md`(STEP 2~5 = Phase 1 뷰 중심, 작성은 STEP 6 후속). ⚠️ STEP 2 착수 전 **OAuth 딥링크 대시보드 등록(Blocked 참고)** 필요 — 코드 먼저 짜고 실기기 검증만 뒤로 미루는 것도 가능.
 5. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
 ## 진행중 (Doing)
-- **모바일 앱(Expo) 동일 흐름 착수(2026-07-12)** — `## 다음` 4번. AdSense 잔여(2번)는 승인 후 slot id 대기라 지금 개발 불가, 커뮤니티(3번)는 STEP 0 후 → 지금 가능한 유일한 큰 개발 작업. planner가 `docs/plan/09-mobile.md` 작성 후 app-dev 구현.
+- **모바일 앱(Expo) Phase 1 진행중(2026-07-12)** — `docs/plan/09-mobile.md` STEP 0+1 완료(reviewer 지적 반영까지, 아래 Done). **다음: STEP 2(OAuth 딥링크 인증)** — 코드는 바로 가능, 실기기 검증은 Blocked의 딥링크 등록 후. 열린 질문은 planner 권장안으로 진행 중(작성=STEP 6 후속·지도=WebView·Expo Go 우선) — 사용자 이견 시 계획서 "열린 질문" 참고.
 - **다음 세션 시작점:** 웹 측 큰 건은 STEP 0(사용자 실데이터) 대기. mobile(4번)이 현재 진행 트랙.
 
 ## 막힘 (Blocked) — 사용자 승인/대시보드 필요
@@ -22,8 +22,14 @@
 - [ ] **0009 라이브 적용 대기** — `0009_explore_regions`(explore_places.region + explore_regions 뷰) 파일 작성·검증 완료, **프로덕션 DB 적용은 자동 승인 거부**됨(사용자 권한 필요). 공개 로그 0건이라 급하지 않음 — STEP0 실데이터 넣을 때 dba로 함께 적용 권장. 그전까진 웹 지역 페처가 `[]`로 degrade.
 - [ ] **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT`** — 코드/`.env.example`엔 `ca-pub-5362531643629275` 반영됨. AdSense 로더가 프로덕션에서 실제 로드되려면 사용자가 Vercel `maps-web` 프로젝트 env에 이 값을 설정해야 함(미설정 시 graceful 미로드).
 - [ ] **카카오 OG 캐시 초기화** — 공개 상세 OG(og-default/커버) 반영 후, 이미 공유된 URL은 카카오가 캐시하므로 https://developers.kakao.com/tool/debugger/sharing 에서 초기화해야 새 썸네일이 뜸.
+- [ ] **모바일 OAuth 딥링크 등록 (09 STEP 2 실기기 검증 선행)** — (a) Supabase Auth redirect allow-list, (b) Kakao/Google OAuth 콘솔 redirect URI에 딥링크 추가. Expo Go 개발은 `exp://` 프록시 URI, dev build는 `maps://auth/callback`(app.json scheme). → `docs/plan/09-mobile.md` 열린 질문 3·5.
 
 ## 완료 (Done)
+
+### 모바일 Phase 1 (2026-07-12 세션, `docs/plan/09`)
+- [x] **계획서 `docs/plan/09-mobile.md` (커밋 `c734a99`)** — Phase 1(뷰 중심) STEP 0~5 + 작성 STEP 6 후속, Kakao Map WebView·OAuth 딥링크·JS 컨텍스트 테마 스왑 기술 결정, 열린 질문 6건.
+- [x] **STEP 0 — 환경 복구·위생 (커밋 `c734a99`·`10eeea0`)** — `babel-preset-expo`+`@babel/runtime`을 apps/mobile 직접 의존성으로 명시(bun isolated 링커에서 transitive가 metro에 안 보이던 expo export 실패 2건 해결, 세팅 메모 이슈 해소), `react-native-webview`/`expo-web-browser`/`expo-auth-session`(SDK52 호환) 추가, `.env.example`에 `EXPO_PUBLIC_KAKAO_REST_KEY` 자리, index 로고 "maps"→"위로그". `.env` 실값 전부 확인됨(KAKAO_REST_KEY만 STEP 6 때).
+- [x] **STEP 1 — 테마 기반 + 기초 atoms (커밋 `59ba768`·`8f7e686`)** — `src/lib/theme.tsx` ThemeProvider/useTheme(useColorScheme+AsyncStorage `welog-theme`, `theme.color`↔`colorDark` JS 스왑, hydration 게이트로 깜빡임 차단) + `_layout` 하드코딩 `#FFFFFF` 제거·StatusBar 테마 연동 + atoms 4종(`ScreenView`/`AppText`/`Button` lg-fullWidth·a11y·44px/`TextField` 2px 고정 보더). reviewer Med2·Low3 전건 반영(Low4 opacity 상수는 수용 판단). typecheck/lint/expo export PASS. ※ 폰트(Pretendard 모바일 로드)는 미배선 — 후속 과제.
 
 ### 기반 (세팅·배포)
 - [x] 모노레포 스캐폴딩 (Bun+Turborepo, apps/web·api·mobile, packages/shared·tokens), morun 복제→커플 도메인 정리
@@ -75,7 +81,7 @@
 - [x] **AdSense STEP1-5 CMP/Consent Mode v2 (커밋 `67d5e7e`, 2026-07-11)** — `lib/consent.ts`(default/update 시그널·localStorage `welog-consent`·AdSense 로더보다 먼저 실행되는 인라인 default 스크립트) + `ConsentBanner`(첫 방문, 동의/필수만) + 푸터 "쿠키 설정" 재오픈(`CookieSettingsLink`, PublicShell 한정) + `/privacy` §5 문구 일치. env 미설정 시 전부 미렌더 검증(build+start).
 
 ## 세팅 메모
-- ⚠️ 로컬 mobile `expo export`가 `Cannot find module 'babel-preset-expo'`로 실패(2026-07-11 build-qa 확인) — `.bun` 스토어엔 있으나 node_modules 링크 누락, 코드 회귀 아님. mobile 착수 시 `bun install`로 재링크.
+- ~~로컬 mobile `expo export` babel-preset-expo 실패~~ → **해결(2026-07-12)**: bun isolated 링커가 transitive dep을 metro에 안 보이게 하는 구조 문제 → `babel-preset-expo`·`@babel/runtime`을 apps/mobile 직접 의존성으로 명시. 같은 증상 재발 시 같은 패턴으로 해결.
 - 지도: Kakao Map. web `NEXT_PUBLIC_KAKAO_MAP_KEY`·mobile `EXPO_PUBLIC_KAKAO_MAP_KEY` 채움. api `KAKAO_REST_API_KEY` 미정(장소검색 프록시 시).
 - ⚠️ 보안: service_role/secret/DB비번이 초기 대화로 노출 → 대시보드 rotate 권장(SETUP.md "Key rotation").
 - ⚠️ `SBP_TOKEN`(Supabase PAT)이 `apps/api/.env`에 있음(마이그레이션 적용용, gitignore). 일회성이므로 대시보드 revoke 권장. mgmt-apply/mgmt-query가 사용.

@@ -5,18 +5,20 @@ import { theme } from '@maps/tokens';
 import { ScreenView, AppText, Button } from '@/components/atoms';
 import { supabase } from '@/lib/supabase';
 
-// Placeholder copy for the two branches that don't have a real destination
-// route yet — STEP 3 (couple-connect) / STEP 4 ((tabs)/home) will replace
-// these with `router.replace(...)` once those routes exist. Navigating to a
-// route that doesn't exist would break the `expo-router` typed-routes build,
-// so this screen stays mounted and swaps its own copy instead.
-type BootState = 'checking' | 'no-couple' | 'connected' | 'error';
+// Placeholder copy for the one branch that doesn't have a real destination
+// route yet — STEP 4 ((tabs)/home) will replace this with a
+// `router.replace(...)` once that route exists. Navigating to a route that
+// doesn't exist would break the `expo-router` typed-routes build, so this
+// screen stays mounted and swaps its own copy instead for that branch only.
+// The no-couple branch (STEP 3) now has a real destination and redirects.
+type BootState = 'checking' | 'connected' | 'error';
 
 /**
- * Boot gate (docs/plan/09-mobile.md STEP 2): reads the persisted Supabase
- * session first. No session → redirect to the one real destination that
- * exists so far, `/login`. A session gates further on couple status, but
- * only renders in place for now (see `BootState` comment).
+ * Boot gate (docs/plan/09-mobile.md STEP 2/3): reads the persisted Supabase
+ * session first. No session → redirect to `/login`. A session with no
+ * connected couple → redirect to `/couple-connect` (STEP 3). A session with
+ * a connected couple has no real destination yet (STEP 4's tabs/home), so
+ * that branch still only renders in place (see `BootState` comment).
  *
  * Session tracking relies solely on `onAuthStateChange` — it fires an
  * `INITIAL_SESSION` event with the persisted session as soon as the client
@@ -63,7 +65,6 @@ export default function Home() {
     let cancelled = false;
     setState('checking');
 
-    // TODO(STEP 3): no connected couple → router.replace('/couple-connect').
     // TODO(STEP 4): connected couple → router.replace('/(tabs)/home').
     (async () => {
       const { data: couple, error } = await supabase
@@ -82,7 +83,13 @@ export default function Home() {
         return;
       }
 
-      setState(couple?.status === 'connected' ? 'connected' : 'no-couple');
+      if (couple?.status === 'connected') {
+        setState('connected');
+        return;
+      }
+
+      // No connected couple yet — STEP 3's real destination now exists.
+      router.replace('/couple-connect');
     })();
 
     return () => {
@@ -98,7 +105,6 @@ export default function Home() {
         </AppText>
         <AppText variant="caption" color="secondary">
           {state === 'checking' && '커플의 데이트 · 맛집 · 경로 기록'}
-          {state === 'no-couple' && '커플 연결 화면이 곧 여기로 연결돼요 (STEP 3).'}
           {state === 'connected' && '홈 피드가 곧 여기로 연결돼요 (STEP 4).'}
           {state === 'error' && '커플 정보를 불러오지 못했어요. 연결 상태를 확인해 주세요.'}
         </AppText>

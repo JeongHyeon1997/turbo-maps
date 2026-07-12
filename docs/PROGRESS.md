@@ -4,6 +4,10 @@
 > 형식 규칙은 `docs/README.md`. 상세 이력은 각 `docs/plan/*` 참고.
 
 ## 다음 (Next)   ← 새 세션은 여기부터, 위에서 아래로
+0. [ ] **⚡ 직전 세션 검수 지적 반영 (구현 완료·검수까지 끝났고 반영만 남음)** — 대상 커밋: 랜딩 `fcebf8c` + mobile OAuth `c157ec2` (둘 다 푸시됨, typecheck/lint/build PASS).
+       - **mobile (app-dev):** ① `app/index.tsx` 부팅 게이트 — onAuthStateChange 콜백 안에서 evaluate()가 getSession 재호출(중복 쿼리·supabase 콜백 내 await 안티패턴) → 콜백 인자 session으로 분기 + couples 조회는 defer, INITIAL_SESSION에 초기 판정 맡기기(Med). ② couples 조회 error 무시 → 오프라인 시 커플인데 no-couple로 표시(Low). ③ `(auth)/login.tsx` 에러 배너에 `accessibilityRole="alert"` + `accessibilityLiveRegion="polite"`(Med). ④ (선택) 로딩 중인 버튼만 dim 제외/스피너(Low).
+       - **web (web-dev):** ⑤ 태블릿(sm~lg)에서 LandingFeatures·LandingHowTo 둘 다 2열이라 리듬 구분 소실 → HowTo `sm:grid-cols-1` 또는 borderless 변형(Med, designer 방향 확인). 
+       - **designer:** ⑥ DESIGN.md 랜딩 스펙 `lg:grid-cols-3` → 구현 확정치 `lg:grid-cols-2`(2×2)로 문서 동기화(Low — 구현이 옳다고 검수 판정).
 1. [ ] **STEP 0 — 실공개 로그 확보 (사용자 작업, 최우선 선행)** — 공개 뷰가 현재 전부 `[]`(공개 로그 0건).
        커플 실테스트를 겸해 **공개 데이트 코스 8~15건 작성**(공개 토글 ON + 커버 사진 + 장소/평점). `/explore`·`/places`·`/explore/regions`를 빈 화면이 아니게 만든다. → `docs/plan/03-adsense.md` STEP 0. **이게 AdSense·지역탐색·심사의 사실상 공통 선행조건.** (데이터 무관한 아래 2·3은 지금 병행 가능.)
 2. [ ] **AdSense STEP 1 잔여** — 로더·`ads.txt`(pub `ca-pub-5362531643629275`)·env·**CMP/Consent Mode v2(커밋 `67d5e7e`, 배너+푸터 쿠키설정+privacy 문구)** 전부 **완료**. 남은 것: **AdUnit 컴포넌트 + 공개 페이지 배치 — 둘 다 STEP2 승인 후 slot id 발급돼야 가능(지금 개발 불가)**. **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT` 설정은 Blocked 참고.** → `docs/plan/03-adsense.md`. 담당 web-dev.
@@ -13,6 +17,10 @@
 6. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
 ## 진행중 (Doing)
+- **⏸ 사용자 중단 지점(2026-07-12): 랜딩 보강 + mobile STEP 2 구현·검수 완료, 지적 반영 직전에 멈춤.** 다음 세션은 `## 다음` 0번부터.
+  - **랜딩 보강(A5+A4) 구현 완료(`fcebf8c`)** — LandingHowTo(4스텝, GuideStep 재사용, 2×2)·LandingPrivacy(brand-soft 문단형 패널+원칙 3행) 신설, 배치 Hero→Features→HowTo→ExplorePreview→Privacy, Features 하단 링크는 /faq만으로 정리. 카피는 planner 작성(privacy/FAQ 정합 확인). designer 스펙은 DESIGN.md `### 랜딩 보강 섹션`(`774ba5f`).
+  - **mobile STEP 2(OAuth 딥링크) 구현 완료(`c157ec2`)** — `lib/auth.ts`(PKCE+skipBrowserRedirect+openAuthSessionAsync+exchangeCodeForSession, 웹 미러 프로필 upsert), supabase.ts `flowType:'pkce'` 추가(계획에 없던 필수 갭 — 웹은 @supabase/ssr이 자동), OAuthButton atom(카카오 브랜드색 예외는 웹 선례), `(auth)/login` 화면, index 부팅 게이트(세션 없음→login 동작·커플 분기는 STEP 3/4 라우트 생기면 TODO 주석 자리에 replace 연결). reviewer: OAuth 조합·upsert 미러 정확 판정.
+  - **실기기 검증 전 사용자 등록 필요(Blocked 갱신됨):** Supabase Auth Redirect URLs + Kakao/Google 콘솔에 ①Expo Go용 `https://auth.expo.io/@<expo-username>/maps` ②dev build용 `maps://auth/callback` **둘 다** 등록 권장.
 - **콘텐츠 A트랙(10-content) 1차+2차 완료(2026-07-12)** — 사용자 피드백("확장형 모드변경"+"더 많은 콘텐츠")을 designer/planner 논의로 확정 후 반영: 모바일 ThemeToggle 팝오버 전환 + `/faq`·`/guide` 신설 + **에디토리얼 아티클 5편(`/guide/[slug]`)**(아래 Done). 사용자가 "가이드대로 진행" 위임 → 최소 매거진(상록 5편)·planner 초안→사용자 검수 방식으로 확정 진행. 잔여: 아티클 문구 사용자 검수(`## 다음` 5번).
 - **모바일 앱(Expo) Phase 1 진행중(2026-07-12)** — `docs/plan/09-mobile.md` STEP 0+1 완료(reviewer 지적 반영까지, 아래 Done). **다음: STEP 2(OAuth 딥링크 인증)** — 코드는 바로 가능, 실기기 검증은 Blocked의 딥링크 등록 후. 열린 질문은 planner 권장안으로 진행 중(작성=STEP 6 후속·지도=WebView·Expo Go 우선) — 사용자 이견 시 계획서 "열린 질문" 참고.
 - **다음 세션 시작점:** 웹 측 큰 건은 STEP 0(사용자 실데이터) 대기. mobile(4번)이 현재 진행 트랙.
@@ -24,7 +32,7 @@
 - [ ] **0009 라이브 적용 대기** — `0009_explore_regions`(explore_places.region + explore_regions 뷰) 파일 작성·검증 완료, **프로덕션 DB 적용은 자동 승인 거부**됨(사용자 권한 필요). 공개 로그 0건이라 급하지 않음 — STEP0 실데이터 넣을 때 dba로 함께 적용 권장. 그전까진 웹 지역 페처가 `[]`로 degrade.
 - [ ] **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT`** — 코드/`.env.example`엔 `ca-pub-5362531643629275` 반영됨. AdSense 로더가 프로덕션에서 실제 로드되려면 사용자가 Vercel `maps-web` 프로젝트 env에 이 값을 설정해야 함(미설정 시 graceful 미로드).
 - [ ] **카카오 OG 캐시 초기화** — 공개 상세 OG(og-default/커버) 반영 후, 이미 공유된 URL은 카카오가 캐시하므로 https://developers.kakao.com/tool/debugger/sharing 에서 초기화해야 새 썸네일이 뜸.
-- [ ] **모바일 OAuth 딥링크 등록 (09 STEP 2 실기기 검증 선행)** — (a) Supabase Auth redirect allow-list, (b) Kakao/Google OAuth 콘솔 redirect URI에 딥링크 추가. Expo Go 개발은 `exp://` 프록시 URI, dev build는 `maps://auth/callback`(app.json scheme). → `docs/plan/09-mobile.md` 열린 질문 3·5.
+- [ ] **모바일 OAuth 딥링크 등록 (09 STEP 2 실기기 검증 선행 — 코드는 완료됨)** — (a) Supabase Auth → URL Configuration → Redirect URLs, (b) Kakao Developers / Google Cloud OAuth 콘솔 redirect URI에 **둘 다** 추가: ① Expo Go 개발용 `https://auth.expo.io/@<expo-username>/maps` ② dev build용 `maps://auth/callback`. 등록 후 실기기에서 카카오/구글 로그인→세션 유지 확인. → `docs/plan/09-mobile.md` 열린 질문 3·5.
 
 ## 완료 (Done)
 

@@ -9,9 +9,11 @@
 2. [ ] **AdSense STEP 1 잔여** — 로더·`ads.txt`(pub `ca-pub-5362531643629275`)·env·**CMP/Consent Mode v2(커밋 `67d5e7e`, 배너+푸터 쿠키설정+privacy 문구)** 전부 **완료**. 남은 것: **AdUnit 컴포넌트 + 공개 페이지 배치 — 둘 다 STEP2 승인 후 slot id 발급돼야 가능(지금 개발 불가)**. **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT` 설정은 Blocked 참고.** → `docs/plan/03-adsense.md`. 담당 web-dev.
 3. [ ] **커뮤니티 공간 (C-1: 좋아요·북마크부터)** — 커플 스코프 넘어 전체 유저 장소/코스 참여·발견. 결정됨: **지금은 헤더 IA에 진입점 자리만, 기능은 STEP0 실데이터 후.** C-1(좋아요·북마크·인기정렬, 익명 유지 가능)→C-2(따라하기)→C-3(정체성, **작성자 익명화 0007과 충돌 → ADR 선행**). → `docs/plan/06-community.md`. 담당 db-dev+web-dev+server-dev.
 4. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름 — STEP 2(OAuth 딥링크 인증)부터** — STEP 0(환경·deps·브랜드)+STEP 1(ThemeProvider+기초 atoms)은 완료(아래 Done). 계획서 `docs/plan/09-mobile.md`(STEP 2~5 = Phase 1 뷰 중심, 작성은 STEP 6 후속). ⚠️ STEP 2 착수 전 **OAuth 딥링크 대시보드 등록(Blocked 참고)** 필요 — 코드 먼저 짜고 실기기 검증만 뒤로 미루는 것도 가능.
-5. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
+5. [ ] **콘텐츠 A1 — 데이트 가이드 에디토리얼(`/guide/[slug]` 3~6편)** — FAQ·사용가이드(1차)는 완료. **착수 전 사용자 확정 필요**: 매거진화 방향·저작 주체(planner 초안→사용자 검수 vs 직접 집필) → `docs/plan/10-content.md` 열린 질문.
+6. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
 ## 진행중 (Doing)
+- **콘텐츠 A트랙(10-content) 1차 완료(2026-07-12)** — 사용자 피드백("확장형 모드변경"+"더 많은 콘텐츠")을 designer/planner 논의로 확정 후 반영: 모바일 ThemeToggle 팝오버 전환 + `/faq`·`/guide` 신설(아래 Done). **잔여: A1 데이트 가이드 에디토리얼(`/guide/[slug]`)은 열린 질문(매거진화 방향·저작 주체) 사용자 확정 대기** → `docs/plan/10-content.md`.
 - **모바일 앱(Expo) Phase 1 진행중(2026-07-12)** — `docs/plan/09-mobile.md` STEP 0+1 완료(reviewer 지적 반영까지, 아래 Done). **다음: STEP 2(OAuth 딥링크 인증)** — 코드는 바로 가능, 실기기 검증은 Blocked의 딥링크 등록 후. 열린 질문은 planner 권장안으로 진행 중(작성=STEP 6 후속·지도=WebView·Expo Go 우선) — 사용자 이견 시 계획서 "열린 질문" 참고.
 - **다음 세션 시작점:** 웹 측 큰 건은 STEP 0(사용자 실데이터) 대기. mobile(4번)이 현재 진행 트랙.
 
@@ -25,6 +27,11 @@
 - [ ] **모바일 OAuth 딥링크 등록 (09 STEP 2 실기기 검증 선행)** — (a) Supabase Auth redirect allow-list, (b) Kakao/Google OAuth 콘솔 redirect URI에 딥링크 추가. Expo Go 개발은 `exp://` 프록시 URI, dev build는 `maps://auth/callback`(app.json scheme). → `docs/plan/09-mobile.md` 열린 질문 3·5.
 
 ## 완료 (Done)
+
+### 확장형 테마토글 + 콘텐츠 A트랙 1차 (2026-07-12 세션, `DESIGN.md`·`docs/plan/10`)
+- [x] **사용자 피드백 논의(designer+planner, 커밋 `e6cbc08`)** — ①"모드변경 확장형": 모바일 블라인드 순환 버튼 → **트리거(아이콘+caret)+앵커 팝오버(라벨·체크)**로 개정, 데스크톱 3-세그먼트 유지(인라인 확장은 07 오버플로 재발·바텀시트는 과비중이라 반려, DESIGN.md 명문화). ②"더 많은 콘텐츠": 실데이터 무관 **A트랙** 신규 정의(`docs/plan/10-content.md`) — FAQ/사용가이드/에디토리얼, B(explore 등)=04/05·C(커뮤니티)=06 소유로 중복 차단.
+- [x] **모바일 ThemeToggle 팝오버 전환 (커밋 `53c9e95`·`4ca0d4a`)** — role=menu/menuitemradio·roving tabindex·ESC/바깥탭/tab-out 닫기·포커스 복귀·더블 rAF 진입 모션·reduced-motion·다크 테두리(`dark:border-border-strong`). 헤더 리플로우 0(320px 안전). 데스크톱 변형 회귀 없음.
+- [x] **공개 `/faq` + `/guide` 신설 (커밋 `345ec82`·`4ca0d4a`)** — planner 카피(privacy/terms·0007 익명화 정합 검증) 11문항 FAQ(FAQPage JSON-LD, 무JS details/summary 아코디언) + 사용법 5스텝(+로그인/둘러보기 CTA). `src/content/{faq,guide}.ts` 타입드 데이터, 미들웨어 public·sitemap·robots·푸터 서비스 그룹·랜딩 인라인 링크. reviewer+uiux 지적(Med1·Low5) 전건 반영, typecheck/lint/build PASS(정적 렌더 확인). **AdSense thin-content 리스크 완화 기여(03 STEP 0와 병행).**
 
 ### 모바일 Phase 1 (2026-07-12 세션, `docs/plan/09`)
 - [x] **계획서 `docs/plan/09-mobile.md` (커밋 `c734a99`)** — Phase 1(뷰 중심) STEP 0~5 + 작성 STEP 6 후속, Kakao Map WebView·OAuth 딥링크·JS 컨텍스트 테마 스왑 기술 결정, 열린 질문 6건.

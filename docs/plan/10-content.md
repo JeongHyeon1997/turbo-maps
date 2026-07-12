@@ -44,7 +44,8 @@ owner: planner
 
 > 선정 기준: 데이터 무관 즉시 착수 · AdSense 심사 blocker 우회 기여 · 비용 대비 효과.
 
-### 1위 — A3 FAQ + A2 사용 가이드 (묶어서 1차) 🎯
+### 1위 — A3 FAQ + A2 사용 가이드 (묶어서 1차) 🎯 ✅ 완료(2026-07-12, 커밋 `345ec82`+`4ca0d4a`)
+- `/faq`(11문항, FAQPage JSON-LD, details/summary 아코디언) + `/guide`(사용법 5스텝 + 시작/둘러보기 CTA). 미들웨어 public·sitemap·robots·푸터 서비스 그룹·랜딩 인라인 링크 배선. 카피는 privacy/terms·0007 익명화와 정합 검증(planner). reviewer+uiux 지적 전건 반영.
 - **범위:** `/faq`(질문 8~12개, FAQPage JSON-LD) + `/guide` 인덱스에 "위로그 사용법" 섹션 or `/help`. 정적 콘텐츠(글 = planner 초안 → 사용자 확인).
 - **왜 1위:** 비용 최저 + 즉시 100% 코드 가능(데이터 0) + 심사관이 서비스 목적/기능을 바로 이해(사이트 품질 신호) + 크롤 URL·롱테일 즉시 증가.
 - **담당:** planner(문구 초안: FAQ Q&A·사용법 카피) → web-dev(`/faq`·`/help` 페이지, FAQPage JSON-LD, 미들웨어 `PUBLIC_PREFIXES`에 `/faq`·`/guide`·`/help` 추가, sitemap/robots 반영) → designer(필요 시 warm 아티클 template) → build-qa(공개 200·크롤·JSON-LD 검증).

@@ -8,6 +8,8 @@ const exploreLinks: readonly FooterLinkItem[] = [
 
 const serviceLinks: readonly FooterLinkItem[] = [
   { label: '소개', href: '/' },
+  { label: '사용 가이드', href: '/guide' },
+  { label: 'FAQ', href: '/faq' },
   { label: '문의', href: 'mailto:ojh@pitin-ev.com' },
 ];
 

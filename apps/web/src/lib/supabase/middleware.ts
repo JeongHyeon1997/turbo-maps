@@ -9,6 +9,8 @@ type CookieToSet = { name: string; value: string; options?: CookieOptions };
 // `/explore` and `/places` (and sub-paths) are public too — they read from
 // anon-safe views (see app/explore/page.tsx, app/places/page.tsx and
 // docs/plan/04-public-surface.md 2단계 / 05-public-enrichment.md B).
+// `/faq` and `/guide` are public, repo-local static content (no Supabase read) —
+// docs/plan/10-content.md A3/A2.
 // `/sitemap.xml`/`/robots.txt` (app/sitemap.ts, app/robots.ts) must be exact-public
 // too — crawlers hit these with no session, and a redirect to /login here makes
 // the sitemap/robots undiscoverable, defeating the whole SEO effort. Same for
@@ -18,7 +20,16 @@ type CookieToSet = { name: string; value: string; options?: CookieOptions };
 // it's a static asset under `/public`, and the middleware `matcher` config in
 // `middleware.ts` already excludes `.png` paths from running this file at all.)
 const EXACT_PUBLIC = ['/', '/sitemap.xml', '/robots.txt', '/ads.txt'];
-const PUBLIC_PREFIXES = ['/login', '/auth', '/privacy', '/terms', '/explore', '/places'];
+const PUBLIC_PREFIXES = [
+  '/login',
+  '/auth',
+  '/privacy',
+  '/terms',
+  '/explore',
+  '/places',
+  '/faq',
+  '/guide',
+];
 
 const isPublic = (path: string) =>
   EXACT_PUBLIC.includes(path) || PUBLIC_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));

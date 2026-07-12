@@ -22,3 +22,5 @@ export { FooterColumn, footerLinkClassName } from './FooterColumn';
 export type { FooterLinkItem } from './FooterColumn';
 export { ConsentBanner, reopenConsentBanner } from './ConsentBanner';
 export { CookieSettingsLink } from './CookieSettingsLink';
+export { FaqItem } from './FaqItem';
+export { GuideStep } from './GuideStep';

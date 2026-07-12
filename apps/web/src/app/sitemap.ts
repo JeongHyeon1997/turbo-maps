@@ -5,7 +5,16 @@ import { getPublicPlaceIds } from '@/lib/places';
 import { getPublicRegionNames } from '@/lib/regions';
 import { SITE_URL } from '@/lib/site-url';
 
-const STATIC_PATHS = ['/', '/explore', '/explore/regions', '/places', '/privacy', '/terms'];
+const STATIC_PATHS = [
+  '/',
+  '/explore',
+  '/explore/regions',
+  '/places',
+  '/privacy',
+  '/terms',
+  '/faq',
+  '/guide',
+];
 
 /**
  * Public URLs only — static marketing/explore/places pages plus every publicly

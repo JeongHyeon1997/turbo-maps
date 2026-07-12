@@ -1,8 +1,10 @@
 ---
-status: todo
+status: doing
 last-updated: 2026-07-12
 owner: planner
 ---
+
+> **진행: STEP B(폰트) 완료(커밋 `516584a`).** 다음 착수점 = **STEP C(페칭/캐시, 감사 2·5·6·10)** — 11번 web STEP 완료로 착수 조건 충족. 단 `revalidate 120s` 등 제품 동작 변화라 사용자 확인 후 진행 권장. STEP A(리전)·실측은 Blocked.
 
 # 웹 성능 최적화 — 감사 결과 & 실행 계획
 
@@ -77,8 +79,8 @@ vercel.json 없음. 기본 iad1 vs Supabase 서울 가능성 — 왕복당 ~150-
 > ⚠️ **착수 조건:** 현재 web-dev가 `docs/plan/11-profile-editing.md`의 web STEP(AvatarUploader + `AppShell.tsx`/`profile/page.tsx` 배선)을 작업 중이다. 본 계획의 STEP B·C·D는 **`AppShell.tsx`·`server.ts`·이미지 컴포넌트를 건드려 11번과 충돌**하므로 **11번 web STEP 완료(reviewer/build-qa PASS) 후 착수**한다. STEP A(리전 확인)와 폰트(1·8)는 파일 겹침이 없어 선행 가능.
 
 - **STEP A — 리전 확인 (사용자/대시보드, Blocked 성격):** Vercel 함수 리전 ↔ Supabase 리전(서울/icn1) 대조. 불일치면 `vercel.json` `regions:["icn1"]` 추가. 측정 없이 코드 착수 금지 — 이 확인이 High(4)의 게이트. → 열린 질문 1.
-- **STEP B — 폰트 (web-dev, 11 무관 선행 가능):** ① Pretendard self-host(`next/font/local`, globals.css `@import` 제거, Tailwind `sans` 변수화). ⑧ BMJUA 서브셋 woff2 또는 wordmark SVG + 미사용 TTF 4종 정리. (파일 충돌 없음.)
-- **STEP C — 페칭/캐시 (web-dev, 11 완료 후):** ② `lib/supabase/anon.ts` 싱글턴 + `lib/{explore,places,regions}.ts` fetcher `unstable_cache`(revalidate 120, tag 기반 무효화). ⑤ `server.ts` `React.cache()` getUser/getCouple 헬퍼(page/AppShell 공유). ⑥·⑩ Promise.all 워터폴 해소 + generateMetadata dedupe. **`AppShell.tsx`·`server.ts` 편집 = 11번 충돌 지점.**
+- **[완료] STEP B — 폰트 (web-dev, 커밋 `516584a`):** ① globals.css `@import` 제거 → layout preconnect + 버전고정 링크(pretendard@1.3.9). **버그 수정: fontFamily `'Pretendard'` ↔ CDN 선언 `'Pretendard Variable'` 불일치로 본문이 시스템 sans 폴백 중이던 것 교정**(sans/jua/logo 정합). ⑧ BMJUA **1.5MB→18KB** pyftsubset 서브셋 + 미사용 TTF 4종 삭제(감사 15). 빌드+next start 실렌더 검증. *(자체호스트 대신 preconnect+버전고정 CDN 채택 — 최소수정안.)*
+- **STEP C — 페칭/캐시 (web-dev, 11 완료 → 착수 조건 충족, ⚠️ 제품동작 변화라 사용자 확인 후):** ② `lib/supabase/anon.ts` 싱글턴 + `lib/{explore,places,regions}.ts` fetcher `unstable_cache`(revalidate 120, tag 기반 무효화). ⑤ `server.ts` `React.cache()` getUser/getCouple 헬퍼(page/AppShell 공유). ⑥·⑩ Promise.all 워터폴 해소 + generateMetadata dedupe. **`AppShell.tsx`·`server.ts` 편집 = 11번 충돌 지점.**
 - **STEP D — 이미지 (web-dev, 11 완료 후):** ③ `next.config.mjs images.remotePatterns` + public-covers next/image(fill+sizes, 상세 priority) + date-photos 서명 URL 처리(택1: 만료 장기화·image transformation·최소 lazy). ⑪ PhotoGallery/PhotoThumb lazy+width/height. `AvatarImage.tsx`는 11번과 겹칠 수 있어 조정 필요.
 - **STEP E — 잔여 (web-dev):** ⑦ 홈 date_logs `.limit(20)`+더보기, map 전건 검토. ⑨ AppShell 아바타 Suspense 분리(5·6 후 우선도↓). ⑫ sitemap `revalidate=3600`. ⑬ 미들웨어 fast-path(여유 시). ⑮ 미사용 deps(axios/zustand) 제거.
 - **STEP F — DB (dba, 규모 후):** ⑭ 캐시(STEP C)로 1차 방어 후 규모 시 explore_places materialized view + region stored generated column + btree(SCHEMA.md:190 경로). 현재 인덱스로 커버되어 급하지 않음.

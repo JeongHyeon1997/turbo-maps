@@ -1,8 +1,10 @@
 ---
-status: todo
+status: doing
 last-updated: 2026-07-12
 owner: planner
 ---
+
+> **진행: DB(STEP 1)·shared(STEP 2)·web(STEP 3) 완료(커밋 `c4c294f`+`b2dbd08`, reviewer PASS).** 잔여: 0010 라이브 적용(0009와 배치·사용자 승인, Blocked) → 적용 후 실동작 확인 → mobile 이식(STEP 5, 09 Phase 1 후).
 
 # 프로필 직접 편집 — 이미지 업로드 + 내정보 편집
 
@@ -66,16 +68,15 @@ owner: planner
 - 서버 라우트 불필요(RLS가 폴더 스코프로 강제). `SupabaseService` 경유 규칙은 apps/api 한정 — web은 클라 직결 유지.
 
 ## 작업 분해 (역할별 STEP)
-- **STEP 1 — db-dev:** `0010_profile_avatars` 작성(위 마이그레이션 1~3, public/test 병행, `avatars` 버킷+정책, SCHEMA.md 동시 갱신). `rls-migration` 스킬 사용.
-- **STEP 1b — dba(사용자 승인 후):** 0010 라이브 적용 + 검증(본인 폴더 write 허용/타 폴더 거부, anon SELECT 200, 컬럼 존재). ⚠️ `0009`가 아직 미적용(Blocked) — **0010은 0009와 함께 배치 적용 권장**(STEP0 실데이터 투입 시점). SCHEMA.md 라이브 현행화.
-- **STEP 2 — schema-dev:** `packages/shared` profile Zod에 `custom_avatar_url: z.string().url().nullable().optional()` 추가(단일 소스). 소비처 타입 확인.
-- **STEP 3 — web-dev:** 
-  - `AvatarUploader` molecule(atoms 재사용: Avatar/Button/파일입력 라벨 focus-within 링) — 미리보기·업로드·되돌리기·에러(a11y `role=alert`).
-  - `/profile` 배선: select에 `custom_avatar_url` 추가 + Avatar 코얼레스 + 업로더 마운트.
-  - `AppShell.tsx`: 본인·파트너 select에 `custom_avatar_url` 추가, `toDescriptor` 코얼레스.
-  - `auth/callback`은 **변경 없음**(설계상 custom을 절대 안 건드림 — 이 무변경이 폴백 유지의 핵심).
-- **STEP 4 — reviewer + build-qa:** 폴더 스코프/코얼레스/콜백 무변경 정확성 검수 + typecheck/lint/web build. 파트너 아바타 회귀 없는지 확인.
-- **STEP 5 — mobile (후속, Phase 1 뷰 이후):** `09-mobile.md` STEP 2~5(뷰) 진행 후, 모바일 `/profile` 상당 화면에 아바타 업로더 이식(`expo-image-picker` + 동일 버킷/컬럼). **Phase 1 뷰 트랙 완료 전엔 착수하지 않음.**
+- **[완료] STEP 1 — db-dev (커밋 `c4c294f`):** `0010_profile_avatars` 작성(마이그레이션 1~3, public/test 병행, `avatars` 버킷+정책, SCHEMA.md 동시 갱신). **reviewer 지적 반영: 버킷 file_size_limit 5MB·allowed_mime_types image/* 서버측 제약 추가.**
+- **[대기] STEP 1b — dba(사용자 승인 후):** 0010 라이브 적용 + 검증(본인 폴더 write 허용/타 폴더 거부, anon SELECT 200, 컬럼 존재). ⚠️ `0009`도 미적용 — **0010은 0009와 배치 적용 권장.** SCHEMA.md 라이브 현행화.
+- **[완료] STEP 2 — schema-dev (커밋 `b2dbd08`):** `packages/shared` profile Zod에 `customAvatarUrl` 추가(단일 소스).
+- **[완료] STEP 3 — web-dev (커밋 `b2dbd08`):** 
+  - `AvatarUploader` molecule — 미리보기·업로드·되돌리기·에러.
+  - `/profile`·`AppShell.tsx` 본인·파트너 select + `toDescriptor` 코얼레스(`custom_avatar_url ?? avatar_url`), `select('*')` degrade(컬럼 미적용 방어).
+  - `auth/callback`은 **변경 없음**(설계상 custom 무접촉 — 폴백 유지 핵심).
+- **[완료] STEP 4 — reviewer:** PASS. Med2·Low1(연속 업로드 고아 객체·버킷 제약·update 실패 고아) 전건 반영. typecheck/lint/web build PASS.
+- **[대기] STEP 5 — mobile (후속, Phase 1 뷰 이후):** `09-mobile.md` STEP 2~5(뷰) 진행 후, 모바일 `/profile` 상당 화면에 아바타 업로더 이식(`expo-image-picker` + 동일 버킷/컬럼). **Phase 1 뷰 트랙 완료 전엔 착수하지 않음.**
 
 ## 완료 기준 (Definition of Done)
 - [ ] `/profile`에서 이미지 업로드 → 즉시 본인 아바타(프로필+헤더) 반영.

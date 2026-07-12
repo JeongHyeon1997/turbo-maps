@@ -1,32 +1,28 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '@maps/tokens';
+import { StyleSheet, View } from 'react-native';
+import { theme } from '@maps/tokens';
+import { ScreenView, AppText } from '@/components/atoms';
 
 // Entry screen. app-dev builds out (auth)/(tabs) route groups per DESIGN.md.
 export default function Home() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>maps</Text>
-      <Text style={styles.tagline}>커플의 데이트 · 맛집 · 경로 기록</Text>
-    </View>
+    <ScreenView>
+      <View style={styles.center}>
+        <AppText variant="displayLarge" color="brand">
+          위로그
+        </AppText>
+        <AppText variant="caption" color="secondary">
+          커플의 데이트 · 맛집 · 경로 기록
+        </AppText>
+      </View>
+    </ScreenView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.background,
-    gap: 8,
-  },
-  logo: {
-    fontSize: 42,
-    fontWeight: '800',
-    color: colors.brand,
-    letterSpacing: -1,
-  },
-  tagline: {
-    fontSize: 14,
-    color: colors.textSecondary,
+    gap: theme.space[2],
   },
 });

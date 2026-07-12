@@ -50,7 +50,8 @@ owner: planner
 - **왜 1위:** 비용 최저 + 즉시 100% 코드 가능(데이터 0) + 심사관이 서비스 목적/기능을 바로 이해(사이트 품질 신호) + 크롤 URL·롱테일 즉시 증가.
 - **담당:** planner(문구 초안: FAQ Q&A·사용법 카피) → web-dev(`/faq`·`/help` 페이지, FAQPage JSON-LD, 미들웨어 `PUBLIC_PREFIXES`에 `/faq`·`/guide`·`/help` 추가, sitemap/robots 반영) → designer(필요 시 warm 아티클 template) → build-qa(공개 200·크롤·JSON-LD 검증).
 
-### 2위 — A1 데이트 가이드 에디토리얼 (`/guide/[slug]` 3~6편)
+### 2위 — A1 데이트 가이드 에디토리얼 (`/guide/[slug]` 3~6편) ✅ 완료(2026-07-12, 커밋 `e275e89`+`1a10696`)
+- 상록 아티클 5편(첫 데이트 코스/비 오는 날/기념일 체크리스트/기록 팁/계절별) — planner 초안, 품질 원칙 준수(상호명 등 검증불가 사실 0, 위로그 언급 절제). `src/content/guides.ts` + `/guide/[slug]` SSG 5편 + `/guide` 인덱스 2섹션 재구성(데이트 가이드 + 사용법) + Article JSON-LD(author/publisher.logo 포함) + per-article OG + sitemap. designer 에디토리얼 템플릿 스펙(DESIGN.md) 기반 ArticleMeta/ArticleCard/ArticleSection/ArticleFooter 신설. reviewer+uiux 지적 전건 반영(카드 계열 공통 focus/대비 조정은 후속 메모). **사용자 검수/보강 환영 — 문구는 `apps/web/src/content/guides.ts`에서 수정.**
 - **범위:** repo 내 콘텐츠 컬렉션(MDX 또는 TS 데이터 — 아래 데이터모델) + `/guide` 인덱스 + `/guide/[slug]` 상세 + Article JSON-LD + per-article OG. 첫 3~6편은 데이터 무관 상록(evergreen) 주제.
 - **왜 2위:** AdSense·SEO 최대 효과(오리지널 다수 콘텐츠)지만 **실제 글쓰기 비용이 있다** — 얇은/AI 티 나는 양산은 오히려 심사 감점. 1위(FAQ/가이드)로 기반을 깐 뒤 품질 있는 아티클을 붙인다.
 - **시너지:** 실데이터가 쌓이면 각 가이드가 `/explore/regions/[region]`·`/places/[id]`로 내부 링크 → B트랙을 살리는 유입 통로가 된다(A→B 연결).

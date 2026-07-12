@@ -9,11 +9,11 @@
 2. [ ] **AdSense STEP 1 잔여** — 로더·`ads.txt`(pub `ca-pub-5362531643629275`)·env·**CMP/Consent Mode v2(커밋 `67d5e7e`, 배너+푸터 쿠키설정+privacy 문구)** 전부 **완료**. 남은 것: **AdUnit 컴포넌트 + 공개 페이지 배치 — 둘 다 STEP2 승인 후 slot id 발급돼야 가능(지금 개발 불가)**. **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT` 설정은 Blocked 참고.** → `docs/plan/03-adsense.md`. 담당 web-dev.
 3. [ ] **커뮤니티 공간 (C-1: 좋아요·북마크부터)** — 커플 스코프 넘어 전체 유저 장소/코스 참여·발견. 결정됨: **지금은 헤더 IA에 진입점 자리만, 기능은 STEP0 실데이터 후.** C-1(좋아요·북마크·인기정렬, 익명 유지 가능)→C-2(따라하기)→C-3(정체성, **작성자 익명화 0007과 충돌 → ADR 선행**). → `docs/plan/06-community.md`. 담당 db-dev+web-dev+server-dev.
 4. [ ] **app-dev: 모바일 앱(Expo) 동일 흐름 — STEP 2(OAuth 딥링크 인증)부터** — STEP 0(환경·deps·브랜드)+STEP 1(ThemeProvider+기초 atoms)은 완료(아래 Done). 계획서 `docs/plan/09-mobile.md`(STEP 2~5 = Phase 1 뷰 중심, 작성은 STEP 6 후속). ⚠️ STEP 2 착수 전 **OAuth 딥링크 대시보드 등록(Blocked 참고)** 필요 — 코드 먼저 짜고 실기기 검증만 뒤로 미루는 것도 가능.
-5. [ ] **콘텐츠 A1 — 데이트 가이드 에디토리얼(`/guide/[slug]` 3~6편)** — FAQ·사용가이드(1차)는 완료. **착수 전 사용자 확정 필요**: 매거진화 방향·저작 주체(planner 초안→사용자 검수 vs 직접 집필) → `docs/plan/10-content.md` 열린 질문.
+5. [ ] **콘텐츠 A1 아티클 사용자 검수** — 에디토리얼 5편 라이브 반영 완료(아래 Done). planner 초안이므로 **사용자가 `apps/web/src/content/guides.ts` 문구를 읽고 본인 목소리로 보강 권장**(AdSense 오리지널리티). 지속 발행 여부는 초기 유입 보고 후 결정. 여력 시 3위 A5 랜딩 보강+A4 About 심화 → `docs/plan/10-content.md`.
 6. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
 ## 진행중 (Doing)
-- **콘텐츠 A트랙(10-content) 1차 완료(2026-07-12)** — 사용자 피드백("확장형 모드변경"+"더 많은 콘텐츠")을 designer/planner 논의로 확정 후 반영: 모바일 ThemeToggle 팝오버 전환 + `/faq`·`/guide` 신설(아래 Done). **잔여: A1 데이트 가이드 에디토리얼(`/guide/[slug]`)은 열린 질문(매거진화 방향·저작 주체) 사용자 확정 대기** → `docs/plan/10-content.md`.
+- **콘텐츠 A트랙(10-content) 1차+2차 완료(2026-07-12)** — 사용자 피드백("확장형 모드변경"+"더 많은 콘텐츠")을 designer/planner 논의로 확정 후 반영: 모바일 ThemeToggle 팝오버 전환 + `/faq`·`/guide` 신설 + **에디토리얼 아티클 5편(`/guide/[slug]`)**(아래 Done). 사용자가 "가이드대로 진행" 위임 → 최소 매거진(상록 5편)·planner 초안→사용자 검수 방식으로 확정 진행. 잔여: 아티클 문구 사용자 검수(`## 다음` 5번).
 - **모바일 앱(Expo) Phase 1 진행중(2026-07-12)** — `docs/plan/09-mobile.md` STEP 0+1 완료(reviewer 지적 반영까지, 아래 Done). **다음: STEP 2(OAuth 딥링크 인증)** — 코드는 바로 가능, 실기기 검증은 Blocked의 딥링크 등록 후. 열린 질문은 planner 권장안으로 진행 중(작성=STEP 6 후속·지도=WebView·Expo Go 우선) — 사용자 이견 시 계획서 "열린 질문" 참고.
 - **다음 세션 시작점:** 웹 측 큰 건은 STEP 0(사용자 실데이터) 대기. mobile(4번)이 현재 진행 트랙.
 
@@ -31,6 +31,7 @@
 ### 확장형 테마토글 + 콘텐츠 A트랙 1차 (2026-07-12 세션, `DESIGN.md`·`docs/plan/10`)
 - [x] **사용자 피드백 논의(designer+planner, 커밋 `e6cbc08`)** — ①"모드변경 확장형": 모바일 블라인드 순환 버튼 → **트리거(아이콘+caret)+앵커 팝오버(라벨·체크)**로 개정, 데스크톱 3-세그먼트 유지(인라인 확장은 07 오버플로 재발·바텀시트는 과비중이라 반려, DESIGN.md 명문화). ②"더 많은 콘텐츠": 실데이터 무관 **A트랙** 신규 정의(`docs/plan/10-content.md`) — FAQ/사용가이드/에디토리얼, B(explore 등)=04/05·C(커뮤니티)=06 소유로 중복 차단.
 - [x] **모바일 ThemeToggle 팝오버 전환 (커밋 `53c9e95`·`4ca0d4a`)** — role=menu/menuitemradio·roving tabindex·ESC/바깥탭/tab-out 닫기·포커스 복귀·더블 rAF 진입 모션·reduced-motion·다크 테두리(`dark:border-border-strong`). 헤더 리플로우 0(320px 안전). 데스크톱 변형 회귀 없음.
+- [x] **A1 에디토리얼 아티클 5편 (커밋 `fa86b59`·`e275e89`·`1a10696`)** — 상록 데이트 가이드 5편(첫 데이트 코스/비 오는 날 실내/기념일 체크리스트/기록 팁/계절별) `src/content/guides.ts` → `/guide/[slug]` SSG + `/guide` 인덱스 2섹션(데이트 가이드 위·사용법 아래). designer 에디토리얼 템플릿(DESIGN.md — 텍스트-퍼스트 히어로·장문 타이포 리듬·max-w-2xl) 기반 ArticleMeta/ArticleCard/ArticleSection molecules + ArticleFooter organism(다른 가이드 3장 + brand-soft CTA 패널). Article JSON-LD(author·publisher.logo — 리치결과 적격) + per-article OG + sitemap 5 URL. 품질 원칙: 상호명·검증불가 사실 0, 위로그 언급 절제. reviewer(콘텐츠 원본 바이트 일치 확인)+uiux(44px 뒤로가기·aria-hidden) 전건 반영. 잔여 메모: ArticleCard/PlaceCard 공통 focus 링 offset·muted 날짜 대비는 카드 계열 일괄 후속.
 - [x] **공개 `/faq` + `/guide` 신설 (커밋 `345ec82`·`4ca0d4a`)** — planner 카피(privacy/terms·0007 익명화 정합 검증) 11문항 FAQ(FAQPage JSON-LD, 무JS details/summary 아코디언) + 사용법 5스텝(+로그인/둘러보기 CTA). `src/content/{faq,guide}.ts` 타입드 데이터, 미들웨어 public·sitemap·robots·푸터 서비스 그룹·랜딩 인라인 링크. reviewer+uiux 지적(Med1·Low5) 전건 반영, typecheck/lint/build PASS(정적 렌더 확인). **AdSense thin-content 리스크 완화 기여(03 STEP 0와 병행).**
 
 ### 모바일 Phase 1 (2026-07-12 세션, `docs/plan/09`)

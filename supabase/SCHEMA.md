@@ -5,16 +5,20 @@
 
 **Project:** `giilijttitajvygdosbe` · **Schemas:** `public` (prod), `test` (test data) — kept in sync.
 
-Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`, `0004_visibility`, `0005_date_log_photos`, `0006_public_explore`, `0007_public_detail`, `0008_explore_places`, `0009_explore_regions`, `0010_profile_avatars`. Mirrored in `public` and `test`.
+Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`, `0004_visibility`, `0005_date_log_photos`, `0006_public_explore`, `0007_public_detail`, `0008_explore_places`, `0009_explore_regions`, `0010_profile_avatars`, `0011_join_couple_guard`. Mirrored in `public` and `test`.
 
 **Live DB status:** all migrations through `0008_explore_places` are **applied to the live DB**
 (0005–0008 applied 2026-07-07 — verified: anon+authenticated blocked from base `date_logs`,
-`explore_logs` anonymized, anon can read `explore_places`/`explore_place_logs`). `0009_explore_regions`
-and `0010_profile_avatars` are written but **not yet applied live** (dba to apply — plan doc
-`docs/plan/11-profile-editing.md` recommends batching `0009`+`0010` together at the next live-apply
-pass). This file matches the live schema through `0008`; the `0009`/`0010` additions described below
-(function `derive_region`, `explore_places.region`, `explore_regions`, `profiles.custom_avatar_url`,
-the `avatars` bucket) are forward-looking until applied.
+`explore_logs` anonymized, anon can read `explore_places`/`explore_place_logs`). `0009_explore_regions`,
+`0010_profile_avatars`, and `0011_join_couple_guard` are written but **not yet applied live** (dba to
+apply — plan doc `docs/plan/11-profile-editing.md` recommends batching `0009`+`0010` together at the
+next live-apply pass; `0011` should be batched into that same pass, but see its live-apply caveat
+below — the `create unique index` calls can fail if the bug it fixes was already exploited against
+live data, so dba must run the duplicate-membership check described in `0011`'s header comment
+*first*). This file matches the live schema through `0008`; the `0009`/`0010`/`0011` additions
+described below (function `derive_region`, `explore_places.region`, `explore_regions`,
+`profiles.custom_avatar_url`, the `avatars` bucket, the `join_couple` membership guard and unique
+couples indexes) are forward-looking until applied.
 
 ## Tables
 
@@ -40,10 +44,15 @@ App upserts this after login (no auth trigger, to keep public/test schemas indep
 | status | text | pending \| connected |
 | created_at / connected_at | timestamptz | |
 
-Indexes: `couples_partner_a_idx`, `couples_partner_b_idx`.
+Indexes: `couples_partner_a_idx` (**unique**, since `0011`, **not yet applied live** — was a plain
+btree from `0001`), `couples_partner_b_idx` (**partial unique** `where partner_b is not null`,
+since `0011`, **not yet applied live** — was a plain btree from `0001`). Together these guarantee a
+user can occupy `partner_a` in at most one row and `partner_b` in at most one row, i.e. at most one
+couple membership at a time — defense in depth alongside the `0011` `join_couple` guard below for
+any path that writes `couples` directly instead of through the RPC.
 
 ### Functions
-- `join_couple(p_code text) → uuid` — SECURITY DEFINER. Sets `partner_b = auth.uid()`, status→connected for a matching pending code. Granted to `authenticated`.
+- `join_couple(p_code text) → uuid` — SECURITY DEFINER. Sets `partner_b = auth.uid()`, status→connected for a matching pending code. Granted to `authenticated`. **Since `0011` (not yet applied live):** before attempting the join, raises the same `'invalid or already-used invite code'` exception (unchanged failure contract — both web and mobile only branch on "RPC returned an error", never inspect the message) if the caller already appears as `partner_a` OR `partner_b` of *any* `couples` row. Closes a hole where a user who already owns a pending couple (as `partner_a`) could still join a *different* couple's code as `partner_b`, ending up in two rows at once and permanently breaking every `.maybeSingle()` couple lookup (boot gate, header, `/couple/connect`) with a multi-row error. The web/mobile UI already hides the join form once the caller has a couple row (client-side mitigation only) — this migration is the DB-level fix.
 - `derive_region(addr text) → text` (added `0009`, public + test, **not yet applied live**) — pure
   `immutable` SQL function (not security definer) that parses a Korean address string into a
   구/시/군-level region label: first Hangul token ending in `구` wins (regex `([가-힣]+구)`); else
@@ -55,7 +64,7 @@ Indexes: `couples_partner_a_idx`, `couples_partner_b_idx`.
 
 ## RLS policies (enabled on both tables)
 - **profiles**: select own row + connected partner's row + (since `0004_visibility`) any row when authenticated; insert/update own only. `0010_profile_avatars` added the `custom_avatar_url` column but **no new policy** — RLS is row-level, not column-level, so the existing `profiles_update` (`using/with check (id = auth.uid())`) already covers writes to the new column, and the existing `profiles_select` already covers a partner reading it.
-- **couples**: select/update only the two partners; insert as `partner_a = auth.uid()`. Joining goes through `join_couple()` (definer) so a stranger can't read a couple by code.
+- **couples**: select/update only the two partners; insert as `partner_a = auth.uid()`. Joining goes through `join_couple()` (definer) so a stranger can't read a couple by code. RLS itself does not enforce single-membership (the insert policy only checks `created_by`/`partner_a = auth.uid()`, not "does this user already have a row") — single-membership is enforced by the `0011` unique indexes plus the `0011` `join_couple` guard, not by an RLS policy.
 
 ### `places` (shared reference — Kakao place)
 id, kakao_place_id (unique), name, category, address, lat, lng, created_at.

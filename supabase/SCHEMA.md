@@ -5,14 +5,16 @@
 
 **Project:** `giilijttitajvygdosbe` · **Schemas:** `public` (prod), `test` (test data) — kept in sync.
 
-Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`, `0004_visibility`, `0005_date_log_photos`, `0006_public_explore`, `0007_public_detail`, `0008_explore_places`, `0009_explore_regions`. Mirrored in `public` and `test`.
+Applied migrations: `0001_init`, `0002_date_logs`, `0003_cover_photo`, `0004_visibility`, `0005_date_log_photos`, `0006_public_explore`, `0007_public_detail`, `0008_explore_places`, `0009_explore_regions`, `0010_profile_avatars`. Mirrored in `public` and `test`.
 
 **Live DB status:** all migrations through `0008_explore_places` are **applied to the live DB**
 (0005–0008 applied 2026-07-07 — verified: anon+authenticated blocked from base `date_logs`,
 `explore_logs` anonymized, anon can read `explore_places`/`explore_place_logs`). `0009_explore_regions`
-is written but **not yet applied live** (dba to apply). This file matches the live schema through
-`0008`; the `0009` additions described below (function `derive_region`, `explore_places.region`,
-`explore_regions`) are forward-looking until applied.
+and `0010_profile_avatars` are written but **not yet applied live** (dba to apply — plan doc
+`docs/plan/11-profile-editing.md` recommends batching `0009`+`0010` together at the next live-apply
+pass). This file matches the live schema through `0008`; the `0009`/`0010` additions described below
+(function `derive_region`, `explore_places.region`, `explore_regions`, `profiles.custom_avatar_url`,
+the `avatars` bucket) are forward-looking until applied.
 
 ## Tables
 
@@ -21,7 +23,8 @@ is written but **not yet applied live** (dba to apply). This file matches the li
 | --- | --- | --- |
 | id | uuid PK | → auth.users(id) cascade |
 | nickname | text | not null |
-| avatar_url | text | |
+| avatar_url | text | OAuth-synced — backfilled from provider metadata on every login (`auth/callback`); never touched by the app otherwise |
+| custom_avatar_url | text | nullable, added `0010` (**not yet applied live**) — user's own uploaded avatar (`avatars` bucket). `NULL` = no custom avatar, fall back to `avatar_url`. Render rule everywhere: `custom_avatar_url ?? avatar_url ?? initials`. "Revert to Kakao photo" = set this back to `NULL`; `avatar_url` is left intact as the permanent OAuth fallback |
 | created_at | timestamptz | default now() |
 
 App upserts this after login (no auth trigger, to keep public/test schemas independent).
@@ -51,7 +54,7 @@ Indexes: `couples_partner_a_idx`, `couples_partner_b_idx`.
   escalation since it does no I/O beyond its own text argument.
 
 ## RLS policies (enabled on both tables)
-- **profiles**: select own row + connected partner's row + (since `0004_visibility`) any row when authenticated; insert/update own only.
+- **profiles**: select own row + connected partner's row + (since `0004_visibility`) any row when authenticated; insert/update own only. `0010_profile_avatars` added the `custom_avatar_url` column but **no new policy** — RLS is row-level, not column-level, so the existing `profiles_update` (`using/with check (id = auth.uid())`) already covers writes to the new column, and the existing `profiles_select` already covers a partner reading it.
 - **couples**: select/update only the two partners; insert as `partner_a = auth.uid()`. Joining goes through `join_couple()` (definer) so a stranger can't read a couple by code.
 
 ### `places` (shared reference — Kakao place)
@@ -154,6 +157,14 @@ explore anymore, but other UI still depends on it.
   anyone including anon** (`public_covers_public_read`, no folder scoping on reads — this bucket
   only ever holds explicitly-published copies). Global (not schema-mirrored). Public object URL:
   `/storage/v1/object/public/public-covers/<path>`.
+- Bucket `avatars` (**public**, added `0010`, **not yet applied live**) — user-uploaded profile
+  avatars, backing `profiles.custom_avatar_url`. Policy: authenticated users insert/update/delete
+  only within their own top-level folder (`<uid>/…`, `avatars_rw`); **SELECT is open to anyone
+  including anon** (`avatars_public_read`, no folder scoping — display avatars are low-sensitivity,
+  same stance as `public-covers`). Unlike the other buckets it carries server-side constraints
+  (`file_size_limit` 5MB, `allowed_mime_types image/*`) because it is public-read — without them an
+  authenticated user could host arbitrary files behind tokenless URLs. Global (not schema-mirrored).
+  Public object URL: `/storage/v1/object/public/avatars/<uid>/<file>`.
 
 ## Views
 - **`explore_logs`**, **`explore_log_places`** (added `0006`, `explore_logs` redefined

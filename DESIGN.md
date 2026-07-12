@@ -123,8 +123,8 @@ extrabold(800) 남발을 정리하고 **bold 헤딩 + regular/medium 본문**의
 web/mobile **별도 구현**, 토큰/스키마만 공유.
 
 - **atoms** — Button(**size 도입**), IconButton, **TextField(신설)**, Tag/Chip(카테고리), Avatar, Rating(하트/별), Thumbnail, MapMarker, ThemeToggle(3-way, **확장형** — 데스크톱 인라인 세그먼트 / 모바일 트리거+팝오버, 아래 스펙).
-- **molecules** — FormField, SearchBar(장소검색), PlaceCard, DateLogCard, RatingInput, PhotoThumbGrid item, CoupleBadge, CoverFallback(신규, 사진없음 폴백).
-- **organisms** — SiteHeader(통합), SiteFooter, PlaceList, DateLogFeed, RouteMap(Kakao), PhotoGallery, DateLogEditor.
+- **molecules** — FormField, SearchBar(장소검색), PlaceCard, DateLogCard, RatingInput, PhotoThumbGrid item, CoupleBadge, CoverFallback(신규, 사진없음 폴백), ArticleMeta·ArticleCard·ArticleSection(신규, 에디토리얼 — 아래 스펙).
+- **organisms** — SiteHeader(통합), SiteFooter, PlaceList, DateLogFeed, RouteMap(Kakao), PhotoGallery, DateLogEditor, ArticleFooter(신규, 다른 가이드 + 절제 CTA).
 - **templates** — AppShell(헤더+콘텐츠+탭바), PublicShell, FeedScreen, DetailScreen, EditorScreen.
 
 원칙: 작은 재사용 컴포넌트 다수. 반복 JSX = 추출 신호. import는 아래로만.
@@ -172,6 +172,34 @@ web/mobile **별도 구현**, 토큰/스키마만 공유.
 ### 카드
 
 radius 16, **테두리 or 얕은 그림자 택1**(이중 강조 금지), **흰 카드 on 웜 캔버스**. 사진 없을 때는 `CoverFallback`(단색 면 + 아이콘).
+
+### 장문 에디토리얼 (`/guide/[slug]` · `/guide` 인덱스, 2026-07-12 신설)
+
+상록 데이트 가이드 아티클(4~5편). 데이터 구조 `{ slug, title, description, publishedAt, tags, sections[] }` — **커버 이미지 없음**. 이미지 없이 성립하는 **텍스트-퍼스트 에디토리얼**. Notion식 조용한 장문 + 토스식 면 분리·여백. privacy/terms/guide/faq와 동일하게 `PublicShell` + `PageTitle` + **`max-w-2xl` 컨테이너**로 정렬(≈672px = 국문 장문 가독 measure ~35~45자/줄).
+
+**히어로 — 가짜 커버 금지, 타이포가 히어로.** 이미지가 없으므로 `CoverFallback` 틴트 면을 상단에 깔지 **않는다.** CoverFallback은 **고정 이미지 슬롯이 있는 카드/피드**를 위한 것(빈 슬롯을 채움) — 아티클 상세엔 슬롯 자체가 없으니 채울 대상이 없다. 가짜 틴트 히어로는 깨진 이미지/필러처럼 보여 오히려 감점. 대신:
+- **kicker(eyebrow):** 제목 위에 작은 브랜드색 라벨("데이트 가이드") — `text-sm font-semibold text-brand`. 온기 한 스푼 + 에디토리얼 정체성을 이미지 없이 부여.
+- **제목:** `PageTitle` 재사용, 에디토리얼이라 유틸 페이지(`text-2xl md:text-3xl`)보다 크게 **`text-3xl md:text-4xl`**.
+- **dek(요약=`description`):** 제목 아래 리드 문단 — `text-base md:text-lg leading-relaxed text-text-secondary`(본문보다 크고 secondary로 위계 분리).
+- **meta:** dek 아래 `ArticleMeta`(날짜 `<time dateTime>` + Tag 칩들). 헤더는 `border-b border-divider pb-8`로 본문과 분리(기존 guide/faq 헤더 관례 그대로).
+
+**장문 타이포·리듬:**
+- 섹션 heading(`h2`): `text-xl md:text-2xl font-bold tracking-tight text-text-primary`.
+- 본문 문단(`p`): **`text-base leading-relaxed text-text-primary`** — 장문은 secondary 아닌 **primary**(대비 여유, 긴 호흡 가독). `leading-relaxed`(1.625) 유지, 하드코딩 행간 금지.
+- 리듬: 섹션 간 `gap-10`(≈40, 유틸 페이지 24~32보다 한 단계 넉넉 — 장문 호흡), 섹션 내 heading→본문 `gap-3`, 문단 간 `gap-4`. 각 섹션 = `ArticleSection` molecule(h2 + 문단 스택).
+
+**하단(과하지 않게):** 본문 끝 → `border-t border-divider` → `ArticleFooter` organism.
+- **다른 가이드 더보기:** 현재 글 제외 2~3편을 `ArticleCard`(index와 동일)로. 그리드 남발 금지 — 단일 컬럼 스택.
+- **위로그 CTA:** 절제(품질 원칙 "위로그 언급 절제"). `brand-soft` 라운드 패널(radius-2xl, **소프트 면 단일 강조** — 테두리+그림자 이중 금지) 안에 한 문장 + Button 하나. 마케팅 배너화 금지.
+- 맨 아래 "가이드 목록으로" 되돌아가기 링크.
+
+**/guide 인덱스 재구성:** 신규 라우트 없이 **한 페이지 2섹션**(07의 "라우트 최소화" 방침 유지). 페이지 타이틀 "가이드"로 재프레이밍 후:
+1. **데이트 가이드**(아티클 목록) — 에디토리얼 콘텐츠가 유입의 주 동선이므로 위. `ArticleCard` 단일 컬럼 스택.
+2. **위로그 사용법**(제품 스텝) — 기존 `GuideStep` 리스트를 아래 보조 섹션으로. 두 섹션은 `h2` + 여백/디바이더로 명확히 구분.
+
+**ArticleCard(이미지 없음):** `PlaceCard` 관례 계승 — `Link` → `article`, `border border-border`(테두리 단일 강조, 그림자 없음), `hover:border-border-strong`, radius-2xl, `bg-surface`, `dark:border-border-strong`. 내용: Tag 칩 → 제목(`h3 text-lg font-bold tracking-tight`) → dek(`text-sm text-text-secondary`, 2줄 클램프) → `ArticleMeta`(날짜). **가짜 이미지 면 없음**(히어로 결정과 일관 — 정직한 텍스트 카드).
+
+**컴포넌트 레벨(GuideStep/FaqItem/PlaceCard 관례):** molecules `ArticleMeta`(날짜+Tag, 상세·카드 공용) · `ArticleCard`(index) · `ArticleSection`(상세 본문 섹션). organism `ArticleFooter`(다른 가이드 + CTA). template는 `PublicShell` 재사용(신규 없음). 날짜 포맷은 `Intl.DateTimeFormat('ko-KR')`(lib 유틸) — 하드코딩 문자열 금지. Article JSON-LD/per-article OG는 web-dev(커버 없으므로 `ogImage(null, title)` 관례).
 
 ## 지도 UI (Kakao Map)
 

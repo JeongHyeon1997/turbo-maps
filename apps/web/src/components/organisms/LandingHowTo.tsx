@@ -24,10 +24,10 @@ const STEPS = [
 
 /**
  * "사용 흐름" section (landing A5) — reuses `GuideStep` (07/guide) with a 4-step
- * condensed copy. Grid is `lg:grid-cols-2` (2×2) rather than Features' `lg:grid-cols-4`:
- * 4 steps split evenly into 2×2 with no orphan row, and the differing column count from
- * the immediately preceding Features grid keeps the two adjacent grids visually distinct
- * (DESIGN.md "랜딩 보강 섹션" — 리듬 주의).
+ * condensed copy. Steps are ordered content, so the grid stays single-column through
+ * `sm`/`md` (tablet) and only opens to `lg:grid-cols-2` (2×2) at `lg`+. This keeps the
+ * tablet layout a 1-column stack, visually distinct from Features' 2-column tablet grid,
+ * preserving section rhythm on adjacent sections (DESIGN.md "랜딩 보강 섹션" — 리듬 주의).
  */
 export function LandingHowTo() {
   return (
@@ -40,7 +40,7 @@ export function LandingHowTo() {
           복잡한 준비 없이, 오늘 다녀온 데이트부터 남겨 보세요.
         </p>
       </div>
-      <ol className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-2">
+      <ol className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-2">
         {STEPS.map((step, i) => (
           <GuideStep key={step.title} index={i + 1} title={step.title} body={step.body} />
         ))}

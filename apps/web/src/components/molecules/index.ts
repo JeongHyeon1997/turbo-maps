@@ -3,6 +3,7 @@ export { SectionHeader } from './SectionHeader';
 export { DateLogCard } from './DateLogCard';
 export { ConnectBanner } from './ConnectBanner';
 export { ProfileActions } from './ProfileActions';
+export { AvatarUploader } from './AvatarUploader';
 export { VisitedPlaceItem } from './VisitedPlaceItem';
 export { PhotoThumb } from './PhotoThumb';
 export { FeatureCard } from './FeatureCard';

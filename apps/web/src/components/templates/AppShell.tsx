@@ -6,6 +6,10 @@ interface ProfileRow {
   id: string;
   nickname: string | null;
   avatar_url: string | null;
+  // Optional: `custom_avatar_url` (migration 0010) may not exist on the live DB
+  // yet — the `select('*')` below degrades this to `undefined` rather than a
+  // 42703 error, and the coalesce below just falls through to `avatar_url`.
+  custom_avatar_url?: string | null;
 }
 
 const PARTNER_COLORS = [accentPalette.coral, accentPalette.lavender] as const;
@@ -15,7 +19,7 @@ function toDescriptor(profile: ProfileRow | undefined, order: number): AvatarDes
   return {
     initial: nickname ? nickname.slice(0, 1) : '?',
     color: PARTNER_COLORS[order % PARTNER_COLORS.length],
-    imageUrl: profile?.avatar_url ?? null,
+    imageUrl: profile?.custom_avatar_url ?? profile?.avatar_url ?? null,
     name: nickname ?? undefined,
   };
 }
@@ -40,10 +44,11 @@ async function resolveAvatars(): Promise<{ avatars: AvatarDescriptor[]; signedIn
       couple && (couple.partner_a === user.id ? couple.partner_b : couple.partner_a);
     const ids = [user.id, ...(partnerId ? [partnerId] : [])];
 
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, nickname, avatar_url')
-      .in('id', ids);
+    // `select('*')` (not an explicit column list): `custom_avatar_url` may not
+    // exist on the live DB yet, and PostgREST 42703s on a missing named column —
+    // `*` degrades that field to `undefined` instead of breaking the header for
+    // everyone (docs/plan/11).
+    const { data: profiles } = await supabase.from('profiles').select('*').in('id', ids);
 
     const byId = new Map((profiles ?? []).map((p) => [p.id, p as ProfileRow]));
     const avatars = ids.map((id, i) => toDescriptor(byId.get(id), i));

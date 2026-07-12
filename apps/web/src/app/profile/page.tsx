@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/templates';
-import { ProfileActions } from '@/components/molecules';
-import { Avatar, Button, PageTitle } from '@/components/atoms';
+import { AvatarUploader, ProfileActions } from '@/components/molecules';
+import { Button, PageTitle } from '@/components/atoms';
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -11,9 +11,13 @@ export default async function ProfilePage() {
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
+  // `select('*')` (not an explicit column list) on purpose: `custom_avatar_url`
+  // (migration 0010) may not exist on the live DB yet, and PostgREST 42703s on an
+  // explicit-but-missing column. The row is tiny, so `*` is cheap and degrades to
+  // `undefined` for the new field instead of breaking the page (docs/plan/11).
   const { data: profile } = await supabase
     .from('profiles')
-    .select('nickname, avatar_url')
+    .select('*')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -32,8 +36,13 @@ export default async function ProfilePage() {
   return (
     <AppShell>
       <div className="flex flex-col gap-6">
-        <div className="flex items-center gap-4">
-          <Avatar initial={nickname.slice(0, 1)} imageUrl={profile?.avatar_url} name={nickname} size={56} />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <AvatarUploader
+            userId={user.id}
+            nickname={nickname}
+            avatarUrl={profile?.avatar_url ?? null}
+            customAvatarUrl={profile?.custom_avatar_url}
+          />
           <div className="flex flex-col">
             <PageTitle className="text-xl">{nickname}</PageTitle>
             <span className="text-sm text-text-muted">기록 {count ?? 0}개</span>

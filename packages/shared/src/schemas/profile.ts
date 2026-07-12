@@ -4,6 +4,8 @@ export const profileSchema = z.object({
   id: z.string().uuid(),
   nickname: z.string().min(1).max(20),
   avatarUrl: z.string().url().nullable().optional(),
+  /** User-uploaded avatar override; falls back to `avatarUrl` (OAuth-synced) when null/unset. */
+  customAvatarUrl: z.string().url().nullable().optional(),
   createdAt: z.string().datetime().optional(),
 });
 export type Profile = z.infer<typeof profileSchema>;

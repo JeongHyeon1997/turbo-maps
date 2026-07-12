@@ -114,14 +114,15 @@ extrabold(800) 남발을 정리하고 **bold 헤딩 + regular/medium 본문**의
 - **인터랙티브 기본:** `transition-all duration-200 ease-out`. 버튼·링크·카드 hover/press.
 - **press feedback:** 버튼 `active:scale-[0.97]`.
 - **포커스 전역:** `focus-visible:ring-2 ring-brand`(키보드 포커스만, 마우스 클릭엔 링 없음).
-- **하단 시트:** 모바일 액션/선택은 **bottom sheet 슬라이드업** 패턴.
+- **하단 시트:** 모바일 **주요** 액션/선택(에디터·피커)은 **bottom sheet 슬라이드업** 패턴.
+- **소형 오버레이(팝오버/메뉴):** 헤더 우상단 등 저비용 선택은 앵커 팝오버 — `origin` 트리거 기준 `opacity+scale-95→100`, `duration-200 ease-out`. 바깥 탭·ESC 닫기, `prefers-reduced-motion`이면 페이드만. (예: ThemeToggle 모바일.)
 - **로딩:** 라우트 전환은 `loading.tsx` + **스켈레톤 셔머**(색 깜빡임 대신 면 셔머).
 
 ## Atomic Design 인벤토리 (구현: web-dev / app-dev)
 
 web/mobile **별도 구현**, 토큰/스키마만 공유.
 
-- **atoms** — Button(**size 도입**), IconButton, **TextField(신설)**, Tag/Chip(카테고리), Avatar, Rating(하트/별), Thumbnail, MapMarker, ThemeToggle(신규, 3-way).
+- **atoms** — Button(**size 도입**), IconButton, **TextField(신설)**, Tag/Chip(카테고리), Avatar, Rating(하트/별), Thumbnail, MapMarker, ThemeToggle(3-way, **확장형** — 데스크톱 인라인 세그먼트 / 모바일 트리거+팝오버, 아래 스펙).
 - **molecules** — FormField, SearchBar(장소검색), PlaceCard, DateLogCard, RatingInput, PhotoThumbGrid item, CoupleBadge, CoverFallback(신규, 사진없음 폴백).
 - **organisms** — SiteHeader(통합), SiteFooter, PlaceList, DateLogFeed, RouteMap(Kakao), PhotoGallery, DateLogEditor.
 - **templates** — AppShell(헤더+콘텐츠+탭바), PublicShell, FeedScreen, DetailScreen, EditorScreen.
@@ -146,6 +147,27 @@ web/mobile **별도 구현**, 토큰/스키마만 공유.
 - 높이 **52~56**, radius **12**, **흰 배경 + 1px 뉴트럴 테두리**, focus 시 **brand 2px 링**.
 - placeholder는 `input-placeholder` 토큰. 라벨은 `FormField`(molecule)로 조합.
 - 반복 JSX 제거 신호 — `logs/new`의 반복 input을 이 atom으로 교체.
+
+### ThemeToggle — 확장형 3-way (2026-07-12 개정)
+
+시스템/라이트/다크 전환. **"지금 뭐가 켜져 있고 뭘 고를 수 있는지"가 항상 보이게** 한다 — 뷰포트 폭에 따라 두 형태로 갈리되 상태는 공유한다.
+
+- **데스크톱(`md+`) = 인라인 세그먼트(상시 확장).** 3-세그먼트 pill(≈140px)이 헤더에 늘 보인다. 이미 "선택/가용"이 노출되므로 별도 확장 동작 없음. **변경 없음.**
+- **모바일(`< md`) = 트리거 + 팝오버(온디맨드 확장).** 07에서 오버플로났던 **블라인드 순환 버튼을 폐기**하고, 탭하면 아래로 펼쳐지는 팝오버 메뉴로 교체한다.
+  - **접힘(트리거):** 44×44 아이콘 버튼. **현재 테마 아이콘**(system=모니터 · light=해 · dark=달) + 작은 **caret**(펼쳐진다는 어포던스). 순환 버튼과 달리 caret이 "여기서 더 열린다"를 알린다.
+  - **펼침(팝오버):** 트리거 우측 하단 앵커(`right-0`, 아래로 전개 — **헤더 폭을 늘리지 않음**, 07 오버플로 재발 방지). 3행: `[아이콘] [라벨(시스템/라이트/다크)] [현재 선택 체크]`. 아이콘만이 아니라 **라벨 + 체크**로 상태를 명시 — 블라인드 순환 문제의 직접 해소.
+  - **선택 후:** 즉시 적용 + 팝오버 접힘, 트리거 아이콘이 새 상태로 갱신.
+  - **닫기:** 바깥 탭(document pointerdown) · ESC(포커스 트리거로 복귀) · Tab 이탈.
+
+**왜 팝오버(인라인 가로확장·바텀시트 아님):**
+- **인라인 가로확장 반려** — 트리거가 제자리에서 140px 세그먼트로 커지면 320px에서 `로고+세그먼트+로그인/아바타`가 다시 오버플로(07 이력). 팝오버는 오버레이라 **헤더 리플로우 0**.
+- **바텀시트 반려** — 모션 베이스라인상 바텀시트는 **주요 액션/선택**(에디터·피커)용. 테마 토글은 헤더 우상단의 저비용 설정이라, 트리거 근처 소형 앵커 팝오버가 비중에 맞고 포커스 이동도 짧다.
+
+**모션(절제 원칙 내):** 팝오버 `transition duration-200 ease-out`, `origin-top-right`, `opacity-0 scale-95 → opacity-100 scale-100`(약한 페이드+스케일). `prefers-reduced-motion`이면 페이드만.
+
+**접근성:** 트리거 `aria-haspopup="menu"`·`aria-expanded`·`aria-label="테마 선택, 현재 {라벨}"`. 팝오버 `role="menu"`, 항목 `role="menuitemradio"`·`aria-checked`. 키보드: Enter/Space 열기 → 열리면 위/아래 화살표 이동·Enter 선택·ESC 닫고 트리거로 포커스 복귀. 트리거 44×44, 각 행 `min-h 44`. 색만으로 상태 전달 금지 → 체크 아이콘 + 활성 텍스트색 병행. 마운트 전엔 중립 셸(FOUC 스크립트가 이미 시각적으로 해소).
+
+> 재사용: 지금은 팝오버를 `ThemeToggle` 내부에 둔다(단일 인스턴스 — "반복 JSX=추출" 신호 아직 아님). 두 번째 헤더 메뉴가 생기면 `Popover`/`Menu` molecule로 추출.
 
 ### 카드
 

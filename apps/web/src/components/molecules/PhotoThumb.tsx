@@ -9,7 +9,13 @@ export function PhotoThumb({ src, alt = '사진 미리보기', onRemove }: Photo
   return (
     <div className="relative aspect-square overflow-hidden rounded-xl border border-border bg-surface">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={alt} className="h-full w-full object-cover" />
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover"
+      />
       <button
         type="button"
         onClick={onRemove}

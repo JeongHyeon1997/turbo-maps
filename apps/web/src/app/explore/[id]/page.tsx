@@ -97,7 +97,12 @@ export default async function ExploreLogDetailPage({ params }: PageParams) {
       <JsonLd data={jsonLd} />
       <BackLink fallbackHref="/explore">‹ 탐색으로 돌아가기</BackLink>
 
-      <CoverHero title={log.title} dateLabel={formatLogDate(log.date)} coverImage={log.coverImage} />
+      <CoverHero
+        title={log.title}
+        dateLabel={formatLogDate(log.date)}
+        coverImage={log.coverImage}
+        priority
+      />
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         {avgRating > 0 && <HeartRating value={avgRating} />}

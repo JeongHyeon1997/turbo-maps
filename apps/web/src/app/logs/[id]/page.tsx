@@ -126,6 +126,7 @@ export default async function DateLogDetailPage({
           title={row.title ?? '무제 데이트'}
           dateLabel={formatLogDate(row.date)}
           coverImage={coverUrl}
+          priority
         />
 
         <div className="flex flex-wrap items-center justify-between gap-2">

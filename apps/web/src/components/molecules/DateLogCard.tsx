@@ -1,7 +1,14 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Tag, HeartRating, CoverFallback } from '@/components/atoms';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 import { formatLogDate } from '@/lib/format-date';
+import { isPublicCoverUrl } from '@/lib/storage/public-cover-url';
+
+/** Matches the feed grid's largest column share (`DateLogFeed`: 1 col mobile, 2
+ * col ≥640px, 3 col ≥1024px) so next/image requests an appropriately sized asset
+ * per breakpoint instead of the full viewport width. */
+const CARD_IMAGE_SIZES = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw';
 
 export interface DateLogCardProps {
   log: MockDateLog;
@@ -17,14 +24,32 @@ export interface DateLogCardProps {
 }
 
 function CardBody({ log }: { log: MockDateLog }) {
+  // `public-covers` cards (explore/landing feeds) are next/image-eligible; the
+  // private `date-photos` signed cover (home feed) stays a plain `<img>` — see
+  // `CoverHero`'s doc comment / docs/plan/12-performance.md STEP D, item 3.
+  const optimizable = !!log.coverImage && isPublicCoverUrl(log.coverImage);
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-surface transition-all duration-200 ease-out hover:border-border-strong dark:border-border-strong">
       <div className="relative flex h-40 items-end p-4">
         {log.coverImage ? (
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${log.coverImage})` }}
-          />
+          optimizable ? (
+            <Image
+              src={log.coverImage}
+              alt=""
+              fill
+              sizes={CARD_IMAGE_SIZES}
+              className="object-cover"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={log.coverImage}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )
         ) : (
           <CoverFallback className="absolute inset-0" />
         )}

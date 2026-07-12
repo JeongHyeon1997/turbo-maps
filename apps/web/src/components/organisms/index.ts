@@ -15,3 +15,4 @@ export { LandingFeatures } from './LandingFeatures';
 export { ExplorePreview } from './ExplorePreview';
 export { SiteFooter } from './SiteFooter';
 export { PolicyDocument } from './PolicyDocument';
+export { ArticleFooter } from './ArticleFooter';

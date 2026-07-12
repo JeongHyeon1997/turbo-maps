@@ -1,6 +1,6 @@
 ---
 status: doing
-last-updated: 2026-07-07
+last-updated: 2026-07-12
 owner: planner
 ---
 
@@ -44,8 +44,7 @@ STEP 0로 실데이터가 어느 정도 쌓인 뒤 착수. **발급된 publisher
        토큰 사용·재사용. env 없으면 렌더 스킵. **승인 후 발급되는 slot id 필요 → STEP 2 이후.**
 4. [ ] **배치(공개 페이지 한정)** — `/`(랜딩)·`/explore`·`/explore/[id]`·`/places`·`/places/[id]`에만.
        **로그인 후 개인 기록·작성·프로필 화면엔 광고 절대 금지**(사적 공간 + 정책 리스크). 자동광고보다 수동 배치.
-5. [ ] **동의(CMP / Consent Mode v2)** — 한국/EU 개인화 광고 동의 관리. Google 인증 CMP 또는 Consent Mode v2 연동.
-       `/privacy`의 쿠키·제3자 광고 고지와 문구 일치시키기.
+5. [x] **동의(CMP / Consent Mode v2)** — 완료(커밋 `67d5e7e`). `lib/consent.ts`(Consent Mode v2 default/update 시그널 + localStorage `welog-consent` + 인라인 default 스크립트가 AdSense 로더보다 먼저 실행) + `ConsentBanner` molecule(첫 방문 하단 배너, 동의/필수만, `/privacy` 링크) + 푸터 "쿠키 설정" 재오픈 링크(`CookieSettingsLink`, PublicShell 한정) + `/privacy` §5 문구 일치. 전부 `NEXT_PUBLIC_ADSENSE_CLIENT` env-gate — env 미설정이면 아무것도 렌더 안 됨.
 
 ## STEP 2 (신청·승인) — 사용자 작업
 - [ ] AdSense 계정 생성 + 사이트 `maps.weourus.xyz` 등록 → pub-id 발급.

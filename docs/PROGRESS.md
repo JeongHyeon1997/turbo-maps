@@ -10,7 +10,7 @@
 3. [ ] **커뮤니티 공간 (C-1: 좋아요·북마크부터)** — 커플 스코프 넘어 전체 유저 장소/코스 참여·발견. 결정됨: **지금은 헤더 IA에 진입점 자리만, 기능은 STEP0 실데이터 후.** C-1(좋아요·북마크·인기정렬, 익명 유지 가능)→C-2(따라하기)→C-3(정체성, **작성자 익명화 0007과 충돌 → ADR 선행**). → `docs/plan/06-community.md`. 담당 db-dev+web-dev+server-dev.
 4. [ ] **app-dev: 모바일 앱(Expo) Phase 1 — STEP 3(라우트/뷰)부터** — STEP 0(환경)+1(테마·atoms)+**2(OAuth 딥링크 인증, 지적반영까지 완료)** Done. 다음은 계획서 `docs/plan/09-mobile.md` STEP 3~5(홈/커플/기록 뷰, 작성은 STEP 6 후속). ⚠️ STEP 2 실기기 검증만 **OAuth 딥링크 대시보드 등록(Blocked)** 대기 — 뷰 STEP은 그와 무관하게 진행 가능.
 5. [ ] **프로필 직접 편집 (이미지 업로드 + 내정보)** — 사용자 요구("카카오에서 받아온 것 말고도 프로필이미지 등 변경"). 계획서 신설 → `docs/plan/11-profile-editing.md`. 핵심 결정: **`custom_avatar_url` 컬럼 분리(OAuth `avatar_url`은 폴백 보존)** + 신규 public `avatars` 버킷(`0010`, public/test·글로벌 버킷) + 렌더 코얼레스(`custom ?? avatar_url`). bio는 컷(공개 소비처 없음). STEP: db-dev(0010)→schema-dev(Zod)→web-dev(AvatarUploader+profile/AppShell 배선)→reviewer/build-qa. **mobile은 09 Phase 1 뷰 이후 후속(STEP 5).** mobile 트랙(4번)과 병렬 가능.
-6. [ ] **웹 성능 최적화** — 성능 감사(perf audit)가 **현재 백그라운드 진행 중**이며, 결과·개선 항목은 **별도 세션/후속에서 docs에 기록될 예정**. 이 항목은 자리표시자 — 감사 리포트 도착 시 착수 범위 확정.
+6. [ ] **웹 성능 최적화** — 성능 감사 **완료·계획서 기록됨** → `docs/plan/12-performance.md`(우선순위표 15항목·STEP A~F). 착수 가능. **⚠️ STEP 착수 조건: web-dev가 11번 아바타 배선 중이라 `AppShell.tsx`/`server.ts`/이미지 컴포넌트 충돌 — 성능 STEP C·D는 11번 web STEP 완료 후.** 선행 가능: STEP A(리전 확인, **사용자/대시보드 Blocked 성격**), STEP B(Pretendard self-host·BMJUA 서브셋, 11 무관). High=폰트 렌더블로킹(1)·캐시부재(2)·이미지(3)·리전(4). 실측(Speed Insights/TTFB)은 대시보드 필요 → Blocked 참고.
 7. [ ] **콘텐츠 A1 아티클 사용자 검수** — 에디토리얼 5편 라이브 반영 완료(아래 Done). planner 초안이므로 **사용자가 `apps/web/src/content/guides.ts` 문구를 읽고 본인 목소리로 보강 권장**(AdSense 오리지널리티). 지속 발행 여부는 초기 유입 보고 후 결정. 여력 시 3위 A5 랜딩 보강+A4 About 심화 → `docs/plan/10-content.md`.
 8. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
@@ -30,6 +30,7 @@
 - [ ] **0009 라이브 적용 대기** — `0009_explore_regions`(explore_places.region + explore_regions 뷰) 파일 작성·검증 완료, **프로덕션 DB 적용은 자동 승인 거부**됨(사용자 권한 필요). 공개 로그 0건이라 급하지 않음 — STEP0 실데이터 넣을 때 dba로 함께 적용 권장. 그전까진 웹 지역 페처가 `[]`로 degrade.
 - [ ] **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT`** — 코드/`.env.example`엔 `ca-pub-5362531643629275` 반영됨. AdSense 로더가 프로덕션에서 실제 로드되려면 사용자가 Vercel `maps-web` 프로젝트 env에 이 값을 설정해야 함(미설정 시 graceful 미로드).
 - [ ] **카카오 OG 캐시 초기화** — 공개 상세 OG(og-default/커버) 반영 후, 이미 공유된 URL은 카카오가 캐시하므로 https://developers.kakao.com/tool/debugger/sharing 에서 초기화해야 새 썸네일이 뜸.
+- [ ] **성능: Vercel↔Supabase 리전 확인 + Speed Insights 실측 (대시보드 필요)** — (a) Vercel 함수 리전과 Supabase 리전(서울) 대조 → 불일치 시 `vercel.json regions:["icn1"]`(코드는 planner가 못 봄, 확인 후 반영). (b) 성능 STEP 전후 Speed Insights/`curl` TTFB 기록으로 효과 검증(현재 실측 0). → `docs/plan/12-performance.md` STEP A·열린 질문 1·2.
 - [ ] **모바일 OAuth 딥링크 등록 (09 STEP 2 실기기 검증 선행 — 코드는 완료됨)** — (a) Supabase Auth → URL Configuration → Redirect URLs, (b) Kakao Developers / Google Cloud OAuth 콘솔 redirect URI에 **둘 다** 추가: ① Expo Go 개발용 `https://auth.expo.io/@<expo-username>/maps` ② dev build용 `maps://auth/callback`. 등록 후 실기기에서 카카오/구글 로그인→세션 유지 확인. → `docs/plan/09-mobile.md` 열린 질문 3·5.
 
 ## 완료 (Done)

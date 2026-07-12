@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { theme } from '@maps/tokens';
-import { ScreenView, AppText } from '@/components/atoms';
+import { ScreenView, AppText, Button } from '@/components/atoms';
 import { supabase } from '@/lib/supabase';
 
 // Placeholder copy for the two branches that don't have a real destination
@@ -10,57 +10,40 @@ import { supabase } from '@/lib/supabase';
 // these with `router.replace(...)` once those routes exist. Navigating to a
 // route that doesn't exist would break the `expo-router` typed-routes build,
 // so this screen stays mounted and swaps its own copy instead.
-type BootState = 'checking' | 'no-couple' | 'connected';
+type BootState = 'checking' | 'no-couple' | 'connected' | 'error';
 
 /**
  * Boot gate (docs/plan/09-mobile.md STEP 2): reads the persisted Supabase
  * session first. No session → redirect to the one real destination that
  * exists so far, `/login`. A session gates further on couple status, but
  * only renders in place for now (see `BootState` comment).
+ *
+ * Session tracking relies solely on `onAuthStateChange` — it fires an
+ * `INITIAL_SESSION` event with the persisted session as soon as the client
+ * has rehydrated it, so there's no separate `getSession()` call (that would
+ * both duplicate the query and, more importantly, run inside the
+ * `onAuthStateChange` callback tick, which Supabase's docs flag as a
+ * deadlock risk for any `await`-ing Supabase call). Only the user *id* is
+ * kept — `TOKEN_REFRESHED` delivers a new Session reference for the same
+ * user, and keying the couples lookup off the id keeps those refreshes from
+ * re-running the query and flashing the checking copy. The lookup lives in
+ * its own effect, so it always runs on a later tick, outside the callback.
  */
 export default function Home() {
   const [state, setState] = useState<BootState>('checking');
+  // `undefined` = not yet resolved by `onAuthStateChange`, `null` = resolved, no session.
+  const [userId, setUserId] = useState<string | null | undefined>(undefined);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function evaluate() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        router.replace('/login');
-        return;
-      }
-
-      // TODO(STEP 3): no connected couple → router.replace('/couple-connect').
-      // TODO(STEP 4): connected couple → router.replace('/(tabs)/home').
-      const { data: couple } = await supabase
-        .from('couples')
-        .select('status')
-        .or(`partner_a.eq.${session.user.id},partner_b.eq.${session.user.id}`)
-        .maybeSingle();
-
-      if (cancelled) return;
-      setState(couple?.status === 'connected' ? 'connected' : 'no-couple');
-    }
-
-    void evaluate();
-
-    // Re-evaluate on auth changes — e.g. the login screen just exchanged a
-    // code and this screen is still mounted underneath it (`router.replace`
-    // keeps the previous screen alive for the transition), or the session
-    // was cleared by a sign-out elsewhere.
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (cancelled) return;
-      if (!session) {
-        router.replace('/login');
-      } else {
-        void evaluate();
-      }
+      // Only ever set local state here — no Supabase calls in this callback.
+      setUserId(nextSession?.user.id ?? null);
     });
 
     return () => {
@@ -68,6 +51,44 @@ export default function Home() {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (userId === undefined) return; // `onAuthStateChange` hasn't resolved yet.
+
+    if (userId === null) {
+      router.replace('/login');
+      return;
+    }
+
+    let cancelled = false;
+    setState('checking');
+
+    // TODO(STEP 3): no connected couple → router.replace('/couple-connect').
+    // TODO(STEP 4): connected couple → router.replace('/(tabs)/home').
+    (async () => {
+      const { data: couple, error } = await supabase
+        .from('couples')
+        .select('status')
+        .or(`partner_a.eq.${userId},partner_b.eq.${userId}`)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      // A failed query (offline, timeout, …) is not the same as "no couple
+      // row" — don't let a network hiccup route an actually-connected couple
+      // into the no-couple branch. Surface it as its own state instead.
+      if (error) {
+        setState('error');
+        return;
+      }
+
+      setState(couple?.status === 'connected' ? 'connected' : 'no-couple');
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, retryCount]);
 
   return (
     <ScreenView>
@@ -79,7 +100,13 @@ export default function Home() {
           {state === 'checking' && '커플의 데이트 · 맛집 · 경로 기록'}
           {state === 'no-couple' && '커플 연결 화면이 곧 여기로 연결돼요 (STEP 3).'}
           {state === 'connected' && '홈 피드가 곧 여기로 연결돼요 (STEP 4).'}
+          {state === 'error' && '커플 정보를 불러오지 못했어요. 연결 상태를 확인해 주세요.'}
         </AppText>
+        {state === 'error' && (
+          <Button size="sm" variant="ghost" onPress={() => setRetryCount((count) => count + 1)}>
+            다시 시도
+          </Button>
+        )}
       </View>
     </ScreenView>
   );

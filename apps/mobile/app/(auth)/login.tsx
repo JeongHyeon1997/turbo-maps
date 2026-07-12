@@ -62,6 +62,8 @@ export default function LoginScreen() {
 
         {error && (
           <View
+            accessibilityRole="alert"
+            accessibilityLiveRegion="polite"
             style={[
               styles.errorBox,
               { backgroundColor: `${themeColors.danger}1A`, borderColor: `${themeColors.danger}4D` },
@@ -78,6 +80,7 @@ export default function LoginScreen() {
             label={loading === 'kakao' ? LOADING_LABEL.kakao : IDLE_LABEL.kakao}
             onPress={() => signIn('kakao')}
             disabled={loading !== null}
+            loading={loading === 'kakao'}
             bg={KAKAO_BG}
             fg={KAKAO_FG}
           />
@@ -85,6 +88,7 @@ export default function LoginScreen() {
             label={loading === 'google' ? LOADING_LABEL.google : IDLE_LABEL.google}
             onPress={() => signIn('google')}
             disabled={loading !== null}
+            loading={loading === 'google'}
             bg="#FFFFFF"
             fg={colors.textPrimary}
           />

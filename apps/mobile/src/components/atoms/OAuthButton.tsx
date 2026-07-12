@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 import { theme } from '@maps/tokens';
 import { AppText } from './AppText';
 
@@ -6,6 +6,14 @@ export interface OAuthButtonProps {
   label: string;
   onPress?: () => void;
   disabled?: boolean;
+  /**
+   * This button's own request is in flight — shows a spinner instead of the
+   * label and skips the disabled-dim treatment (it's clearly busy, not
+   * merely inactive). A sibling button that's `disabled` but not `loading`
+   * still dims, so the two read as "this one is working" vs. "this one is
+   * blocked for now".
+   */
+  loading?: boolean;
   /**
    * Raw hex — these are third-party brand colors (e.g. Kakao's mandated
    * `#FEE500`/`#191600`, Google's fixed white button), not `@maps/tokens`
@@ -18,24 +26,35 @@ export interface OAuthButtonProps {
 }
 
 /** Full-width social sign-in button — mirrors the web `OAuthButton` atom. */
-export function OAuthButton({ label, onPress, disabled, bg, fg = '#FFFFFF' }: OAuthButtonProps) {
+export function OAuthButton({
+  label,
+  onPress,
+  disabled,
+  loading,
+  bg,
+  fg = '#FFFFFF',
+}: OAuthButtonProps) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: !!disabled }}
+      accessibilityState={{ disabled: !!disabled, busy: !!loading }}
       disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
         {
           backgroundColor: bg,
-          opacity: disabled ? 0.6 : pressed ? 0.85 : 1,
+          opacity: loading ? 1 : disabled ? 0.6 : pressed ? 0.85 : 1,
         },
       ]}
     >
-      <AppText variant="button" style={{ color: fg }}>
-        {label}
-      </AppText>
+      {loading ? (
+        <ActivityIndicator color={fg} />
+      ) : (
+        <AppText variant="button" style={{ color: fg }}>
+          {label}
+        </AppText>
+      )}
     </Pressable>
   );
 }

@@ -60,6 +60,11 @@ export default async function GuideArticlePage({ params }: PageParams) {
   const article = findArticle(slug);
   if (!article) notFound();
 
+  // `author` + `publisher.logo` are both required for Article rich-result
+  // eligibility (Google's structured-data guidelines), not just recommended —
+  // reviewer/uiux-reviewer flagged their absence. `publisher.logo.url` reuses
+  // the same `SITE_URL` + `public/logo.png` pairing `og-image.ts` uses for the
+  // brand default OG image, so it stays in lockstep with that asset.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -67,7 +72,12 @@ export default async function GuideArticlePage({ params }: PageParams) {
     description: article.description,
     datePublished: article.publishedAt,
     url: `${SITE_URL}/guide/${article.slug}`,
-    publisher: { '@type': 'Organization', name: '위로그' },
+    author: { '@type': 'Organization', name: '위로그' },
+    publisher: {
+      '@type': 'Organization',
+      name: '위로그',
+      logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png` },
+    },
   };
 
   return (

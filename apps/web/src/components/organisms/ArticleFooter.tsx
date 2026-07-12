@@ -43,9 +43,9 @@ export function ArticleFooter({ currentSlug }: ArticleFooterProps) {
 
       <Link
         href="/guide"
-        className="self-start rounded text-sm font-medium text-text-secondary transition-colors duration-200 ease-out hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        className="inline-flex min-h-11 w-fit items-center rounded text-sm font-medium text-text-secondary transition-colors duration-200 ease-out hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
       >
-        ‹ 가이드 목록으로
+        <span aria-hidden="true">‹ </span>가이드 목록으로
       </Link>
     </footer>
   );

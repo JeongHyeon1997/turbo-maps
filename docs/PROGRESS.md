@@ -8,32 +8,43 @@
        커플 실테스트를 겸해 **공개 데이트 코스 8~15건 작성**(공개 토글 ON + 커버 사진 + 장소/평점). `/explore`·`/places`·`/explore/regions`를 빈 화면이 아니게 만든다. → `docs/plan/03-adsense.md` STEP 0. **이게 AdSense·지역탐색·심사의 사실상 공통 선행조건.** (데이터 무관한 아래 2·3은 지금 병행 가능.)
 2. [ ] **AdSense STEP 1 잔여** — 로더·`ads.txt`(pub `ca-pub-5362531643629275`)·env·**CMP/Consent Mode v2(커밋 `67d5e7e`, 배너+푸터 쿠키설정+privacy 문구)** 전부 **완료**. 남은 것: **AdUnit 컴포넌트 + 공개 페이지 배치 — 둘 다 STEP2 승인 후 slot id 발급돼야 가능(지금 개발 불가)**. **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT` 설정은 Blocked 참고.** → `docs/plan/03-adsense.md`. 담당 web-dev.
 3. [ ] **커뮤니티 공간 (C-1: 좋아요·북마크부터)** — 커플 스코프 넘어 전체 유저 장소/코스 참여·발견. 결정됨: **지금은 헤더 IA에 진입점 자리만, 기능은 STEP0 실데이터 후.** C-1(좋아요·북마크·인기정렬, 익명 유지 가능)→C-2(따라하기)→C-3(정체성, **작성자 익명화 0007과 충돌 → ADR 선행**). → `docs/plan/06-community.md`. 담당 db-dev+web-dev+server-dev.
-4. [ ] **app-dev: 모바일 앱(Expo) Phase 1 — STEP 3(라우트/뷰)부터** — STEP 0(환경)+1(테마·atoms)+**2(OAuth 딥링크 인증, 지적반영까지 완료)** Done. 다음은 계획서 `docs/plan/09-mobile.md` STEP 3~5(홈/커플/기록 뷰, 작성은 STEP 6 후속). ⚠️ STEP 2 실기기 검증만 **OAuth 딥링크 대시보드 등록(Blocked)** 대기 — 뷰 STEP은 그와 무관하게 진행 가능.
-5. [ ] **프로필 직접 편집 — DB·shared·web STEP 완료, 라이브 적용·실동작·mobile 잔여** — `docs/plan/11-profile-editing.md`(status: web STEP 완료). 완료(아래 Done): 0010 마이그레이션+AvatarUploader+코얼레스 배선, reviewer PASS. **잔여: (a) 0010 라이브 적용(0009와 배치, 사용자 승인 — Blocked), (b) 적용 후 실동작 확인(업로드→헤더 반영→되돌리기), (c) mobile 이식은 09 Phase 1 뷰 이후.**
-6. [ ] **웹 성능 최적화 — STEP B 완료, 다음은 STEP C(페칭/캐시)** — `docs/plan/12-performance.md`. STEP B(폰트) 완료(아래 Done). **11번 web STEP이 끝나 STEP C 착수 조건 충족(`AppShell.tsx`/`server.ts` 충돌 해소).** ⚠️ **STEP C(감사 2·5·6·10)는 공개 페이지 `revalidate 120s` 등 제품 동작 변화가 있어 사용자 확인 후 진행 권장.** 이어 STEP D(이미지 3·11)·E·F(dba). STEP A(리전 확인)·실측은 대시보드 필요 → Blocked 참고.
+4. [ ] **app-dev: 모바일 앱(Expo) Phase 1 — STEP 4(탭 홈)부터** — STEP 0(환경)+1(테마·atoms)+2(OAuth 딥링크)+**3(커플 연결 화면·부팅게이트 no-couple 분기, `bc040e6`)** Done. 다음은 계획서 `docs/plan/09-mobile.md` STEP 4~5(탭 홈/기록 뷰, 작성은 STEP 6 후속). ⚠️ STEP 2 실기기 검증만 **OAuth 딥링크 대시보드 등록(Blocked)** 대기 — 뷰 STEP은 그와 무관하게 진행 가능.
+5. [ ] **프로필 직접 편집 — DB·shared·web STEP 완료, 라이브 적용·실동작·mobile 잔여** — `docs/plan/11-profile-editing.md`(status: web STEP 완료). 완료(아래 Done): 0010 마이그레이션+AvatarUploader+코얼레스 배선, reviewer PASS. **잔여: (a) 0010 라이브 적용(0009·0011과 배치, 사용자 명시 승인 필요 — Blocked), (b) 적용 후 실동작 확인(업로드→헤더 반영→되돌리기), (c) mobile 이식은 09 Phase 1 뷰 이후.**
+6. [ ] **웹 성능 최적화 — STEP C 완료, 다음은 STEP D(이미지)** — `docs/plan/12-performance.md`. STEP B(폰트)+C(페칭/캐시) 완료(아래 Done). **다음 = STEP D(이미지 3·11): next/image remotePatterns + 커버/썸네일 전환.** 이어 STEP E·F(dba). STEP A(리전 확인)·실측은 대시보드 필요 → Blocked 참고. ⚠️ STEP C 부작용: **공개 로그 발행 반영이 최대 120s 지연**(클라 직접 insert라 revalidateTag 미배선 — STEP E 후보 또는 발행 경로 서버화 시 해소).
 7. [ ] **콘텐츠 A1 아티클 사용자 검수** — 에디토리얼 5편 라이브 반영 완료(아래 Done). planner 초안이므로 **사용자가 `apps/web/src/content/guides.ts` 문구를 읽고 본인 목소리로 보강 권장**(AdSense 오리지널리티). 지속 발행 여부는 초기 유입 보고 후 결정. 여력 시 3위 A5 랜딩 보강+A4 About 심화 → `docs/plan/10-content.md`.
 8. [ ] (나중) api Kakao 장소검색 프록시 (서버리스는 배포됨, map-api.weourus.xyz).
 
 ## 진행중 (Doing)
-- **⏸ 사용자 중단 지점(2026-07-12): 이번 세션 = 검수 지적 반영 → 프로필 편집(11) DB+web → 성능(12) 계획서+STEP B까지 완료.** 다음 세션은 셋 중 택: **①0010/0009 라이브 적용(사용자·dba) ②성능 STEP C(페칭/캐시, 제품동작 변화라 사용자 확인 후) ③mobile STEP 3(뷰).**
-  - **프로필 편집(11) DB+shared+web 완료(`c4c294f`+`b2dbd08`)** — 0010(custom_avatar_url public/test + avatars 버킷, file_size_limit 5MB·mime image/* 서버제약)·AvatarUploader molecule·`/profile`+AppShell 코얼레스·shared customAvatarUrl. reviewer PASS(Med2·Low1 전건). 잔여는 `## 다음` 5번.
-  - **성능(12) 계획서+STEP B 완료(`fa61d79`+`516584a`)** — 감사 15항목 계획서화 + STEP B(Pretendard @import→preconnect+버전고정 pretendard@1.3.9, **fontFamily 'Pretendard'↔CDN 'Pretendard Variable' 불일치로 본문이 시스템 폴백 중이던 버그 수정**, BMJUA 1.5MB→18KB 서브셋, 미사용 TTF 4종 삭제). 다음은 STEP C(`## 다음` 6번).
-  - **mobile STEP 2(OAuth 딥링크) 완료(`c157ec2`+`6a8d374`)** — 다음 STEP 3(뷰). 실기기 검증만 Blocked(딥링크 등록).
+- **⏸ 사용자 중단 지점(2026-07-12): "알아서 진행" 위임으로 mobile STEP 3 + 0011 가드 + 성능 STEP C까지 완료.** 다음 착수 후보: **①사용자 명시 승인 후 0009~0011 라이브 적용 ②성능 STEP D(이미지) ③mobile STEP 4(탭 홈).** ※ DB 라이브 적용은 "알아서 진행"으로 불충분 — 사용자가 명시적으로 "0009~0011 라이브 적용해"라고 해야 진행(Blocked).
+  - **mobile STEP 3 완료(`bc040e6`)** — `(auth)/couple-connect` 화면(초대코드 생성/표시 + join_couple RPC 조인, 웹 미러, atoms 조합) + 부팅게이트 no-couple 분기 실연결(router.replace). reviewer Med1(커플 보유 시 join 폼 노출→이중 소속) 반영: 웹·모바일 양쪽 join 폼 숨김. typecheck/lint/expo export PASS. 다음 STEP 4.
+  - **0011_join_couple_guard 신규(`9eb7420`)** — 위 결함의 DB 근본 방어: join_couple 이미-소속 거부(기존 exception 계약 유지) + couples partner_a unique·partner_b 부분 unique 인덱스. SCHEMA.md 동기. **라이브 적용 대기가 0009+0010+0011 셋으로 늘어남**(0011은 적용 전 중복 소속 데이터 사전 점검 필요 — 마이그레이션 헤더 참고).
+  - **성능 STEP C 완료(`38a9a21`)** — anon 싱글턴 + 공개 fetcher `unstable_cache`(120s, tag explore) + `React.cache` getUser/getCouple(요청당 auth 1회) + Promise.all 병렬화 + generateMetadata dedupe + sitemap revalidate 3600 + couple/connect join 폼 숨김. reviewer 캐시 정확성/보안 PASS(치명 0, Low2 무영향 기록: anon.ts 스키마 env 분기 잠재 불일치·server-only 가드 부재). **주의: 공개 로그 발행 반영 최대 120s 지연**(revalidateTag 미배선). 다음 STEP D.
+  - **프로필/성능 STEP B(직전)·mobile STEP 2** — 아래 Done. avatar 라이브적용·성능 리전은 사용자/대시보드 대기.
 - **콘텐츠 A트랙(10-content) 1차+2차 완료(2026-07-12)** — 사용자 피드백("확장형 모드변경"+"더 많은 콘텐츠")을 designer/planner 논의로 확정 후 반영: 모바일 ThemeToggle 팝오버 전환 + `/faq`·`/guide` 신설 + **에디토리얼 아티클 5편(`/guide/[slug]`)**(아래 Done). 사용자가 "가이드대로 진행" 위임 → 최소 매거진(상록 5편)·planner 초안→사용자 검수 방식으로 확정 진행. 잔여: 아티클 문구 사용자 검수(`## 다음` 5번).
-- **모바일 앱(Expo) Phase 1 진행중(2026-07-12)** — `docs/plan/09-mobile.md` STEP 0+1+2 완료(각 reviewer 지적 반영까지, 아래 Done). **다음: STEP 3(라우트/뷰).** STEP 2 실기기 검증만 Blocked(딥링크 등록) 후. 열린 질문은 planner 권장안으로 진행 중(작성=STEP 6 후속·지도=WebView·Expo Go 우선).
-- **다음 세션 시작점:** 웹 큰 건은 STEP 0(사용자 실데이터) 대기. 지금 진행 가능 트랙 = mobile 뷰(4번, STEP 3) · 성능 STEP C(6번, 사용자 확인 후). 프로필(5번)·성능 리전(STEP A)은 사용자 라이브적용/대시보드 대기.
+- **모바일 앱(Expo) Phase 1 진행중(2026-07-12)** — `docs/plan/09-mobile.md` STEP 0~3 완료(각 reviewer 지적 반영까지, 아래 Done). **다음: STEP 4(탭 홈).** STEP 2 실기기 검증만 Blocked(딥링크 등록) 후. 열린 질문은 planner 권장안으로 진행 중(작성=STEP 6 후속·지도=WebView·Expo Go 우선).
+- **다음 세션 시작점:** 웹 큰 건은 STEP 0(사용자 실데이터) 대기. 지금 진행 가능 트랙 = mobile STEP 4(4번) · 성능 STEP D(6번, 이미지). DB 라이브적용(0009~0011)·성능 리전(STEP A)은 사용자 명시 승인/대시보드 대기.
 
 ## 막힘 (Blocked) — 사용자 승인/대시보드 필요
 - [ ] **커플 연결 실테스트(두 계정)** — 코드(아바타 포함) 완료. 사용자가 2계정으로 실검증: A 초대코드 생성 → B `/couple/connect` 입력 → 양쪽 헤더 아바타/status=connected/커플 스코프 공유 확인. (※ `## 다음` STEP 0와 겸해서 진행 가능)
 - [ ] **api CORS_ORIGINS prod 반영** — `.env.example`/로컬엔 `https://maps.weourus.xyz` 추가됨. Vercel production 값은 사용자가 `vercel env`로 반영. (웹은 Supabase 직접 호출이라 당장 blocking 아님)
 - [ ] **SSO 동의화면 앱명 위로그로** — Kakao Developers / Google Cloud OAuth 동의화면 App name·아이콘을 "위로그"로. (코드 아님)
-- [ ] **0009 + 0010 라이브 적용 대기** — `0009_explore_regions`(explore_places.region + explore_regions 뷰) + `0010_profile_avatars`(profiles.custom_avatar_url public/test + `avatars` public 버킷, file_size_limit 5MB·mime image/*) 둘 다 파일 작성·검증 완료, **프로덕션 DB 적용은 사용자 권한 필요**. **0009+0010 배치로 dba 적용 권장.** 미적용 시: 지역 페처 `[]` degrade / 프로필 아바타 업로드는 `custom_avatar_url` select가 degrade(select('*') 폴백)라 기존 avatar_url 표시는 유지되나 커스텀 업로드 저장은 컬럼/버킷 없어 실패. 적용 후 실동작 확인(업로드→헤더 반영→되돌리기).
+- [ ] **⚠️ 0009 + 0010 + 0011 라이브 적용 대기 (사용자 명시 승인 필요)** — 세 마이그레이션 파일 작성·검증 완료. dba로 적용 시도했으나 **"알아서 진행" 위임으로는 프로덕션 DB 변경 승인 불충분 판정** → **사용자가 명시적으로 "0009~0011 라이브 적용해"라고 해야 진행 가능.** 배치 적용 권장.
+  - `0009_explore_regions`: explore_places.region + explore_regions 뷰. 미적용 시 지역 페처 `[]` degrade.
+  - `0010_profile_avatars`: profiles.custom_avatar_url(public/test) + `avatars` public 버킷(5MB·image/*). 미적용 시 아바타 표시는 select('*') 폴백으로 유지되나 커스텀 업로드 저장 실패.
+  - `0011_join_couple_guard`: join_couple 이미-소속 거부 + couples partner unique 인덱스. **적용 전 기존 중복 소속 데이터 사전 점검 필요**(마이그레이션 헤더 참고 — unique 인덱스가 기존 위반 행에서 실패할 수 있음).
+  - 적용 후: 아바타 실동작(업로드→헤더 반영→되돌리기) + join 이중소속 거부 확인.
 - [ ] **Vercel env `NEXT_PUBLIC_ADSENSE_CLIENT`** — 코드/`.env.example`엔 `ca-pub-5362531643629275` 반영됨. AdSense 로더가 프로덕션에서 실제 로드되려면 사용자가 Vercel `maps-web` 프로젝트 env에 이 값을 설정해야 함(미설정 시 graceful 미로드).
 - [ ] **카카오 OG 캐시 초기화** — 공개 상세 OG(og-default/커버) 반영 후, 이미 공유된 URL은 카카오가 캐시하므로 https://developers.kakao.com/tool/debugger/sharing 에서 초기화해야 새 썸네일이 뜸.
 - [ ] **성능: Vercel↔Supabase 리전 확인 + Speed Insights 실측 (대시보드 필요)** — (a) Vercel 함수 리전과 Supabase 리전(서울) 대조 → 불일치 시 `vercel.json regions:["icn1"]`(코드는 planner가 못 봄, 확인 후 반영). (b) 성능 STEP 전후 Speed Insights/`curl` TTFB 기록으로 효과 검증(현재 실측 0). → `docs/plan/12-performance.md` STEP A·열린 질문 1·2.
 - [ ] **모바일 OAuth 딥링크 등록 (09 STEP 2 실기기 검증 선행 — 코드는 완료됨)** — (a) Supabase Auth → URL Configuration → Redirect URLs, (b) Kakao Developers / Google Cloud OAuth 콘솔 redirect URI에 **둘 다** 추가: ① Expo Go 개발용 `https://auth.expo.io/@<expo-username>/maps` ② dev build용 `maps://auth/callback`. 등록 후 실기기에서 카카오/구글 로그인→세션 유지 확인. → `docs/plan/09-mobile.md` 열린 질문 3·5.
 
 ## 완료 (Done)
+
+### "알아서 진행" 추가분 — mobile STEP 3 + 0011 가드 + 성능 STEP C (2026-07-12 세션)
+- [x] **mobile STEP 3 — 커플 연결 화면 (커밋 `bc040e6`, `docs/plan/09`)** — `(auth)/couple-connect`(초대코드 생성/표시 + `join_couple` RPC 조인, 웹 미러, atoms 조합) + 부팅게이트 no-couple 분기 실연결(`router.replace`). reviewer Med1(커플 보유 시 join 폼 노출→이중 소속 가능) 반영: **웹·모바일 양쪽 join 폼 숨김.** typecheck/lint/expo export PASS. 다음 STEP 4(탭 홈).
+- [x] **0011_join_couple_guard 마이그레이션 (커밋 `9eb7420`)** — reviewer 발견 결함(이중 소속)의 DB 근본 방어: `join_couple`에 이미-소속 거부(기존 exception 계약 유지) + couples `partner_a` unique·`partner_b` 부분 unique 인덱스. SCHEMA.md 동기. **라이브 적용은 Blocked(0009+0010과 배치, 사용자 명시 승인·중복 데이터 사전 점검).**
+- [x] **성능 STEP C — 페칭/캐시 (커밋 `38a9a21`, `docs/plan/12`)** — anon 싱글턴(`lib/supabase/anon.ts`) + 공개 fetcher `unstable_cache`(120s, tag explore) + `React.cache` getUser/getCouple(요청당 auth 1회) + Promise.all 워터폴 병렬화 + generateMetadata dedupe + sitemap `revalidate 3600` + couple/connect join 폼 숨김. **reviewer 캐시 정확성/보안 PASS**(치명 0, Low2 무영향 기록: anon.ts 스키마 env 분기 잠재 불일치·server-only 가드 부재). **부작용 기록: 공개 로그 발행 반영 최대 120s 지연**(클라 직접 insert라 revalidateTag 미배선). 다음 STEP D(이미지).
+  - **기존 이슈 발견(이번 변경 무관, SEO 후속):** loading.tsx 있는 동적 상세 라우트(`/explore/[id]` 등)가 존재하지 않는 id에서 404 대신 200+스트림 폴백 → notFound() 처리 필요. `docs/plan/12` STEP E에 기록.
 
 ### 프로필 직접 편집 11 — DB+shared+web (2026-07-12 세션, `docs/plan/11`)
 - [x] **0010 마이그레이션 (커밋 `c4c294f`)** — `profiles.custom_avatar_url text` (public/test 병행) + 신규 **public `avatars` 버킷** + storage 정책(본인 폴더 rw, anon SELECT). **reviewer 지적 반영: file_size_limit 5MB·allowed_mime_types image/* 서버측 버킷 제약 추가.** SCHEMA.md 동기. **라이브 적용은 Blocked(0009와 배치).**

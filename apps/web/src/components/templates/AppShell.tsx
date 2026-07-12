@@ -1,5 +1,5 @@
 import { accentPalette } from '@maps/tokens';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getUser, getCouple } from '@/lib/supabase/server';
 import { SiteHeader, SiteFooter, BottomNav, type AvatarDescriptor } from '@/components/organisms';
 
 interface ProfileRow {
@@ -27,18 +27,12 @@ function toDescriptor(profile: ProfileRow | undefined, order: number): AvatarDes
 /** Signed-in header avatars: self first, then partner (if connected). Best-effort — any read
  * failure degrades to an empty avatar list rather than breaking the shell. */
 async function resolveAvatars(): Promise<{ avatars: AvatarDescriptor[]; signedIn: boolean }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
   if (!user) return { avatars: [], signedIn: false };
 
   try {
-    const { data: couple } = await supabase
-      .from('couples')
-      .select('partner_a, partner_b, status')
-      .or(`partner_a.eq.${user.id},partner_b.eq.${user.id}`)
-      .maybeSingle();
+    const supabase = await createClient();
+    const couple = await getCouple(user.id);
 
     const partnerId =
       couple && (couple.partner_a === user.id ? couple.partner_b : couple.partner_a);

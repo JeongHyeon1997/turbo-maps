@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getUser } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { DateLogFeed } from '@/components/organisms';
 import { PageTitle } from '@/components/atoms';
@@ -9,11 +9,8 @@ import { getPublicExploreLogs } from '@/lib/explore';
 // (0006 migration), never the base `date_logs` table, so private fields
 // (memo, private cover path) can't leak here regardless of session state.
 export default async function ExplorePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const logs = await getPublicExploreLogs(supabase, 50);
+  // Independent reads — parallelized (docs/plan/12-performance.md STEP C, item 6).
+  const [user, logs] = await Promise.all([getUser(), getPublicExploreLogs(50)]);
 
   const content = (
     <div className="flex flex-col gap-5">

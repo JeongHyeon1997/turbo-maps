@@ -1,4 +1,6 @@
-import type { createClient } from '@/lib/supabase/server';
+import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
+import { anonClient } from '@/lib/supabase/anon';
 import { EXPLORE_PLACE_COLUMNS, toPublicPlace, type ExplorePlaceRow, type PublicPlace } from '@/lib/places';
 
 // Backs `/explore/regions` and `/explore/regions/[region]` — anon-safe region aggregates
@@ -6,6 +8,10 @@ import { EXPLORE_PLACE_COLUMNS, toPublicPlace, type ExplorePlaceRow, type Public
 // `lib/places.ts`/`lib/explore.ts`: only read the `explore_regions` /
 // `explore_places` views, never a base table (`places`, `date_logs`) directly.
 // 0009 may not be live yet, so every export below degrades to `[]` on any error.
+//
+// Same caching contract as `lib/explore.ts`/`lib/places.ts`: reads through the
+// cookie-independent `anonClient` and is wrapped `cache(unstable_cache(...))`
+// (docs/plan/12-performance.md STEP C, items 2 & 10).
 
 interface ExploreRegionRow {
   region: string;
@@ -32,11 +38,9 @@ function toPublicRegion(row: ExploreRegionRow): PublicRegion {
  * `region` is never null here — the view excludes places it couldn't parse a
  * region for.
  */
-export async function getPublicRegions(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-): Promise<PublicRegion[]> {
+async function fetchPublicRegions(): Promise<PublicRegion[]> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await anonClient
       .from('explore_regions')
       .select('region, place_count, public_log_count')
       .order('public_log_count', { ascending: false });
@@ -47,17 +51,18 @@ export async function getPublicRegions(
   }
 }
 
+export const getPublicRegions = cache(
+  unstable_cache(fetchPublicRegions, ['explore-regions'], { revalidate: 120, tags: ['explore'] }),
+);
+
 /**
  * Places in a single region for `/explore/regions/[region]`, most-visited first —
  * same shape/mapper as `lib/places.ts`'s `getPublicPlaces` so the page can reuse
  * `PlaceCard` unchanged.
  */
-export async function getPublicPlacesByRegion(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  region: string,
-): Promise<PublicPlace[]> {
+async function fetchPublicPlacesByRegion(region: string): Promise<PublicPlace[]> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await anonClient
       .from('explore_places')
       .select(EXPLORE_PLACE_COLUMNS)
       .eq('region', region)
@@ -69,15 +74,27 @@ export async function getPublicPlacesByRegion(
   }
 }
 
+export const getPublicPlacesByRegion = cache(
+  unstable_cache(fetchPublicPlacesByRegion, ['explore-places-by-region'], {
+    revalidate: 120,
+    tags: ['explore'],
+  }),
+);
+
 /** All public region names — used by `app/sitemap.ts`. Degrades to `[]` like the fetchers above. */
-export async function getPublicRegionNames(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-): Promise<string[]> {
+async function fetchPublicRegionNames(): Promise<string[]> {
   try {
-    const { data, error } = await supabase.from('explore_regions').select('region');
+    const { data, error } = await anonClient.from('explore_regions').select('region');
     if (error || !data) return [];
     return (data as { region: string }[]).map((r) => r.region);
   } catch {
     return [];
   }
 }
+
+export const getPublicRegionNames = cache(
+  unstable_cache(fetchPublicRegionNames, ['explore-region-names'], {
+    revalidate: 120,
+    tags: ['explore'],
+  }),
+);

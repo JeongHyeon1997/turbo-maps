@@ -62,35 +62,40 @@ export default async function ConnectPage({
         </form>
       )}
 
-      <div className="flex flex-col gap-3">
-        <p className="text-center text-sm font-medium text-text-secondary">
-          이미 초대코드를 받았나요?
-        </p>
-        <form action={joinCouple} className="flex flex-col gap-1.5">
-          <label htmlFor="invite-code" className="sr-only">
-            초대코드
-          </label>
-          <div className="flex gap-2">
-            <TextField
-              id="invite-code"
-              name="code"
-              placeholder="예: A1B2C3"
-              maxLength={6}
-              aria-describedby="invite-code-hint"
-              className="flex-1 uppercase"
-            />
-            <Button type="submit" size="lg" fullWidth={false}>
-              연결
-            </Button>
-          </div>
-          <p id="invite-code-hint" className="text-center text-xs text-text-secondary">
-            영문·숫자 6자리 코드를 입력하세요.
+      {/* Once the user owns a couple row, joining another would put them in
+          two couples at once (no membership unique constraint) and break
+          every .maybeSingle() couple lookup — hide the join path entirely. */}
+      {!couple && (
+        <div className="flex flex-col gap-3">
+          <p className="text-center text-sm font-medium text-text-secondary">
+            이미 초대코드를 받았나요?
           </p>
-        </form>
-        {error === 'join' && (
-          <p className="text-center text-xs text-danger">유효하지 않거나 이미 사용된 코드예요.</p>
-        )}
-      </div>
+          <form action={joinCouple} className="flex flex-col gap-1.5">
+            <label htmlFor="invite-code" className="sr-only">
+              초대코드
+            </label>
+            <div className="flex gap-2">
+              <TextField
+                id="invite-code"
+                name="code"
+                placeholder="예: A1B2C3"
+                maxLength={6}
+                aria-describedby="invite-code-hint"
+                className="flex-1 uppercase"
+              />
+              <Button type="submit" size="lg" fullWidth={false}>
+                연결
+              </Button>
+            </div>
+            <p id="invite-code-hint" className="text-center text-xs text-text-secondary">
+              영문·숫자 6자리 코드를 입력하세요.
+            </p>
+          </form>
+          {error === 'join' && (
+            <p className="text-center text-xs text-danger">유효하지 않거나 이미 사용된 코드예요.</p>
+          )}
+        </div>
+      )}
     </main>
   );
 }

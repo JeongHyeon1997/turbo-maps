@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getUser } from '@/lib/supabase/server';
 import { AppShell } from '@/components/templates';
 import { KakaoMap, PhotoGallery, type MapMarker } from '@/components/organisms';
 import { BackLink, HeartRating } from '@/components/atoms';
@@ -50,11 +50,9 @@ export default async function DateLogDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
   if (!user) redirect('/login');
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('date_logs')
@@ -74,19 +72,21 @@ export default async function DateLogDetailPage({
     ? Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.length)
     : 0;
 
-  let coverUrl: string | null = null;
-  if (row.cover_photo_path) {
-    const { data: signed } = await supabase.storage
-      .from('date-photos')
-      .createSignedUrl(row.cover_photo_path, 3600);
-    coverUrl = signed?.signedUrl ?? null;
-  }
-
-  const { data: photoRows } = await supabase
-    .from('date_log_photos')
-    .select('storage_path')
-    .eq('date_log_id', id)
-    .order('sort_order', { ascending: true });
+  // Independent reads — parallelized instead of a serial waterfall
+  // (docs/plan/12-performance.md STEP C, item 6). Only `galleryUrls` has a real
+  // dependency (needs `photoRows` first), so that one stays sequential below.
+  const [signedCover, { data: photoRows }, { data: author }] = await Promise.all([
+    row.cover_photo_path
+      ? supabase.storage.from('date-photos').createSignedUrl(row.cover_photo_path, 3600)
+      : Promise.resolve({ data: null }),
+    supabase
+      .from('date_log_photos')
+      .select('storage_path')
+      .eq('date_log_id', id)
+      .order('sort_order', { ascending: true }),
+    supabase.from('profiles').select('nickname').eq('id', row.author_id).maybeSingle(),
+  ]);
+  const coverUrl = signedCover.data?.signedUrl ?? null;
 
   const photoPaths = (photoRows ?? []).map((r) => r.storage_path as string);
   let galleryUrls: string[] = [];
@@ -103,12 +103,6 @@ export default async function DateLogDetailPage({
       .map((p) => signedMap.get(p))
       .filter((u): u is string => !!u);
   }
-
-  const { data: author } = await supabase
-    .from('profiles')
-    .select('nickname')
-    .eq('id', row.author_id)
-    .maybeSingle();
 
   const routeRow = Array.isArray(row.routes) ? row.routes[0] : row.routes;
   const coords = isCoordList(routeRow?.coordinates) ? routeRow.coordinates : null;

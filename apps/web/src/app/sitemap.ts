@@ -1,10 +1,17 @@
 import type { MetadataRoute } from 'next';
-import { createClient } from '@/lib/supabase/server';
 import { getPublicExploreLogIds } from '@/lib/explore';
 import { getPublicPlaceIds } from '@/lib/places';
 import { getPublicRegionNames } from '@/lib/regions';
 import { guides } from '@/content/guides';
 import { SITE_URL } from '@/lib/site-url';
+
+// Crawlers can hit this route far more often than a human visitor would —
+// re-generating it (and re-running the three view queries below) on every
+// single request is wasted work once the underlying data itself is already
+// cached for 120s (see lib/{explore,places,regions}.ts). 1h is a safe upper
+// bound for a route that's not time-critical (docs/plan/12-performance.md
+// STEP C, item 12).
+export const revalidate = 3600;
 
 const STATIC_PATHS = [
   '/',
@@ -39,11 +46,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   try {
-    const supabase = await createClient();
     const [logIds, placeIds, regionNames] = await Promise.all([
-      getPublicExploreLogIds(supabase),
-      getPublicPlaceIds(supabase),
-      getPublicRegionNames(supabase),
+      getPublicExploreLogIds(),
+      getPublicPlaceIds(),
+      getPublicRegionNames(),
     ]);
     const logEntries: MetadataRoute.Sitemap = logIds.map((id) => ({
       url: `${SITE_URL}/explore/${id}`,

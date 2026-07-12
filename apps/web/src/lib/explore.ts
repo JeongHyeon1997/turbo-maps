@@ -1,4 +1,6 @@
-import type { createClient } from '@/lib/supabase/server';
+import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
+import { anonClient } from '@/lib/supabase/anon';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 import { publicCoverUrl } from '@/lib/storage/public-cover-url';
 
@@ -8,6 +10,19 @@ import { publicCoverUrl } from '@/lib/storage/public-cover-url';
 // PostgREST can't embed across these views, so places are fetched separately and
 // grouped by `date_log_id` here. Never read the base `date_logs` table from here —
 // that's the whole point of going through these views (memo/private-cover safety).
+//
+// Every export below reads through the cookie-independent `anonClient`
+// (docs/plan/12-performance.md STEP C, item 2) — safe because these views apply
+// their own `visibility = 'public'` filter, so anon/authenticated callers get
+// byte-identical rows — and is wrapped `cache(unstable_cache(...))`: the outer
+// `React.cache` dedupes repeat calls within one request (e.g. `generateMetadata`
+// + the page itself), the inner `unstable_cache` persists the result for 120s
+// across requests/visitors, tagged `'explore'` for future `revalidateTag`-based
+// invalidation. `/logs/new` currently writes via a direct client-side Supabase
+// insert (no server action/route handler to call `revalidateTag` from) — see
+// docs/plan/12-performance.md STEP C notes — so a freshly published course can
+// take up to 120s to appear on these public surfaces. That's an acceptable
+// trade-off for the TTFB win; revisit if `/logs/new` ever moves server-side.
 
 // Public surfaces are anonymized by product decision — the views don't even carry
 // an author nickname column. Every public log/course is attributed to this label.
@@ -80,12 +95,9 @@ function toPublicPlace(row: ExploreLogPlaceRow): PublicExplorePlace {
  * EmptyState placeholder. Once 0006 is live, this starts returning real rows with
  * no code change needed.
  */
-export async function getPublicExploreLogs(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  limit: number,
-): Promise<MockDateLog[]> {
+async function fetchPublicExploreLogs(limit: number): Promise<MockDateLog[]> {
   try {
-    const { data: logRows, error } = await supabase
+    const { data: logRows, error } = await anonClient
       .from('explore_logs')
       .select('id, couple_id, date, title, public_cover_path, created_at')
       .order('date', { ascending: false })
@@ -97,7 +109,7 @@ export async function getPublicExploreLogs(
 
     const placesByLog = new Map<string, ExploreLogPlaceRow[]>();
     if (logIds.length > 0) {
-      const { data: placeRows } = await supabase
+      const { data: placeRows } = await anonClient
         .from('explore_log_places')
         .select('id, date_log_id, place_id, visit_order, rating, name, category, address, lat, lng')
         .in('date_log_id', logIds);
@@ -128,18 +140,19 @@ export async function getPublicExploreLogs(
   }
 }
 
+export const getPublicExploreLogs = cache(
+  unstable_cache(fetchPublicExploreLogs, ['explore-logs'], { revalidate: 120, tags: ['explore'] }),
+);
+
 /**
  * Best-effort single-log fetch for the public detail page `/explore/[id]`. Reads
  * only the anon-safe views — same privacy guarantee as `getPublicExploreLogs`.
  * Returns `null` when the id doesn't exist, isn't public, or the views aren't
  * live yet (caller renders `notFound()`).
  */
-export async function getPublicExploreLog(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  id: string,
-): Promise<PublicExploreLogDetail | null> {
+async function fetchPublicExploreLog(id: string): Promise<PublicExploreLogDetail | null> {
   try {
-    const { data: logRow, error } = await supabase
+    const { data: logRow, error } = await anonClient
       .from('explore_logs')
       .select('id, couple_id, date, title, public_cover_path, created_at')
       .eq('id', id)
@@ -148,7 +161,7 @@ export async function getPublicExploreLog(
 
     const log = logRow as unknown as ExploreLogRow;
 
-    const { data: placeRows } = await supabase
+    const { data: placeRows } = await anonClient
       .from('explore_log_places')
       .select('id, date_log_id, place_id, visit_order, rating, name, category, address, lat, lng')
       .eq('date_log_id', log.id)
@@ -172,15 +185,21 @@ export async function getPublicExploreLog(
   }
 }
 
+export const getPublicExploreLog = cache(
+  unstable_cache(fetchPublicExploreLog, ['explore-log'], { revalidate: 120, tags: ['explore'] }),
+);
+
 /** All public log ids — used by `app/sitemap.ts`. Degrades to `[]` like the fetchers above. */
-export async function getPublicExploreLogIds(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-): Promise<string[]> {
+async function fetchPublicExploreLogIds(): Promise<string[]> {
   try {
-    const { data, error } = await supabase.from('explore_logs').select('id');
+    const { data, error } = await anonClient.from('explore_logs').select('id');
     if (error || !data) return [];
     return (data as { id: string }[]).map((r) => r.id);
   } catch {
     return [];
   }
 }
+
+export const getPublicExploreLogIds = cache(
+  unstable_cache(fetchPublicExploreLogIds, ['explore-log-ids'], { revalidate: 120, tags: ['explore'] }),
+);

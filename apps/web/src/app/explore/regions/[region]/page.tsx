@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { getUser } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { BackLink, JsonLd, PageTitle } from '@/components/atoms';
 import { PlaceCard } from '@/components/molecules';
@@ -21,8 +21,9 @@ interface PageParams {
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { region: encoded } = await params;
   const region = decodeURIComponent(encoded);
-  const supabase = await createClient();
-  const places = await getPublicPlacesByRegion(supabase, region);
+  // `React.cache`-wrapped (see lib/regions.ts) — deduped against the same call
+  // the page component below makes (docs/plan/12-performance.md STEP C, item 10).
+  const places = await getPublicPlacesByRegion(region);
   if (places.length === 0) return {};
 
   const description = `${region}에서 다른 커플이 다녀간 데이트 코스·맛집 ${places.length}곳을 둘러보세요.`;
@@ -58,12 +59,8 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 export default async function RegionDetailPage({ params }: PageParams) {
   const { region: encoded } = await params;
   const region = decodeURIComponent(encoded);
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const places = await getPublicPlacesByRegion(supabase, region);
+  // Independent reads — parallelized (docs/plan/12-performance.md STEP C, item 6).
+  const [user, places] = await Promise.all([getUser(), getPublicPlacesByRegion(region)]);
   if (places.length === 0) notFound();
 
   const jsonLd = {

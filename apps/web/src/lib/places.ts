@@ -1,4 +1,6 @@
-import type { createClient } from '@/lib/supabase/server';
+import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
+import { anonClient } from '@/lib/supabase/anon';
 import type { MockDateLog } from '@/lib/mock/date-logs';
 import { publicCoverUrl } from '@/lib/storage/public-cover-url';
 import { ANONYMOUS_AUTHOR } from '@/lib/explore';
@@ -9,6 +11,11 @@ import { ANONYMOUS_AUTHOR } from '@/lib/explore';
 // (`places`, `date_logs`, `date_log_places`) directly — that's what keeps memo,
 // private covers and real nicknames structurally unreachable here. 0008 may not be
 // live yet, so every export below degrades to `null`/`[]` on any error.
+//
+// Same caching contract as `lib/explore.ts`: reads through the cookie-independent
+// `anonClient` and is wrapped `cache(unstable_cache(...))` — 120s cross-request
+// cache tagged `'explore'`, plus in-request dedupe for `generateMetadata` + page
+// (docs/plan/12-performance.md STEP C, items 2 & 10).
 
 // Exported so `lib/regions.ts` can query the same view/columns for
 // `getPublicPlacesByRegion` without redefining the row shape or mapper.
@@ -72,12 +79,9 @@ export const EXPLORE_PLACE_COLUMNS =
  * place doesn't exist, has no public courses, or the view isn't live yet
  * (caller renders `notFound()`).
  */
-export async function getPublicPlace(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  placeId: string,
-): Promise<PublicPlace | null> {
+async function fetchPublicPlace(placeId: string): Promise<PublicPlace | null> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await anonClient
       .from('explore_places')
       .select(EXPLORE_PLACE_COLUMNS)
       .eq('place_id', placeId)
@@ -89,6 +93,10 @@ export async function getPublicPlace(
   }
 }
 
+export const getPublicPlace = cache(
+  unstable_cache(fetchPublicPlace, ['explore-place'], { revalidate: 120, tags: ['explore'] }),
+);
+
 /**
  * Public courses (date logs) a place appeared in, newest first — mapped to the
  * same `MockDateLog` shape `DateLogFeed`/`DateLogCard` already render so the
@@ -96,12 +104,9 @@ export async function getPublicPlace(
  * this view only carries the one place the page is already about, so a self-tag
  * on every card would be redundant.
  */
-export async function getPublicPlaceLogs(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  placeId: string,
-): Promise<MockDateLog[]> {
+async function fetchPublicPlaceLogs(placeId: string): Promise<MockDateLog[]> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await anonClient
       .from('explore_place_logs')
       .select('place_id, date_log_id, title, date, public_cover_path, rating')
       .eq('place_id', placeId)
@@ -123,17 +128,18 @@ export async function getPublicPlaceLogs(
   }
 }
 
+export const getPublicPlaceLogs = cache(
+  unstable_cache(fetchPublicPlaceLogs, ['explore-place-logs'], { revalidate: 120, tags: ['explore'] }),
+);
+
 /**
  * Directory listing for `/places`, most-visited first. `category` narrows the
  * DB query when passed, but the page itself fetches unfiltered and filters
  * in-memory so it can derive the category chip list from the same round trip.
  */
-export async function getPublicPlaces(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  options: { category?: string } = {},
-): Promise<PublicPlace[]> {
+async function fetchPublicPlaces(options: { category?: string } = {}): Promise<PublicPlace[]> {
   try {
-    let query = supabase
+    let query = anonClient
       .from('explore_places')
       .select(EXPLORE_PLACE_COLUMNS)
       .order('public_log_count', { ascending: false });
@@ -147,15 +153,21 @@ export async function getPublicPlaces(
   }
 }
 
+export const getPublicPlaces = cache(
+  unstable_cache(fetchPublicPlaces, ['explore-places'], { revalidate: 120, tags: ['explore'] }),
+);
+
 /** All public place ids — used by `app/sitemap.ts`. Degrades to `[]` like the fetchers above. */
-export async function getPublicPlaceIds(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-): Promise<string[]> {
+async function fetchPublicPlaceIds(): Promise<string[]> {
   try {
-    const { data, error } = await supabase.from('explore_places').select('place_id');
+    const { data, error } = await anonClient.from('explore_places').select('place_id');
     if (error || !data) return [];
     return (data as { place_id: string }[]).map((r) => r.place_id);
   } catch {
     return [];
   }
 }
+
+export const getPublicPlaceIds = cache(
+  unstable_cache(fetchPublicPlaceIds, ['explore-place-ids'], { revalidate: 120, tags: ['explore'] }),
+);

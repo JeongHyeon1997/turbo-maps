@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { getUser } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { RegionCard, EmptyState } from '@/components/molecules';
 import { PageTitle } from '@/components/atoms';
@@ -17,12 +17,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RegionIndexPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const regions = await getPublicRegions(supabase);
+  // Independent reads — parallelized (docs/plan/12-performance.md STEP C, item 6).
+  const [user, regions] = await Promise.all([getUser(), getPublicRegions()]);
 
   const content = (
     <div className="flex flex-col gap-5">

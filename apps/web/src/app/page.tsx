@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getUser, getCouple } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import {
   DateLogFeed,
@@ -47,15 +47,12 @@ function toCard(row: Row, coverUrl?: string | null): MockDateLog {
 }
 
 export default async function HomePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   if (!user) {
     // Best-effort excerpt of publicly visible date logs (anon-safe `explore_logs`
     // view, 0006 migration) — gracefully empty until that migration is live.
-    const previewLogs = await getPublicExploreLogs(supabase, 3);
+    const previewLogs = await getPublicExploreLogs(3);
     return (
       <PublicShell>
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-5 py-10 md:gap-24 md:px-8 md:py-16">
@@ -76,19 +73,22 @@ export default async function HomePage() {
     );
   }
 
-  const { data: couple } = await supabase
-    .from('couples')
-    .select('status')
-    .or(`partner_a.eq.${user.id},partner_b.eq.${user.id}`)
-    .maybeSingle();
-  const connected = couple?.status === 'connected';
+  const supabase = await createClient();
 
-  const { data: rows } = await supabase
-    .from('date_logs')
-    .select(
-      'id, date, title, memo, cover_photo_path, date_log_places(visit_order, rating, places(name, category))',
-    )
-    .order('date', { ascending: false });
+  // Independent reads — parallelized instead of a serial waterfall
+  // (docs/plan/12-performance.md STEP C, item 6). `getCouple` is the same
+  // `React.cache`-wrapped helper `AppShell` calls for the partner avatar, so a
+  // signed-in request hits `couples` once total, not twice.
+  const [couple, { data: rows }] = await Promise.all([
+    getCouple(user.id),
+    supabase
+      .from('date_logs')
+      .select(
+        'id, date, title, memo, cover_photo_path, date_log_places(visit_order, rating, places(name, category))',
+      )
+      .order('date', { ascending: false }),
+  ]);
+  const connected = couple?.status === 'connected';
 
   const typed = (rows ?? []) as unknown as Row[];
 

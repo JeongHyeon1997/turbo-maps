@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { getUser } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { FilterChip, PageTitle } from '@/components/atoms';
 import { PlaceCard, EmptyState } from '@/components/molecules';
@@ -21,14 +21,11 @@ interface PageProps {
 
 export default async function PlacesDirectoryPage({ searchParams }: PageProps) {
   const { category } = await searchParams;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // Fetch once, unfiltered — reused both to derive the category chip list and
-  // (filtered in-memory below) as the grid itself, avoiding a second round trip.
-  const places = await getPublicPlaces(supabase);
+  // Independent reads — parallelized (docs/plan/12-performance.md STEP C, item 6).
+  // `getPublicPlaces` is fetched once, unfiltered — reused both to derive the
+  // category chip list and (filtered in-memory below) as the grid itself,
+  // avoiding a second round trip.
+  const [user, places] = await Promise.all([getUser(), getPublicPlaces()]);
   const categories = Array.from(
     new Set(places.map((p) => p.category).filter((c): c is string => !!c)),
   ).sort((a, b) => a.localeCompare(b, 'ko'));

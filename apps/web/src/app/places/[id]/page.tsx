@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { getUser } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { KakaoMap, type MapMarker, DateLogFeed } from '@/components/organisms';
 import { BackLink, HeartRating, JsonLd, PageTitle, Tag } from '@/components/atoms';
@@ -23,13 +23,14 @@ interface PageParams {
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { id } = await params;
-  const supabase = await createClient();
-  const place = await getPublicPlace(supabase, id);
+  // Both `React.cache`-wrapped (see lib/places.ts) — deduped against the same
+  // calls the page component below makes (docs/plan/12-performance.md STEP C,
+  // item 10), and independent of each other so fetched in parallel.
+  const [place, logs] = await Promise.all([getPublicPlace(id), getPublicPlaceLogs(id)]);
   if (!place) return {};
 
   // `logs` is already newest-first (see `getPublicPlaceLogs`), so this is the
   // most recent public course's cover — this page has no cover of its own.
-  const logs = await getPublicPlaceLogs(supabase, id);
   const coverImage = logs.find((l) => !!l.coverImage)?.coverImage ?? undefined;
 
   const parts = [place.category, place.address].filter((v): v is string => !!v);
@@ -59,15 +60,13 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 
 export default async function PlaceDetailPage({ params }: PageParams) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const place = await getPublicPlace(supabase, id);
+  // Independent reads — parallelized (docs/plan/12-performance.md STEP C, item 6).
+  const [user, place, logs] = await Promise.all([
+    getUser(),
+    getPublicPlace(id),
+    getPublicPlaceLogs(id),
+  ]);
   if (!place) notFound();
-
-  const logs = await getPublicPlaceLogs(supabase, id);
 
   const markers: MapMarker[] = [{ lat: place.lat, lng: place.lng, name: place.name }];
 

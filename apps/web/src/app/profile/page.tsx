@@ -1,15 +1,13 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getUser } from '@/lib/supabase/server';
 import { AppShell } from '@/components/templates';
 import { AvatarUploader, ProfileActions } from '@/components/molecules';
 import { Button, PageTitle } from '@/components/atoms';
 
 export default async function ProfilePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
   if (!user) redirect('/login');
+  const supabase = await createClient();
 
   // `select('*')` (not an explicit column list) on purpose: `custom_avatar_url`
   // (migration 0010) may not exist on the live DB yet, and PostgREST 42703s on an

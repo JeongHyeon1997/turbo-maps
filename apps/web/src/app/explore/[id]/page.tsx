@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { getUser } from '@/lib/supabase/server';
 import { AppShell, PublicShell } from '@/components/templates';
 import { KakaoMap, type MapMarker } from '@/components/organisms';
 import { BackLink, HeartRating, JsonLd } from '@/components/atoms';
@@ -23,8 +23,9 @@ interface PageParams {
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { id } = await params;
-  const supabase = await createClient();
-  const log = await getPublicExploreLog(supabase, id);
+  // `React.cache`-wrapped (see lib/explore.ts) — deduped against the same call
+  // the page component below makes (docs/plan/12-performance.md STEP C, item 10).
+  const log = await getPublicExploreLog(id);
   if (!log) return {};
 
   const placeNames = log.places.map((p) => p.name).filter(Boolean);
@@ -61,12 +62,8 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 
 export default async function ExploreLogDetailPage({ params }: PageParams) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const log = await getPublicExploreLog(supabase, id);
+  // Independent reads — parallelized (docs/plan/12-performance.md STEP C, item 6).
+  const [user, log] = await Promise.all([getUser(), getPublicExploreLog(id)]);
   if (!log) notFound();
 
   const ratings = log.places.map((p) => p.rating ?? 0).filter((r) => r > 0);

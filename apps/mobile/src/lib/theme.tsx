@@ -48,15 +48,22 @@ function isThemeMode(value: unknown): value is ThemeMode {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const systemScheme = useColorScheme();
   const [mode, setModeState] = useState<ThemeMode>('system');
+  // Gates the first render on the AsyncStorage read resolving — without this,
+  // a user with a persisted 'dark'/'light' pick would flash 'system' colors
+  // for one frame before the stored value lands (STEP 4 toggle would surface
+  // this immediately).
+  const [hydrated, setHydrated] = useState(false);
 
   // Load the persisted preference once on mount (falls back to 'system' — the
   // initial state already is — while the read resolves).
   useEffect(() => {
     let cancelled = false;
     AsyncStorage.getItem(THEME_STORAGE_KEY).then((stored) => {
-      if (!cancelled && isThemeMode(stored)) {
+      if (cancelled) return;
+      if (isThemeMode(stored)) {
         setModeState(stored);
       }
+      setHydrated(true);
     });
     return () => {
       cancelled = true;
@@ -75,6 +82,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     () => ({ mode, isDark, colors, setMode }),
     [mode, isDark, colors, setMode],
   );
+
+  // Hold rendering until the persisted mode has loaded (or failed to) —
+  // prevents a system->stored-preference flash. No children mount yet, so
+  // there's nothing to flicker; the native splash screen covers this beat.
+  if (!hydrated) return null;
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

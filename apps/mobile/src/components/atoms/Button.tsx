@@ -15,6 +15,7 @@ export interface ButtonProps extends Omit<PressableProps, 'children' | 'style'> 
    * (never pill — pill is reserved for chips/filters/badges).
    */
   size?: ButtonSize;
+  /** Defaults to `true` for `size="lg"` (DESIGN.md "lg = fullWidth 기본"), else `false`. Explicit prop always wins. */
   fullWidth?: boolean;
   disabled?: boolean;
   style?: ViewStyle;
@@ -51,7 +52,7 @@ export function Button({
   children,
   variant = 'primary',
   size = 'md',
-  fullWidth = false,
+  fullWidth,
   disabled,
   style,
   hitSlop,
@@ -60,10 +61,12 @@ export function Button({
   const { colors } = useTheme();
   const config = sizeConfig[size];
   const extraHit = Math.max(0, Math.ceil((MIN_TOUCH_TARGET - config.height) / 2));
+  const isFullWidth = fullWidth ?? size === 'lg';
 
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
       hitSlop={hitSlop ?? (extraHit > 0 ? extraHit : undefined)}
       style={({ pressed }) => [
@@ -74,7 +77,7 @@ export function Button({
           borderRadius: config.borderRadius,
           backgroundColor: variant === 'primary' ? colors.brand : colors.surfaceAlt,
           opacity: disabled ? 0.6 : pressed ? 0.85 : 1,
-          width: fullWidth ? '100%' : undefined,
+          width: isFullWidth ? '100%' : undefined,
         },
         style,
       ]}

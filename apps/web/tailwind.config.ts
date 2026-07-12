@@ -76,8 +76,13 @@ export default {
         Object.entries(theme.space).map(([k, val]) => [k, `${val}px`]),
       ),
       fontFamily: {
+        // `@font-face` from the jsDelivr dynamic-subset stylesheet (see
+        // `app/layout.tsx` <head> link) declares the family name as
+        // `'Pretendard Variable'`, not `'Pretendard'` — it must come first or
+        // the browser never matches the loaded face and silently falls back
+        // to system sans (perf audit #1, docs/plan/12-performance.md).
         sans: [
-          'Pretendard',
+          'Pretendard Variable',
           '-apple-system',
           'BlinkMacSystemFont',
           'Segoe UI',
@@ -86,8 +91,8 @@ export default {
         ],
         // Logo wordmark only (BMJUA, self-hosted via `--font-jua`). `logo` is an
         // alias of `jua` so either class works; use `font-jua` on `<Logo>` only.
-        jua: ['var(--font-jua)', 'Pretendard', 'sans-serif'],
-        logo: ['var(--font-jua)', 'Pretendard', 'sans-serif'],
+        jua: ['var(--font-jua)', 'Pretendard Variable', 'sans-serif'],
+        logo: ['var(--font-jua)', 'Pretendard Variable', 'sans-serif'],
       },
       letterSpacing: {
         tight: theme.font.letterSpacingTight,

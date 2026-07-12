@@ -1,8 +1,14 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/variable/pretendardvariable-dynamic-subset.css');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Pretendard (UI sans, `fontFamily.sans` in tailwind.config.ts) is loaded via a
+   version-pinned jsDelivr `<link rel="stylesheet">` + preconnect in
+   `app/layout.tsx`'s <head> — NOT a CSS `@import` here. A same-file @import
+   would sit *after* this compiled app CSS in the response, serializing the
+   chain (app CSS → jsDelivr CSS → woff2) behind the app's own stylesheet and
+   blocking first paint. The <link> lets the browser discover + fetch it in
+   parallel with app CSS instead (perf audit #1, docs/plan/12-performance.md). */
 
 /* Semantic palette (`--color-*` channels) + `color-scheme` for `:root` (light)
    and `.dark` (charcoal) are injected by the Tailwind base plugin from

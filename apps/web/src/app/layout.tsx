@@ -56,6 +56,21 @@ export default function RootLayout({
   return (
     <html lang="ko" className={jua.variable} suppressHydrationWarning>
       <head>
+        {/* Pretendard (UI sans) — dynamic-subset CSS from jsDelivr, version-pinned
+            (not `@latest`) so the response is CDN-cacheable and reproducible.
+            `preconnect` lets the browser open the connection while the rest of
+            <head> parses, instead of discovering cdn.jsdelivr.net only after
+            this stylesheet request is issued. Kept as a real <link> (not a CSS
+            `@import` in globals.css) so it loads in parallel with app CSS
+            rather than serialized behind it (perf audit #1,
+            docs/plan/12-performance.md). Dynamic-subset (glyph-slice) loading
+            beats a self-hosted full variable woff2 (~2MB) for Korean text, so
+            we keep the CDN chain rather than `next/font/local`. */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css"
+        />
         {/* Runs before first paint so light→dark never flashes (08 risk #3):
             reads the stored preference and flips `.dark` ahead of hydration. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />

@@ -12,6 +12,12 @@ export const supabase = createClient(url, anonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    // PKCE, not the default 'implicit' flow — required so `signInWithOAuth`
+    // returns a `?code=` param (exchanged via `exchangeCodeForSession` in
+    // `src/lib/auth.ts`) instead of `#access_token` in the redirect fragment.
+    // Mirrors `apps/web/src/lib/supabase/client.ts`, which gets this for free
+    // from `@supabase/ssr`'s `createBrowserClient` default.
+    flowType: 'pkce',
   },
   db: { schema },
 });

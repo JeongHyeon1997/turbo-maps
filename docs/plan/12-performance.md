@@ -4,7 +4,7 @@ last-updated: 2026-07-12
 owner: planner
 ---
 
-> **진행: STEP B(폰트)+C(페칭/캐시) 완료(커밋 `516584a`·`38a9a21`).** 다음 착수점 = **STEP D(이미지, 감사 3·11)**. STEP C 부작용: 공개 로그 발행 반영 최대 120s 지연(revalidateTag 미배선). STEP A(리전)·실측은 Blocked.
+> **진행: STEP B(폰트)+C(페칭/캐시)+D(이미지) 완료(커밋 `516584a`·`38a9a21`·`687c1fb`).** 다음 착수점 = **STEP E(잔여: 홈 limit·AppShell Suspense·`revalidateTag` 배선·`notFound()` SEO·미사용 deps)**. STEP C 부작용(120s 지연) 해소도 STEP E `revalidateTag('explore')`. STEP A(리전)·실측은 Blocked.
 
 # 웹 성능 최적화 — 감사 결과 & 실행 계획
 
@@ -81,7 +81,7 @@ vercel.json 없음. 기본 iad1 vs Supabase 서울 가능성 — 왕복당 ~150-
 - **STEP A — 리전 확인 (사용자/대시보드, Blocked 성격):** Vercel 함수 리전 ↔ Supabase 리전(서울/icn1) 대조. 불일치면 `vercel.json` `regions:["icn1"]` 추가. 측정 없이 코드 착수 금지 — 이 확인이 High(4)의 게이트. → 열린 질문 1.
 - **[완료] STEP B — 폰트 (web-dev, 커밋 `516584a`):** ① globals.css `@import` 제거 → layout preconnect + 버전고정 링크(pretendard@1.3.9). **버그 수정: fontFamily `'Pretendard'` ↔ CDN 선언 `'Pretendard Variable'` 불일치로 본문이 시스템 sans 폴백 중이던 것 교정**(sans/jua/logo 정합). ⑧ BMJUA **1.5MB→18KB** pyftsubset 서브셋 + 미사용 TTF 4종 삭제(감사 15). 빌드+next start 실렌더 검증. *(자체호스트 대신 preconnect+버전고정 CDN 채택 — 최소수정안.)*
 - **[완료] STEP C — 페칭/캐시 (web-dev, 커밋 `38a9a21`):** ② `lib/supabase/anon.ts` 싱글턴 + 공개 fetcher `unstable_cache`(120s, tag explore). ⑤ `React.cache` getUser/getCouple(요청당 auth 1회). ⑥·⑩ Promise.all 병렬화 + generateMetadata dedupe. + sitemap `revalidate 3600`(감사 12) + couple/connect join 폼 숨김. **reviewer 캐시 정확성/보안 PASS**(치명 0, Low2 무영향 기록: anon.ts 스키마 env 분기 잠재 불일치·server-only 가드 부재). **⚠️ 부작용: 공개 로그 발행 반영 최대 120s 지연**(클라 직접 insert라 `revalidateTag` 미배선 — STEP E 후보 또는 발행 경로 서버화 시 해소).
-- **STEP D — 이미지 (web-dev, 다음 착수점):** ③ `next.config.mjs images.remotePatterns` + public-covers next/image(fill+sizes, 상세 priority) + date-photos 서명 URL 처리(택1: 만료 장기화·image transformation·최소 lazy). ⑪ PhotoGallery/PhotoThumb lazy+width/height. `AvatarImage.tsx`는 11번(아바타)과 겹치니 조정.
+- **[완료] STEP D — 이미지 (web-dev, 커밋 `687c1fb`):** ③ `next.config` `images.remotePatterns`(`NEXT_PUBLIC_SUPABASE_URL` 호스트 파생) + `isPublicCoverUrl` 분기로 **public-covers만 next/image**(fill+sizes, 상세 CoverHero priority) — 서명 date-photos는 캐시 키 변동 회피 위해 **raw img 유지**(택 c: 최소 lazy·decoding). ⑪ 갤러리/썸네일 lazy+decoding. **reviewer clean — Low2(CoverHero sizes 상한·호스트 하드코딩) 반영.**
 - **STEP E — 잔여 (web-dev):** ⑦ 홈 date_logs `.limit(20)`+더보기, map 전건 검토. ⑨ AppShell 아바타 Suspense 분리(5·6 후 우선도↓). ⑬ 미들웨어 fast-path(여유 시). ⑮ 미사용 deps(axios/zustand) 제거. **발행→캐시 무효화 배선(`revalidateTag('explore')`)** — STEP C의 120s 지연 해소. **[SEO 후속, STEP C 검수 중 발견·이번 변경 무관] loading.tsx 있는 동적 상세 라우트(`/explore/[id]`·`/places/[id]`·regions)가 존재하지 않는 id에서 404 대신 200+스트림 폴백** → 각 상세 page에서 데이터 없을 때 `notFound()` 호출로 정상 404 처리(크롤러/SEO 정합).
 - **STEP F — DB (dba, 규모 후):** ⑭ 캐시(STEP C)로 1차 방어 후 규모 시 explore_places materialized view + region stored generated column + btree(SCHEMA.md:190 경로). 현재 인덱스로 커버되어 급하지 않음.
 - **측정 (STEP 전후, 사용자/대시보드):** 각 STEP 전후 Vercel Speed Insights 또는 `curl` TTFB 기록 — 효과 검증. 실측 인프라는 대시보드 필요(Blocked 성격).
@@ -90,11 +90,11 @@ vercel.json 없음. 기본 iad1 vs Supabase 서울 가능성 — 왕복당 ~150-
 - [ ] STEP A 리전 정합 확인·필요 시 `vercel.json` 반영.
 - [x] ~~Pretendard self-host~~ preconnect+버전고정 + BMJUA 서브셋, 렌더 블로킹 체인 제거 (STEP B `516584a`).
 - [x] 공개 표면 fetcher 캐시(unstable_cache) + anon 싱글턴, getUser/getCouple React.cache 공유 (STEP C `38a9a21`).
-- [ ] next/image 배선(remotePatterns + 커버/썸네일 전환) — STEP D.
+- [x] next/image 배선(remotePatterns + public-covers 전환, date-photos raw 유지) (STEP D `687c1fb`).
 - [ ] typecheck/lint/web build PASS, 회귀 없음, 적용 전후 TTFB 기록.
 
 ## 열린 질문 (Blocked 성격 표기)
 1. **리전(4) — 사용자/대시보드 필요.** Vercel 함수 리전과 Supabase 리전 확인은 planner가 코드로 못 함. 불일치 시 `vercel.json` 반영. **측정 전 단정 금지.**
 2. **Speed Insights 실측 — 대시보드 필요.** 현재 실측 데이터 없음, 효과 전부 구조 추론. 전후 기록으로 검증 권장.
-3. **date-photos next/image 전략(3) — 플랜 확인 필요.** Supabase image transformation은 유료 → 플랜 확인 후 (a)만료 장기화 (b)transformation (c)최소 lazy 중 택. 미확인 시 (c) 안전 기본.
+3. ~~date-photos next/image 전략(3)~~ **[STEP D에서 (c) 최소 lazy 채택]** — 서명 URL은 캐시 키 변동 위험이 있어 raw img + lazy·decoding으로 유지. 규모 커지면 (a)만료 장기화·(b)image transformation(유료) 재검토.
 4. **AdSense 로더 lazyOnload 격하(11~13)** — 유닛 배치 전까지 무손실이나, 03 STEP2 승인/배치 전이라 지금 손대도 회귀 위험 낮음. 여유 시.

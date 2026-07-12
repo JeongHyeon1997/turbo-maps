@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { applyTheme, readStoredTheme, storeTheme, type ThemePreference } from '@/lib/theme';
 
 const OPTIONS: { value: ThemePreference; label: string }[] = [
@@ -38,17 +38,28 @@ function MoonIcon() {
   );
 }
 
+/** Small affordance on the mobile trigger signalling "taps open a menu" (vs. the old cycle button). */
+function CaretIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-3 w-3 shrink-0" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Marks the currently-selected option inside the popover menu. */
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 const ICONS: Record<ThemePreference, React.ReactNode> = {
   system: <SystemIcon />,
   light: <SunIcon />,
   dark: <MoonIcon />,
-};
-
-/** Tap order for the compact mobile cycle button: system → light → dark → system. */
-const NEXT_PREF: Record<ThemePreference, ThemePreference> = {
-  system: 'light',
-  light: 'dark',
-  dark: 'system',
 };
 
 const PREF_LABEL: Record<ThemePreference, string> = {
@@ -59,24 +70,36 @@ const PREF_LABEL: Record<ThemePreference, string> = {
 
 /**
  * 3-way (system/light/dark) theme control, rendered as two responsive variants that share
- * state: a **compact single-button cycle** on mobile (`< md`) and the full **segmented
- * control** on desktop (`md+`) — a 3-segment toggle (140px) plus the login CTA overflows a
- * 320px viewport, so mobile gets one 44×44 icon button that cycles system→light→dark on tap
- * (docs/plan/07-header-footer.md uiux-reviewer fix #1). Reads/writes `localStorage` and flips
- * `<html class="dark">` — see `lib/theme.ts`. Renders a neutral, non-interactive shell (for both
- * variants) until mounted so SSR markup never has to guess which option is "active" (that guess
- * is exactly what the `<head>` FOUC script already resolved visually, just not into React state
- * yet).
+ * state: the full **segmented control** on desktop (`md+`, always expanded — a 3-segment pill
+ * already shows what's selected/available) and a **trigger + anchored popover** on mobile
+ * (`< md`). The compact single-button cycle that shipped in 07 overflowed 320px if grown inline
+ * and hid state behind a blind tap-to-cycle gesture; the popover keeps the header width fixed
+ * (overlay, not inline growth) while making the label + checkmark explicit
+ * (DESIGN.md "ThemeToggle — 확장형 3-way", 2026-07-12).
+ *
+ * Reads/writes `localStorage` and flips `<html class="dark">` — see `lib/theme.ts`. Renders a
+ * neutral, non-interactive shell (for both variants) until mounted so SSR markup never has to
+ * guess which option is "active" (that guess is exactly what the `<head>` FOUC script already
+ * resolved visually, just not into React state yet).
  *
  * Desktop segments are a **44×44 touch target** each (DESIGN.md accessibility floor) — the icon
  * itself stays small and centered, the button hit-area is what's enlarged. Uses `role="group"` +
  * `aria-pressed` per-button (a plain toggle group) rather than a `radiogroup`/roving-tabindex
  * pattern, since a 3-item segmented control reads and operates more simply as independent
  * pressable toggles than as ARIA radios needing arrow-key navigation.
+ *
+ * The mobile popover, by contrast, *is* a `role="menu"` of `menuitemradio`s with roving
+ * Up/Down-arrow focus, because it only reveals on demand and needs the fuller ARIA menu
+ * semantics (closes on outside tap / Escape / tab-out) that a toggle group doesn't.
  */
 export function ThemeToggle() {
   const [pref, setPref] = useState<ThemePreference>('system');
   const [mounted, setMounted] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
     setPref(readStoredTheme());
@@ -98,10 +121,58 @@ export function ThemeToggle() {
     return () => mql.removeEventListener('change', onChange);
   }, [mounted, pref]);
 
+  const closeAndFocusTrigger = useCallback(() => {
+    setOpen(false);
+    triggerRef.current?.focus();
+  }, []);
+
+  // Entrance transition: mount collapsed (opacity-0 scale-95), then flip to the settled state on
+  // the next frame so the CSS transition actually has something to animate from. Closing is an
+  // instant unmount (menuitemradios must not be tab-reachable while hidden).
+  useEffect(() => {
+    if (!open) {
+      setEntered(false);
+      return;
+    }
+    const raf = requestAnimationFrame(() => setEntered(true));
+    return () => cancelAnimationFrame(raf);
+  }, [open]);
+
+  // Outside-tap close.
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (menuRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
+      setOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [open]);
+
+  // Tab-out close (focus left the trigger/menu entirely).
+  useEffect(() => {
+    if (!open) return;
+    const onFocusIn = (event: FocusEvent) => {
+      const target = event.target as Node;
+      if (menuRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
+      setOpen(false);
+    };
+    document.addEventListener('focusin', onFocusIn);
+    return () => document.removeEventListener('focusin', onFocusIn);
+  }, [open]);
+
+  // Focus the currently-active option as soon as the popover opens.
+  useEffect(() => {
+    if (!open) return;
+    const activeIndex = OPTIONS.findIndex((opt) => opt.value === pref);
+    itemRefs.current[activeIndex >= 0 ? activeIndex : 0]?.focus();
+  }, [open, pref]);
+
   if (!mounted) {
     return (
       <>
-        {/* Compact mobile shell: 44×44 icon button. */}
+        {/* Compact mobile shell: 44×44 trigger button. */}
         <div className="h-11 w-11 rounded-full bg-surface-alt md:hidden" aria-hidden="true" />
         {/* Desktop shell: 3 × 44px buttons + 2 × 2px gaps + 2 × 2px padding = 140×48. */}
         <div
@@ -112,18 +183,77 @@ export function ThemeToggle() {
     );
   }
 
-  const next = NEXT_PREF[pref];
+  const handleMenuKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeAndFocusTrigger();
+      return;
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const currentIndex = itemRefs.current.findIndex((el) => el === document.activeElement);
+      const delta = event.key === 'ArrowDown' ? 1 : -1;
+      const nextIndex = (currentIndex + delta + OPTIONS.length) % OPTIONS.length;
+      itemRefs.current[nextIndex]?.focus();
+    }
+  };
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setPref(next)}
-        aria-label={`현재 ${PREF_LABEL[pref]}. 탭하면 ${PREF_LABEL[next]}로 전환`}
-        className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-alt text-text-secondary transition-all duration-200 ease-out hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand md:hidden"
-      >
-        {ICONS[pref]}
-      </button>
+      <div className="relative md:hidden">
+        <button
+          ref={triggerRef}
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-label={`테마 선택, 현재 ${PREF_LABEL[pref]}`}
+          onClick={() => setOpen((value) => !value)}
+          className="flex h-11 w-11 items-center justify-center gap-0.5 rounded-full bg-surface-alt text-text-secondary transition-all duration-200 ease-out hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        >
+          {ICONS[pref]}
+          <CaretIcon />
+        </button>
+
+        {open && (
+          <div
+            ref={menuRef}
+            role="menu"
+            aria-label="테마 선택"
+            onKeyDown={handleMenuKeyDown}
+            className={`absolute right-0 top-full z-20 mt-2 min-w-[180px] origin-top-right rounded-2xl bg-surface p-1 shadow-lg transition duration-200 ease-out motion-reduce:scale-100 motion-reduce:transition-opacity ${
+              entered ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+            }`}
+          >
+            {OPTIONS.map((opt, index) => {
+              const active = pref === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  ref={(el) => {
+                    itemRefs.current[index] = el;
+                  }}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={active}
+                  onClick={() => {
+                    setPref(opt.value);
+                    closeAndFocusTrigger();
+                  }}
+                  className={`flex w-full min-h-11 items-center gap-2 rounded-xl px-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+                    active
+                      ? 'text-brand'
+                      : 'text-text-secondary hover:bg-surface-alt'
+                  }`}
+                >
+                  <span className="flex h-5 w-5 items-center justify-center">{ICONS[opt.value]}</span>
+                  <span className="flex-1 text-sm">{opt.label}</span>
+                  {active && <CheckIcon />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       <div
         role="group"

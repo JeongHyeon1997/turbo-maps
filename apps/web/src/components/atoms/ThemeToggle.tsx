@@ -97,6 +97,7 @@ export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [entered, setEntered] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(0);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -126,47 +127,56 @@ export function ThemeToggle() {
     triggerRef.current?.focus();
   }, []);
 
-  // Entrance transition: mount collapsed (opacity-0 scale-95), then flip to the settled state on
-  // the next frame so the CSS transition actually has something to animate from. Closing is an
-  // instant unmount (menuitemradios must not be tab-reachable while hidden).
+  // Shared "did this event happen outside the trigger/menu" check for both close-on-outside
+  // effects below (pointer taps and focus moving away via Tab).
+  const isOutside = useCallback((target: Node) => {
+    return !menuRef.current?.contains(target) && !triggerRef.current?.contains(target);
+  }, []);
+
+  // Entrance transition: mount collapsed (opacity-0 scale-95), then flip to the settled state
+  // two frames later so the CSS transition always has something to animate from — a single rAF
+  // can still land in the same paint as the initial styles on some browsers and get skipped.
+  // Closing is an instant unmount (menuitemradios must not be tab-reachable while hidden).
   useEffect(() => {
     if (!open) {
       setEntered(false);
       return;
     }
-    const raf = requestAnimationFrame(() => setEntered(true));
-    return () => cancelAnimationFrame(raf);
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setEntered(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
   }, [open]);
 
-  // Outside-tap close.
+  // Outside-tap close + tab-out close, sharing the isOutside check above.
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (event: PointerEvent) => {
-      const target = event.target as Node;
-      if (menuRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
-      setOpen(false);
+      if (isOutside(event.target as Node)) setOpen(false);
+    };
+    const onFocusIn = (event: FocusEvent) => {
+      if (isOutside(event.target as Node)) setOpen(false);
     };
     document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
-  }, [open]);
-
-  // Tab-out close (focus left the trigger/menu entirely).
-  useEffect(() => {
-    if (!open) return;
-    const onFocusIn = (event: FocusEvent) => {
-      const target = event.target as Node;
-      if (menuRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
-      setOpen(false);
-    };
     document.addEventListener('focusin', onFocusIn);
-    return () => document.removeEventListener('focusin', onFocusIn);
-  }, [open]);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('focusin', onFocusIn);
+    };
+  }, [open, isOutside]);
 
-  // Focus the currently-active option as soon as the popover opens.
+  // Focus the currently-active option as soon as the popover opens, and make it the sole
+  // roving-tabindex stop (the other two options become tabIndex=-1 — see the item map below).
   useEffect(() => {
     if (!open) return;
     const activeIndex = OPTIONS.findIndex((opt) => opt.value === pref);
-    itemRefs.current[activeIndex >= 0 ? activeIndex : 0]?.focus();
+    const index = activeIndex >= 0 ? activeIndex : 0;
+    setFocusedIndex(index);
+    itemRefs.current[index]?.focus();
   }, [open, pref]);
 
   if (!mounted) {
@@ -194,6 +204,7 @@ export function ThemeToggle() {
       const currentIndex = itemRefs.current.findIndex((el) => el === document.activeElement);
       const delta = event.key === 'ArrowDown' ? 1 : -1;
       const nextIndex = (currentIndex + delta + OPTIONS.length) % OPTIONS.length;
+      setFocusedIndex(nextIndex);
       itemRefs.current[nextIndex]?.focus();
     }
   };
@@ -220,7 +231,7 @@ export function ThemeToggle() {
             role="menu"
             aria-label="테마 선택"
             onKeyDown={handleMenuKeyDown}
-            className={`absolute right-0 top-full z-20 mt-2 min-w-[180px] origin-top-right rounded-2xl bg-surface p-1 shadow-lg transition duration-200 ease-out motion-reduce:scale-100 motion-reduce:transition-opacity ${
+            className={`absolute right-0 top-full z-20 mt-2 min-w-[180px] origin-top-right rounded-2xl bg-surface p-1 shadow-lg transition duration-200 ease-out motion-reduce:scale-100 motion-reduce:transition-opacity dark:border dark:border-border-strong ${
               entered ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
             }`}
           >
@@ -235,6 +246,8 @@ export function ThemeToggle() {
                   type="button"
                   role="menuitemradio"
                   aria-checked={active}
+                  tabIndex={focusedIndex === index ? 0 : -1}
+                  onFocus={() => setFocusedIndex(index)}
                   onClick={() => {
                     setPref(opt.value);
                     closeAndFocusTrigger();

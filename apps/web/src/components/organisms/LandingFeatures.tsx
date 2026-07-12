@@ -39,14 +39,14 @@ export function LandingFeatures() {
       <p className="text-center text-sm text-text-secondary">
         더 궁금하다면{' '}
         <Link
-          href={'/guide' as React.ComponentProps<typeof Link>['href']}
+          href="/guide"
           className="text-brand underline underline-offset-2 hover:text-brand-pressed"
         >
           사용 가이드
         </Link>
         나{' '}
         <Link
-          href={'/faq' as React.ComponentProps<typeof Link>['href']}
+          href="/faq"
           className="text-brand underline underline-offset-2 hover:text-brand-pressed"
         >
           자주 묻는 질문

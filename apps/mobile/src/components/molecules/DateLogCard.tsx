@@ -31,9 +31,10 @@ const DATE_BADGE_FG = '#FFFFFF';
 
 /**
  * One date-log entry in the home feed (docs/plan/09-mobile.md STEP 4) — mirrors
- * web `DateLogCard`, but RN primitives and no `Link` yet: the detail route
- * (`/logs/[id]`) doesn't exist until STEP 5, so this card is read-only display
- * for now (no `onPress`/navigation — STEP 5 wires that up once the route exists).
+ * web `DateLogCard`, but RN primitives. Stays a purely presentational molecule
+ * (no `onPress` of its own) — the caller (`(tabs)/home.tsx`) wraps it in a
+ * `Pressable` to navigate to `/logs/[id]` (STEP 5), keeping navigation a
+ * screen-level concern.
  */
 export function DateLogCard({ log }: DateLogCardProps) {
   const { colors } = useTheme();

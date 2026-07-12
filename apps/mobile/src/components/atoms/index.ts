@@ -8,3 +8,4 @@ export * from './Icon';
 export * from './Tag';
 export * from './HeartRating';
 export * from './CoverFallback';
+export * from './BackLink';
